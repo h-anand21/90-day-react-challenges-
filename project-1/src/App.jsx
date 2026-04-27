@@ -1,17 +1,13 @@
-import { useState } from 'react'
-
-import './App.css'
-
-function App() {
- 
-
+import './App.css';
+import HeroSection from './components/HeroSection';
+import Navigation from './components/Navigation';
+const App = () => {
   return (
-   <div>
-    <nav>
-      <div className=""></div>
-    </nav>
-   </div>
-  )
-}
+    <div>
+      <Navigation />
+      <HeroSection />
+    </div>
+  );
+};
 
-export default App
+export default App;
