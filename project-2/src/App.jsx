@@ -1,15 +1,19 @@
-import { useState } from 'react'
+import Navigation from './components/Navigation/Navigation';
 
-import './App.css'
+import './App.css';
+import ContactHeader from './components/ContactHeader/ContactHeader';
+import ContactForm from './components/ContactFrom/ContactFrom';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-   <div>
-    
-   </div>
-  )
+    <div>
+      <Navigation />
+      <main className="main_container">
+        <ContactHeader />
+        <ContactForm />
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
