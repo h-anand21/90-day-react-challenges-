@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 export default function ChannelInfo({ channel }) {
   const info = channel?.info || {};
