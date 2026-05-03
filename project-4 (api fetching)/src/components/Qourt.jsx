@@ -1,26 +1,32 @@
 import QuoteCard from './QuoteCard';
 
 function Qourt({ quotes, error, loading, onLoadMore }) {
+  const currentQuote = quotes[0];
+
   return (
     <section className="quotes-panel">
       <header className="quotes-header">
-        <p className="eyebrow">Daily inspiration</p>
-        <h1>Quotes</h1>
-        <p className="intro">
-          Short lines, clear authors, and a button to load more when you want
-          another one.
-        </p>
+        <p className="eyebrow">Daily Inspiration</p>
+        <h1>Code Quotes</h1>
       </header>
 
       {error ? <p className="status error">{error}</p> : null}
 
       <div className="quotes-list">
-        {quotes.map((quote) => (
-          <QuoteCard
-            key={quote._id ?? `${quote.author}-${quote.content}`}
-            quote={quote}
-          />
-        ))}
+        {currentQuote ? (
+          <QuoteCard quote={currentQuote} />
+        ) : loading ? (
+          <div className="mac-window loading-window">
+            <div className="mac-header">
+              <div className="mac-dots">
+                <span className="dot red"></span>
+                <span className="dot yellow"></span>
+                <span className="dot green"></span>
+              </div>
+            </div>
+            <div className="mac-body">Compiling next quote...</div>
+          </div>
+        ) : null}
       </div>
 
       <div className="actions">
@@ -30,7 +36,7 @@ function Qourt({ quotes, error, loading, onLoadMore }) {
           onClick={onLoadMore}
           disabled={loading}
         >
-          {loading ? 'Loading quotes...' : 'Show more quotes'}
+          {loading ? 'Running...' : 'Run Next Quote'}
         </button>
       </div>
     </section>

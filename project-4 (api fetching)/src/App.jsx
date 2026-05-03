@@ -18,7 +18,7 @@ function App() {
 
       try {
         const response = await fetch(
-          `https://api.freeapi.app/api/v1/public/quotes?page=${page}&limit=20`,
+          `https://api.freeapi.app/api/v1/public/quotes?page=${page}&limit=1`,
           {
             method: 'GET',
             headers: { accept: 'application/json' },
@@ -26,15 +26,11 @@ function App() {
           },
         );
 
-        // if (!response.ok) {
-        //   throw new Error('Failed to fetch quotes.');
-        // }
-
         const data = await response.json();
         const nextQuotes = data?.data?.data ?? [];
 
         if (isActive) {
-          setQuotes((currentQuotes) => [...currentQuotes, ...nextQuotes]);
+          setQuotes(nextQuotes);
         }
       } catch (error) {
         if (error.name !== 'AbortError' && isActive) {
