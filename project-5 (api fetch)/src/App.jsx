@@ -1,62 +1,55 @@
 import { useEffect, useState } from 'react';
+import Header from './components/Header';
+import ChannelInfo from './components/ChannelInfo';
+import VideoList from './components/VideoList';
+import './styles.css';
 
 function App() {
   const [data, setData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await fetch(
-        'https://api.freeapi.app/api/v1/public/youtube/playlists/PLRAV69dS1uWSx4erHGq8hW_GE-Eaj60r-',
-      );
-      const result = await res.json();
-
-       console.log(result);
-      setData(result.data);
+      try {
+        const [channelRes, playlistsRes] = await Promise.all([
+          fetch('https://api.freeapi.app/api/v1/public/youtube/playlists/PLRAV69dS1uWSx4erHGq8hW_GE-Eaj60r-'),
+          fetch('https://api.freeapi.app/api/v1/public/youtube/playlists')
+        ]);
+        
+        const channelResult = await channelRes.json();
+        const playlistsResult = await playlistsRes.json();
+        
+        setData({
+          channel: channelResult.data.channel,
+          playlists: playlistsResult.data.data
+        });
+      } catch (err) {
+        console.error(err);
+      }
     };
 
     fetchData();
   }, []);
 
-  if (!data) return <h2>Loading...</h2>;
+  if (!data) return <div className="loader">Loading...</div>;
 
   return (
-    <>
-      {/* ✅ 1. Channel Info */}
-      <h1>Channel: {data.channel?.info?.title}</h1>
-
-      {/* ✅ Localized */}
-      <p>Localized Title: {data.channel?.info?.localized?.title}</p>
-
-      {/* ✅ Statistics */}
-      <p>Subscribers: {data.channel?.statistics?.subscriberCount}</p>
-      <p>Videos: {data.channel?.statistics?.videoCount}</p>
-      <p>Views: {data.channel?.statistics?.viewCount}</p>
-
-      <hr />
-
-      {/* ✅ 2. Playlist Info */}
-      <h2>{data.playlist?.snippet?.title}</h2>
-      <p>{data.playlist?.snippet?.description}</p>
-
-      <p>Playlist Localized: {data.playlist?.snippet?.localized?.title}</p>
-
-      <hr />
-
-      {/* ✅ Videos (map) */}
-      {data.playlistItems?.map((item) => (
-        <div key={item.id} style={{ marginBottom: '20px' }}>
-          <h3>{item.snippet?.title}</h3>
-          <p>{item.snippet?.description}</p>
-
-          <a
-            href={`https://www.youtube.com/watch?v=${item.snippet?.resourceId?.videoId}`}
-            target="_blank"
-          >
-            ▶ Watch Video
-          </a>
+    <div className="app fade-in">
+      <Header title={data.channel?.info?.title || 'Channel'} />
+      <main className="container">
+        <ChannelInfo channel={data.channel} />
+        
+        <div className="section-header slide-up">
+          <h2 style={{ marginTop: '30px', marginBottom: '10px', fontSize: '1.6rem', color: 'var(--text)' }}>
+            All Playlists
+          </h2>
+          <p style={{ color: 'var(--muted)', marginBottom: '20px' }}>
+            Explore all the curated playlists from the channel
+          </p>
         </div>
-      ))}
-    </>
+
+        <VideoList items={data.playlists || []} />
+      </main>
+    </div>
   );
 }
 
