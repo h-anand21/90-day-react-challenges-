@@ -1,37 +1,41 @@
-// import './JokeCard.css';
+import './JokeCard.css';
 
-// function JokeCard({ joke, loading, onFetchJoke }) {
-//   return (
-//     <section className="joke-card">
-//       <h2 className="joke-card__title">Random Joke</h2>
+function JokeCard({ joke, loading, onFetchJoke }) {
+  return (
+    <section className="joke-card">
+      <div className="joke-card__topbar" />
 
-//       <div className="joke-card__panel">
-//         <div className="joke-card__panel-content">
-//           {loading && <div className="joke-card__loading">Loading...</div>}
+      <h2 className="joke-card__title">Random Joke</h2>
 
-//           {!loading && joke && (
-//             <p className="joke-card__text">{joke.content}</p>
-//           )}
+      <div className="joke-card__panel">
+        <div className="joke-card__panel-content">
+          {loading && <div className="joke-card__loading">Loading...</div>}
 
-//           {!loading && !joke && (
-//             <div className="joke-card__empty">
-//               No joke yet — click the button.
-//             </div>
-//           )}
-//         </div>
+          {!loading && joke && (
+            <p className="joke-card__text">{joke.content}</p>
+          )}
 
-//         <div className="joke-card__panel-actions">
-//           <button
-//             className="joke-card__button"
-//             onClick={onFetchJoke}
-//             disabled={loading}
-//           >
-//             {loading ? 'Loading...' : 'Get New Joke'}
-//           </button>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
+          {!loading && !joke && (
+            <div className="joke-card__empty">
+              No joke yet — click the button.
+            </div>
+          )}
+        </div>
 
-// export default JokeCard;
+        <div className="joke-card__panel-actions">
+          <button
+            className="joke-card__button"
+            onClick={onFetchJoke}
+            disabled={loading}
+          >
+            {loading ? 'Loading...' : 'Get New Joke'}
+          </button>
+        </div>
+      </div>
+
+      <div className="joke-card__bottombar" />
+    </section>
+  );
+}
+
+export default JokeCard;

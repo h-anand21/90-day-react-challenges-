@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import './App.css';
+import JokeCard from './components/JokeCard/JokeCard';
 
 function App() {
   const [joke, setJoke] = useState(null);
@@ -11,7 +12,7 @@ function App() {
       setLoading(true);
 
       const res = await axios.get(
-        'https://api.freeapi.app/api/v1/public/randomjokes'
+        'https://api.freeapi.app/api/v1/public/randomjokes',
       );
 
       // 👇 IMPORTANT CHANGE HERE
@@ -35,19 +36,7 @@ function App() {
 
   return (
     <div>
-      <h1>Random Joke</h1>
-
-      {loading && <p>Loading...</p>}
-
-      {!loading && joke && (
-        <div className="card">
-          <p>{joke.content}</p>
-        </div>
-      )}
-
-      <button onClick={fetchJoke} disabled={loading}>
-        {loading ? 'Loading...' : 'Get New Joke'}
-      </button>
+      <JokeCard joke={joke} loading={loading} onFetchJoke={fetchJoke} />
     </div>
   );
 }

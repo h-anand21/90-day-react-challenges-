@@ -1,4 +1,4 @@
-/* body {
+body {
   margin: 0;
   min-width: 320px;
   font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -51,4 +51,4 @@ select {
 img {
   display: block;
   max-width: 100%;
-} */
+}
