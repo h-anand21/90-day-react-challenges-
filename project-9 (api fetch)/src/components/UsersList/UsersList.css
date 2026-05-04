@@ -1,0 +1,47 @@
+.users-list {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.users-list__header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.users-list__header h2 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  color: #fffefc;
+}
+
+.users-list__count {
+  margin: 0;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.users-list__container {
+  display: grid;
+  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}
+
+.users-list__loading,
+.users-list__empty {
+  text-align: center;
+  padding: 2rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .users-list {
+    padding: 1.5rem 1rem;
+  }
+
+  .users-list__container {
+    grid-template-columns: 1fr;
+  }
+}
