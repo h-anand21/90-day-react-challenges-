@@ -14,7 +14,7 @@
 
 .meals-sidebar__title {
   margin: 0 0 20px 0;
-  color: var(--text-main);
+  color: var(--cherry);
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: -0.5px;
@@ -48,7 +48,7 @@
 }
 
 .meals-sidebar__input::placeholder {
-  color: rgba(117, 7, 12, 0.4);
+  color: var(--muted);
 }
 
 .meals-sidebar__actions {
@@ -75,18 +75,19 @@
 .meals-sidebar__btn:hover {
   background: var(--butter);
   border-color: var(--cherry);
+  color: var(--cherry);
   transform: translateY(-2px);
 }
 
 .meals-sidebar__btn--all {
   background: var(--olive);
-  color: var(--butter);
+  color: #fff;
   border-color: var(--olive);
 }
 
 .meals-sidebar__btn--all:hover {
-  background: #3c4f10;
-  color: var(--butter);
+  background: #3c4f10; /* darker olive */
+  color: #fff;
   box-shadow: 0 4px 12px rgba(79, 104, 21, 0.3);
   border-color: #3c4f10;
 }
@@ -100,7 +101,6 @@
   padding-right: 8px;
 }
 
-/* Custom scrollbar */
 .meals-sidebar__list::-webkit-scrollbar {
   width: 6px;
 }

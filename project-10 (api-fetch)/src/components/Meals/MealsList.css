@@ -23,7 +23,7 @@
   border-radius: 12px;
   border: 1px solid var(--border-color);
   cursor: pointer;
-  background: var(--card-bg);
+  background: #fff;
   color: var(--cherry);
   font-size: 1rem;
   font-weight: 600;
@@ -34,8 +34,9 @@
 .meals-list__btn:hover {
   background: var(--butter);
   border-color: var(--cherry);
+  color: var(--cherry);
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(117, 7, 12, 0.1);
+  box-shadow: 0 8px 24px rgba(117, 7, 12, 0.15);
 }
 
 .meals-list__btn:active {

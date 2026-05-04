@@ -3,7 +3,7 @@
   padding: 30px;
   border-radius: 24px;
   background: var(--card-bg);
-  box-shadow: 0 20px 40px rgba(117, 7, 12, 0.08);
+  box-shadow: 0 20px 40px rgba(117, 7, 12, 0.05);
   animation: fadeIn 0.5s ease-out;
 }
 
@@ -53,18 +53,18 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  color: var(--cherry);
+  color: var(--text-main);
   margin-bottom: 24px;
 }
 
 .meal-detail__meta span {
-  background: var(--butter);
+  background: rgba(117, 7, 12, 0.08);
   color: var(--cherry);
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 0.9rem;
   font-weight: 600;
-  border: 1px solid rgba(117, 7, 12, 0.1);
+  border: 1px solid rgba(117, 7, 12, 0.15);
 }
 
 .meal-detail__tags {
@@ -76,18 +76,18 @@
 
 .meal-detail__tags .tag {
   background: var(--oat);
-  color: var(--olive);
+  color: var(--text-main);
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 0.85rem;
+  border: 1px solid var(--border-color);
   font-weight: 500;
-  border: 1px solid rgba(79, 104, 21, 0.2);
 }
 
 .meal-detail__back-btn {
   align-self: flex-start;
   margin-bottom: 24px;
-  background: var(--oat);
+  background: #fff;
   border: 1px solid var(--border-color);
   color: var(--cherry);
   padding: 10px 20px;
@@ -96,12 +96,13 @@
   transition: all 0.2s;
   font-weight: 600;
   font-size: 0.95rem;
+  box-shadow: 0 4px 10px rgba(117, 7, 12, 0.05);
 }
 
 .meal-detail__back-btn:hover {
   background: var(--butter);
-  transform: translateX(-4px);
   border-color: var(--cherry);
+  transform: translateX(-4px);
 }
 
 .meal-detail__content {
@@ -123,6 +124,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  font-weight: 700;
 }
 
 .meal-detail__section-title::before {
@@ -135,7 +137,7 @@
 }
 
 .meal-detail__instructions {
-  color: var(--cherry);
+  color: var(--text-main);
   line-height: 1.8;
   font-size: 1.05rem;
   background: var(--oat);
@@ -158,8 +160,9 @@
   background: var(--oat);
   padding: 14px 18px;
   border-radius: 12px;
-  color: var(--cherry);
+  color: var(--text-main);
   font-size: 0.95rem;
+  font-weight: 500;
   display: flex;
   align-items: center;
   border: 1px solid var(--border-color);
@@ -168,8 +171,9 @@
 
 .meal-detail__ingredients li:hover {
   background: var(--butter);
+  color: var(--cherry);
   transform: translateX(4px);
-  border-color: var(--cherry);
+  border-color: rgba(117, 7, 12, 0.2);
 }
 
 .meal-detail__ingredients li::before {
@@ -177,5 +181,5 @@
   margin-right: 12px;
   color: var(--olive);
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }

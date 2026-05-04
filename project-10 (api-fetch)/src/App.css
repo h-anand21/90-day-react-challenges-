@@ -1,16 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
+/* Global app styles: elegant light theme with Butter, Cherry, Olive, Oat */
 :root {
-  --oat: #F0E6DA;
   --butter: #FFEDAB;
   --cherry: #75070C;
   --olive: #4F6815;
+  --oat: #F0E6DA;
 
   --bg-main: var(--oat);
-  --card-bg: #fff;
-  --text-main: var(--cherry);
-  --text-muted: var(--olive);
-  --border-color: rgba(117, 7, 12, 0.1); /* Cherry low opacity */
+  --card-bg: #FFFFFF;
+  --text-main: #2d2422;
+  --muted: rgba(45, 36, 34, 0.6);
+  --border-color: rgba(117, 7, 12, 0.1); /* Cherry tint */
+  --accent: var(--cherry);
 }
 
 * {
@@ -20,8 +22,9 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
   background: var(--bg-main);
+  background-attachment: fixed;
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -38,7 +41,7 @@ body {
 
 main {
   flex: 1;
-  min-width: 0;
+  min-width: 0; /* Prevents overflow in flex child */
   animation: fadeIn 0.6s ease-out;
 }
 
@@ -47,6 +50,7 @@ main {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* responsive tweaks */
 @media (max-width: 880px) {
   .meals-app {
     flex-direction: column;
@@ -69,6 +73,7 @@ main {
 }
 .category-filter-container::-webkit-scrollbar-track {
   background: transparent;
+  border-radius: 10px;
 }
 .category-filter-container::-webkit-scrollbar-thumb {
   background: rgba(117, 7, 12, 0.15);
@@ -86,22 +91,21 @@ main {
   color: var(--text-main);
   cursor: pointer;
   white-space: nowrap;
-  font-weight: 600;
+  font-weight: 500;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(117, 7, 12, 0.05);
+  box-shadow: 0 2px 8px rgba(117, 7, 12, 0.05);
 }
 
 .category-filter-btn:hover {
   background: var(--butter);
+  color: var(--cherry);
   border-color: var(--cherry);
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(117, 7, 12, 0.1);
 }
 
 .category-filter-btn.active {
   background: var(--cherry);
-  color: var(--butter);
+  color: #fff;
   border-color: var(--cherry);
-  box-shadow: 0 6px 15px rgba(117, 7, 12, 0.2);
+  box-shadow: 0 4px 12px rgba(117, 7, 12, 0.3);
 }
-
