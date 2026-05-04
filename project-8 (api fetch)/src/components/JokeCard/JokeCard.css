@@ -1,0 +1,91 @@
+/* .joke-card {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 1.5rem;
+  border-radius: 16px;
+  background: rgba(10, 12, 14, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 22px 50px rgba(2, 6, 12, 0.55);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  box-sizing: border-box;
+}
+
+.joke-card__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 4vw, 2.6rem);
+  font-weight: 800;
+  text-align: center;
+  color: #fffefc;
+}
+
+.joke-card__panel {
+  width: 100%;
+  max-width: 640px;
+  border-radius: 12px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 2px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.joke-card__panel-content {
+  width: 100%;
+  max-height: 180px;
+  overflow: auto;
+  padding: 6px 8px;
+  color: #fffefc;
+  text-align: center;
+  line-height: 1.6;
+  word-break: break-word;
+}
+
+.joke-card__panel-actions {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.joke-card__button {
+  background-color: #ff7a59;
+  border: none;
+  color: #0b1020;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    filter 120ms ease,
+    box-shadow 120ms ease;
+  box-shadow: 0 8px 20px rgba(255, 122, 89, 0.12);
+}
+
+.joke-card__button:hover:not(:disabled) {
+  filter: brightness(0.97);
+}
+
+.joke-card__button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 520px) {
+  .joke-card {
+    padding: 0.8rem;
+  }
+  .joke-card__panel-content {
+    max-height: 140px;
+  }
+  .joke-card__title {
+    font-size: 1.3rem;
+  }
+} */
