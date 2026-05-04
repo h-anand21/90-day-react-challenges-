@@ -1,0 +1,43 @@
+.meals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.meals-list__grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.meals-list__actions {
+  margin-top: 32px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px 0;
+}
+
+.meals-list__btn {
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  background: var(--card-bg);
+  color: var(--cherry);
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(117, 7, 12, 0.05);
+}
+
+.meals-list__btn:hover {
+  background: var(--butter);
+  border-color: var(--cherry);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(117, 7, 12, 0.1);
+}
+
+.meals-list__btn:active {
+  transform: translateY(0);
+}
