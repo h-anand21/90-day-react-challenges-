@@ -15,20 +15,7 @@ body {
   justify-content: center;
   padding: 2rem 1rem;
 }
-    Inter,
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
-  /* warm page gradient (not blue/purple) */
-  background: linear-gradient(120deg, #081007 0%, #3a2618 45%, #ff7a18 100%);
-  color: #f8fafc;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  min-height: 100vh;
-  padding: 2rem;
-}
+
 
 #root {
   min-height: 100vh;
