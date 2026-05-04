@@ -21,7 +21,8 @@
 
 body {
   margin: 0;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   font-family: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
   background: var(--bg-main);
   background-attachment: fixed;
@@ -32,6 +33,7 @@ body {
 
 .meals-app {
   max-width: 1400px;
+  height: 100vh;
   margin: 0 auto;
   display: flex;
   gap: 32px;
@@ -42,6 +44,9 @@ body {
 main {
   flex: 1;
   min-width: 0; /* Prevents overflow in flex child */
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 64px);
   animation: fadeIn 0.6s ease-out;
 }
 
@@ -61,6 +66,7 @@ main {
 
 /* Category Filters */
 .category-filter-container {
+  flex-shrink: 0;
   display: flex;
   gap: 12px;
   overflow-x: auto;

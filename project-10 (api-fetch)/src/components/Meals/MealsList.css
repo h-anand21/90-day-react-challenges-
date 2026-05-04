@@ -2,6 +2,24 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+/* Custom scrollbar for meals-list */
+.meals-list::-webkit-scrollbar {
+  width: 8px;
+}
+.meals-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.meals-list::-webkit-scrollbar-thumb {
+  background: rgba(117, 7, 12, 0.15);
+  border-radius: 10px;
+}
+.meals-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(117, 7, 12, 0.3);
 }
 
 .meals-list__grid {
