@@ -24,7 +24,11 @@ function App() {
   };
 
   useEffect(() => {
-    fetchCat();
+    const id = setTimeout(() => {
+      fetchCat();
+    }, 0);
+
+    return () => clearTimeout(id);
   }, []);
 
   return (
