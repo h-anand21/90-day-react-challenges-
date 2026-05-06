@@ -7,7 +7,11 @@ export const Route = createFileRoute('/')({
 });
 
 function Login() {
-  const { register, handleSubmit } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
 
   const navigate = useNavigate();
 
@@ -24,14 +28,36 @@ function Login() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <h2>Login</h2>
+    <div className="form-container">
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <h2>Login</h2>
 
-      <input {...register('username')} placeholder="Username" />
+        <div className="form-group">
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            {...register('username', { required: 'Username is required' })}
+            placeholder="Enter your username"
+          />
+          {errors.username && <span className="error-message">{errors.username.message}</span>}
+        </div>
 
-      <input {...register('password')} type="password" placeholder="Password" />
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            {...register('password', {
+              required: 'Password is required',
+              minLength: { value: 6, message: 'Password must be at least 6 characters' },
+            })}
+            type="password"
+            placeholder="Enter your password"
+          />
+          {errors.password && <span className="error-message">{errors.password.message}</span>}
+        </div>
 
-      <button type="submit">Login</button>
-    </form>
+        <button type="submit">Login</button>
+      </form>
+    </div>
   );
 }
