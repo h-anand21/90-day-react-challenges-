@@ -11,8 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as IndexRouteImport } from './routes/Index'
-import { Route as AboutRouteImport } from './routes/About'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as IndexRouteImport } from './routes/index'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -24,47 +24,47 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/Index',
-  path: '/Index',
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/About',
-  path: '/About',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/About': typeof AboutRoute
-  '/Index': typeof IndexRoute
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
 }
 export interface FileRoutesByTo {
-  '/About': typeof AboutRoute
-  '/Index': typeof IndexRoute
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/About': typeof AboutRoute
-  '/Index': typeof IndexRoute
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/About' | '/Index' | '/profile' | '/register'
+  fullPaths: '/' | '/about' | '/profile' | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/About' | '/Index' | '/profile' | '/register'
-  id: '__root__' | '/About' | '/Index' | '/profile' | '/register'
+  to: '/' | '/about' | '/profile' | '/register'
+  id: '__root__' | '/' | '/about' | '/profile' | '/register'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AboutRoute: typeof AboutRoute
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
 }
@@ -85,26 +85,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/Index': {
-      id: '/Index'
-      path: '/Index'
-      fullPath: '/Index'
-      preLoaderRoute: typeof IndexRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/About': {
-      id: '/About'
-      path: '/About'
-      fullPath: '/About'
-      preLoaderRoute: typeof AboutRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  AboutRoute: AboutRoute,
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
 }
