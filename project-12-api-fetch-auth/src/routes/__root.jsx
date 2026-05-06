@@ -1,4 +1,5 @@
-import { Outlet, Link, createRootRoute } from '@tanstack/react-router';
+import { Outlet, createRootRoute } from '@tanstack/react-router';
+import './routes.css';
 
 export const Route = createRootRoute({
   component: RootLayout,
@@ -7,13 +8,6 @@ export const Route = createRootRoute({
 function RootLayout() {
   return (
     <div>
-      <nav>
-        <Link to="/">Login</Link> | {' '}
-        <Link to="/register">Register</Link> |{' '}
-        <Link to="/profile">Profile</Link>
-      </nav>
-      <hr />
-
       <Outlet />
     </div>
   );
