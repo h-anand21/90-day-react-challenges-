@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   backend:
     build: ./backend
@@ -15,6 +13,9 @@ services:
     env_file:
       - ./backend/.env
 
+    networks:
+      - trip_net
+
   frontend:
     build: ./frontend
     container_name: trip_frontend
@@ -25,3 +26,13 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+
+    depends_on:
+      - backend
+
+    networks:
+      - trip_net
+
+networks:
+  trip_net:
+    driver: bridge
