@@ -14,6 +14,7 @@ const schema = z.object({
   description: z.string().max(500).optional(),
   totalBudget: z.coerce.number().min(0).optional(),
   currency: z.string().max(3).default('USD'),
+  status: z.enum(['planning', 'upcoming', 'ongoing', 'completed', 'cancelled']).default('planning'),
 }).refine((d) => new Date(d.endDate) >= new Date(d.startDate), {
   message: 'End date must be on or after start date',
   path: ['endDate'],
@@ -22,7 +23,7 @@ const schema = z.object({
 export default function CreateTripModal({ onClose, onCreated }) {
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
-    defaultValues: { currency: 'USD', totalBudget: 0 },
+    defaultValues: { currency: 'USD', totalBudget: 0, status: 'planning' },
   });
 
   const onSubmit = async (data) => {
@@ -91,6 +92,18 @@ export default function CreateTripModal({ onClose, onCreated }) {
                   <option value="JPY">JPY</option>
                 </select>
               </div>
+            </div>
+
+            {/* Status */}
+            <div className="form-group">
+              <label className="label">Status</label>
+              <select className="input" {...register('status')}>
+                <option value="planning">Planning (Draft)</option>
+                <option value="upcoming">Upcoming (Confirmed)</option>
+                <option value="ongoing">Ongoing (Right now)</option>
+                <option value="completed">Completed (History)</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
             </div>
 
             {/* Description */}
