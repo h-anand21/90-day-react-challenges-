@@ -1,0 +1,9 @@
+[build]
+  base = "project-13 -with-backend/Frontend"
+  publish = "dist"
+  command = "npm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
