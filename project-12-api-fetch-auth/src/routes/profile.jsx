@@ -32,16 +32,28 @@ function Profile() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const userData = authService.currentUser();
+useEffect(() => {
+  const getCurrentUser = async () => {
+    try {
+      const userData = await authService.currentUser();
 
-    if (!userData) {
+      console.log(userData);
+
+      if (!userData) {
+        navigate({ to: '/' });
+        return;
+      }
+
+      setUser(userData);
+    } catch (error) {
+      console.log(error);
+
       navigate({ to: '/' });
-      return;
     }
+  };
 
-    setUser(userData);
-  }, []);
+  getCurrentUser();
+}, [navigate]);
 
   const handleLogout = async () => {
     try {
