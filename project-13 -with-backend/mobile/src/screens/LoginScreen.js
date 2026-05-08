@@ -1,0 +1,86 @@
+import React, { useState } from 'react';
+import { View, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { Text } from '../components/Typography';
+import { Button } from '../components/Button';
+import { Input } from '../components/Input';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '../context/AuthContext';
+import { LogIn } from 'lucide-react-native';
+
+export default function LoginScreen({ navigation }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  
+  const { login } = useAuth();
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      return;
+    }
+    
+    setLoading(true);
+    setError('');
+    
+    const result = await login(email, password);
+    
+    if (!result.success) {
+      setError(result.message);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-surface">
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+      >
+        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24 }}>
+          <View className="mb-10 items-center">
+            <View className="w-16 h-16 bg-brand-500 rounded-2xl items-center justify-center mb-4">
+              <LogIn color="white" size={32} />
+            </View>
+            <Text variant="h1">Welcome Back</Text>
+            <Text variant="secondary">Login to your TripSync account</Text>
+          </View>
+
+          <View className="mb-6">
+            <Input 
+              label="Email Address"
+              placeholder="name@example.com"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
+            <Input 
+              label="Password"
+              placeholder="••••••••"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+              error={error}
+            />
+          </View>
+
+          <Button 
+            title="Login" 
+            onPress={handleLogin} 
+            loading={loading}
+            className="mb-6"
+          />
+          
+          <View className="flex-row justify-center">
+            <Text variant="secondary">Don't have an account? </Text>
+            <Text 
+              variant="brand" 
+              onPress={() => navigation.navigate('Signup')}
+            >Sign Up</Text>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}

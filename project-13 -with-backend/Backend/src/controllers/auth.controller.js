@@ -27,12 +27,13 @@ export const register = async (req, res) => {
     const user = await User.create({ name, email, password });
 
     // 4. Issue cookie
-    sendTokenCookie(res, user._id);
+    const token = sendTokenCookie(res, user._id);
 
     return res.status(201).json({
       success: true,
       message: 'Account created successfully',
       user,
+      token,
     });
   } catch (error) {
     console.error('[register]', error);
@@ -68,12 +69,13 @@ export const login = async (req, res) => {
     }
 
     // 4. Issue cookie
-    sendTokenCookie(res, user._id);
+    const token = sendTokenCookie(res, user._id);
 
     return res.status(200).json({
       success: true,
       message: 'Login successful',
       user,
+      token,
     });
   } catch (error) {
     console.error('[login]', error);

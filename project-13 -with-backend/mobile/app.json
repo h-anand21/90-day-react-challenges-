@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "TripSync",
+    "slug": "tripsync-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#111111"
+      }
+    },
+    "extra": {
+      "apiUrl": "https://tripsync-backend-9mle.onrender.com/api"
+    }
+  }
+}
