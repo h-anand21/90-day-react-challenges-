@@ -5,14 +5,14 @@ import {
 } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Curated Firebase credentials extracted securely from google-services.json
+// Curated Firebase credentials extracted securely from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyCJEeWVzIqUUtxaGMCmYLndCKxnjIYAtno",
-  authDomain: "tripsync-e8f1e.firebaseapp.com",
-  projectId: "tripsync-e8f1e",
-  storageBucket: "tripsync-e8f1e.firebasestorage.app",
-  messagingSenderId: "830478854843",
-  appId: "1:830478854843:android:1ee85d30882ff29bf0579e"
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID
 };
 
 // Initialize Firebase App
