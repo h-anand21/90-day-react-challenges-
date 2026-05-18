@@ -4,6 +4,7 @@ import TripMember from '../models/TripMember.js';
 import TripDay from '../models/TripDay.js';
 import { createTripSchema, updateTripSchema } from '../validations/trip.validation.js';
 import { differenceInCalendarDays, addDays } from '../utils/dateHelpers.js';
+import { fetchDestinationImage } from '../utils/imageSearch.js';
 
 // ─── POST /api/trips ───────────────────────────────────────────────────────
 export const createTrip = async (req, res) => {
@@ -17,7 +18,8 @@ export const createTrip = async (req, res) => {
       });
     }
 
-    const tripData = { ...parsed.data, owner: req.user._id };
+    const coverImage = await fetchDestinationImage(parsed.data.destination);
+    const tripData = { ...parsed.data, coverImage, owner: req.user._id };
     const trip = await Trip.create(tripData);
 
     // Auto-create owner membership
@@ -114,7 +116,12 @@ export const updateTrip = async (req, res) => {
       });
     }
 
-    const trip = await Trip.findByIdAndUpdate(req.params.tripId, parsed.data, {
+    const updateData = { ...parsed.data };
+    if (parsed.data.destination) {
+      updateData.coverImage = await fetchDestinationImage(parsed.data.destination);
+    }
+
+    const trip = await Trip.findByIdAndUpdate(req.params.tripId, updateData, {
       new: true,
       runValidators: true,
     });

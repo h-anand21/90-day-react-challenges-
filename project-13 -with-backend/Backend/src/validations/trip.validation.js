@@ -12,6 +12,7 @@ const baseTripSchema = z.object({
   endDate: z.coerce.date({ required_error: 'End date is required' }),
   totalBudget: z.coerce.number().min(0).optional().default(0),
   currency: z.string().max(3).optional().default('USD'),
+  status: z.enum(['planning', 'upcoming', 'ongoing', 'completed', 'cancelled']).optional().default('planning'),
   isPublic: z.boolean().optional().default(false),
   tags: z.array(z.string().trim()).optional().default([]),
 });

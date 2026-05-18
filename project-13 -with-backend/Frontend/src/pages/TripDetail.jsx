@@ -77,7 +77,7 @@ export default function TripDetailPage() {
         {[
           { label: 'Duration', value: `${days} days`, icon: Calendar },
           { label: 'Members', value: members.length, icon: Users },
-          { label: 'Budget', value: `${trip.currency} ${(trip.totalBudget || 0).toLocaleString()}`, icon: DollarSign },
+          { label: 'Budget', value: `₹${(trip.totalBudget || 0).toLocaleString()}`, icon: DollarSign },
         ].map(({ label, value, icon: Icon }) => (
           <div key={label} className="trip-stat-chip">
             <Icon size={14} />

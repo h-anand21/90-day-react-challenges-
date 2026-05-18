@@ -14,6 +14,9 @@ import reservationRoutes from './routes/reservation.routes.js';
 
 const app = express();
 
+// Trust proxy for deployed environments (Render, Heroku, etc.)
+app.set('trust proxy', 1);
+
 // ─── Security ─────────────────────────────────────────────────────────────────
 app.use(helmet());
 
@@ -24,10 +27,12 @@ app.use(
   }),
 );
 
+const isDev = process.env.NODE_ENV !== 'production';
+
 app.use(
   rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 200,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: isDev ? 100000 : 150, // 100,000 requests in dev (unlimited), 150 requests in production (secure)
     standardHeaders: true,
     legacyHeaders: false,
     message: { success: false, message: 'Too many requests, please try again later.' },

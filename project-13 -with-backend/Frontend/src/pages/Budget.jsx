@@ -190,7 +190,7 @@ export default function BudgetPage() {
                   {exp.notes && ` · ${exp.notes}`}
                 </span>
               </div>
-              <span className="expense-item__amount">{exp.currency} {exp.amount.toLocaleString()}</span>
+              <span className="expense-item__amount">₹{exp.amount.toLocaleString()}</span>
               {canEdit && (
                 <button className="activity-item__del" onClick={() => delMut.mutate(exp._id)}><Trash2 size={13} /></button>
               )}

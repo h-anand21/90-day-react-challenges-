@@ -1,6 +1,7 @@
 import User from '../models/User.js';
 import { registerSchema, loginSchema } from '../validations/auth.validation.js';
 import { sendTokenCookie, clearTokenCookie } from '../utils/jwt.js';
+import { verifyFirebaseToken } from '../utils/firebaseAuth.js';
 
 // ─── POST /api/auth/register ───────────────────────────────────────────────
 export const register = async (req, res) => {
@@ -92,4 +93,44 @@ export const logout = (req, res) => {
 // ─── GET /api/auth/me ──────────────────────────────────────────────────────
 export const getMe = async (req, res) => {
   return res.status(200).json({ success: true, user: req.user });
+};
+
+// ─── POST /api/auth/firebase ───────────────────────────────────────────────
+export const firebaseAuth = async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ success: false, message: 'Firebase token is required' });
+    }
+
+    // 1. Cryptographically verify the client's Firebase token
+    const decoded = await verifyFirebaseToken(token);
+    const email = decoded.email;
+    const name = decoded.name || email.split('@')[0];
+
+    // 2. Find or automatically create user in MongoDB matching verified email
+    let user = await User.findOne({ email });
+    if (!user) {
+      console.log(`[Firebase Auth] Registering new MongoDB user document for email: "${email}"`);
+      // Since passwords are managed by Firebase, satisfy MongoDB schema with secure random hash fallback
+      user = await User.create({
+        name,
+        email,
+        password: Math.random().toString(36).slice(-10) + 'A1!',
+      });
+    }
+
+    // 3. Issue our backend session cookie + JWT token just like normal login!
+    const backendToken = sendTokenCookie(res, user._id);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Authentication successful',
+      user,
+      token: backendToken,
+    });
+  } catch (error) {
+    console.error('[firebaseAuth Controller Error]', error);
+    return res.status(401).json({ success: false, message: error.message || 'Authentication failed' });
+  }
 };
