@@ -333,21 +333,7 @@ export default function TripBudgetScreen({ route, navigation }) {
             )}
           </View>
 
-          {/* Budget Notes */}
-          <View style={{ marginBottom: 40 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <FileText size={18} color={THEME.brand} style={{ marginRight: 8 }} />
-                <Text style={{ color: '#fff', fontWeight: 'bold' }}>Budget Notes</Text>
-              </View>
-              <Edit2 size={16} color="#aaa" />
-            </View>
-            <View style={{ backgroundColor: THEME.surface, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: THEME.border }}>
-              <Text style={{ color: '#ccc', fontSize: 12, lineHeight: 18 }}>
-                {trip.description || "No notes added for this trip's budget yet."}
-              </Text>
-            </View>
-          </View>
+
 
         </View>
       </ScrollView>
