@@ -7,6 +7,7 @@ import CalendarScreen from '../screens/CalendarScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import TripDetailScreen from '../screens/TripDetailScreen';
+import TripBudgetScreen from '../screens/TripBudgetScreen';
 import CreateTripScreen from '../screens/CreateTripScreen';
 import { Home, Wallet, Calendar, Bell, User } from 'lucide-react-native';
 
@@ -106,6 +107,11 @@ export default function AppNavigator() {
           headerTintColor: '#f5f5f5',
           headerBackTitleVisible: false
         }} 
+      />
+      <Stack.Screen 
+        name="TripBudget" 
+        component={TripBudgetScreen} 
+        options={{ headerShown: false }} 
       />
       <Stack.Screen 
         name="CreateTrip" 
