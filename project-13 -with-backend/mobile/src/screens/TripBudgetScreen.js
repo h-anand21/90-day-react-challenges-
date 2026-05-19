@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { View, ScrollView, RefreshControl, ActivityIndicator, TouchableOpacity, Image, StyleSheet, Dimensions, Modal } from 'react-native';
 import { Text } from '../components/Typography';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Edit2, Wallet, Tag, PieChart as PieChartIcon, TrendingUp, Bed, Car, Utensils, Camera, ShoppingBag, FileText, IndianRupee, X } from 'lucide-react-native';
+import { ArrowLeft, Edit2, Wallet, Tag, PieChart as PieChartIcon, TrendingUp, Bed, Car, Utensils, Camera, ShoppingBag, FileText, IndianRupee, X, Users } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PieChart } from 'react-native-chart-kit';
 import client, { getImageUri } from '../api/client';
@@ -42,6 +42,9 @@ export default function TripBudgetScreen({ route, navigation }) {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [members, setMembers] = useState([]);
+  const [selectedMemberFilter, setSelectedMemberFilter] = useState(null);
+  const [memberFilterModalVisible, setMemberFilterModalVisible] = useState(false);
   const [allExpensesModalVisible, setAllExpensesModalVisible] = useState(false);
 
   const fetchData = async () => {
@@ -51,6 +54,7 @@ export default function TripBudgetScreen({ route, navigation }) {
         client.get(`/trips/${tripId}/expenses`)
       ]);
       setTrip(tripRes.data.trip);
+      setMembers(tripRes.data.members || []);
       setExpenses(expRes.data.expenses || []);
     } catch (e) {
       console.error(e);
@@ -76,15 +80,25 @@ export default function TripBudgetScreen({ route, navigation }) {
 
   if (!trip) return null;
 
+  const getMemberSpentAmount = (memberUserId) => {
+    return expenses
+      .filter(e => e.paidBy?._id === memberUserId || e.paidBy === memberUserId)
+      .reduce((sum, e) => sum + (e.amount || 0), 0);
+  };
+
   // Calcs
+  const filteredExpenses = selectedMemberFilter
+    ? expenses.filter(e => e.paidBy?._id === selectedMemberFilter || e.paidBy === selectedMemberFilter)
+    : expenses;
+
   const budget = trip.totalBudget || 0;
-  const spent = expenses.reduce((a, e) => a + (e.amount || 0), 0);
+  const spent = filteredExpenses.reduce((a, e) => a + (e.amount || 0), 0);
   const left = budget - spent;
   const pct = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
 
   // Categories
   const catTotals = {};
-  expenses.forEach(e => {
+  filteredExpenses.forEach(e => {
     const c = e.category || 'others';
     catTotals[c] = (catTotals[c] || 0) + (e.amount || 0);
   });
@@ -127,8 +141,11 @@ export default function TripBudgetScreen({ route, navigation }) {
                   </Text>
                 </View>
               </View>
-              <TouchableOpacity style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#333' }}>
-                <Edit2 size={16} color="#fff" />
+              <TouchableOpacity 
+                onPress={() => setMemberFilterModalVisible(true)}
+                style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#333' }}
+              >
+                <Users size={18} color="#fff" />
               </TouchableOpacity>
             </View>
           </SafeAreaView>
@@ -202,6 +219,24 @@ export default function TripBudgetScreen({ route, navigation }) {
         {/* Content Body */}
         <View style={{ padding: 20 }}>
           
+          {/* Active Member Filter Indicator */}
+          {selectedMemberFilter && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: THEME.brand + '20', paddingHorizontal: 16, paddingVertical: 12, borderRadius: 12, marginBottom: 20, borderWidth: 1, borderColor: THEME.brand }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+                <Users size={16} color={THEME.brand} style={{ marginRight: 8 }} />
+                <Text style={{ color: '#fff', fontSize: 12, flexShrink: 1 }}>
+                  Showing expenses for:{' '}
+                  <Text style={{ fontWeight: 'bold', color: THEME.brand }}>
+                    {members.find(m => m.user?._id === selectedMemberFilter)?.user?.name || 'Selected Member'}
+                  </Text>
+                </Text>
+              </View>
+              <TouchableOpacity onPress={() => setSelectedMemberFilter(null)} style={{ backgroundColor: THEME.border, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}>
+                <Text style={{ color: '#ff4d4d', fontSize: 10, fontWeight: 'bold' }}>Clear</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          
           {/* Budget Usage Bar */}
           <View style={{ backgroundColor: THEME.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: THEME.border, marginBottom: 20 }}>
             <Text style={{ color: '#fff', fontWeight: 'bold', marginBottom: 12 }}>Budget Usage</Text>
@@ -268,13 +303,13 @@ export default function TripBudgetScreen({ route, navigation }) {
               </TouchableOpacity>
             </View>
 
-            {expenses.slice(0, 5).map((exp, index) => {
+            {filteredExpenses.slice(0, 5).map((exp, index) => {
               const cat = exp.category || 'others';
               const catColor = EXP_CAT_COLORS[cat] || '#888';
               const Icon = ICONS[cat] || Wallet;
 
               return (
-                <View key={exp._id} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: index !== expenses.slice(0, 5).length-1 ? 16 : 0 }}>
+                <View key={exp._id} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: index !== filteredExpenses.slice(0, 5).length-1 ? 16 : 0 }}>
                   <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: catColor + '20', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
                     <Icon size={18} color={catColor} />
                   </View>
@@ -293,8 +328,8 @@ export default function TripBudgetScreen({ route, navigation }) {
               );
             })}
             
-            {expenses.length === 0 && (
-              <Text style={{ color: THEME.textMuted, fontSize: 12 }}>No recent expenses.</Text>
+            {filteredExpenses.length === 0 && (
+              <Text style={{ color: THEME.textMuted, fontSize: 12 }}>No expenses recorded.</Text>
             )}
           </View>
 
@@ -317,6 +352,79 @@ export default function TripBudgetScreen({ route, navigation }) {
         </View>
       </ScrollView>
 
+      {/* Member Filter Modal */}
+      <Modal visible={memberFilterModalVisible} animationType="fade" transparent={true} onRequestClose={() => setMemberFilterModalVisible(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+          <View style={{ backgroundColor: THEME.surface, borderRadius: 20, width: '100%', padding: 24, borderWidth: 1, borderColor: THEME.border }}>
+            
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#fff' }}>Filter by Member</Text>
+              <TouchableOpacity onPress={() => setMemberFilterModalVisible(false)}>
+                <X size={20} color={THEME.textMuted} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={{ maxHeight: 300 }} showsVerticalScrollIndicator={false}>
+              {/* Option to clear filter */}
+              <TouchableOpacity 
+                onPress={() => {
+                  setSelectedMemberFilter(null);
+                  setMemberFilterModalVisible(false);
+                }}
+                style={{ 
+                  flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, 
+                  borderBottomWidth: 1, borderBottomColor: THEME.border,
+                  backgroundColor: selectedMemberFilter === null ? THEME.brand + '15' : 'transparent',
+                  paddingHorizontal: 12, borderRadius: 8
+                }}
+              >
+                <Text style={{ color: selectedMemberFilter === null ? THEME.brand : '#fff', fontWeight: 'bold', fontSize: 14 }}>All Members</Text>
+                <Text style={{ color: THEME.textMuted, fontSize: 12 }}>₹{expenses.reduce((sum, e) => sum + (e.amount || 0), 0).toLocaleString()}</Text>
+              </TouchableOpacity>
+
+              {/* List of members */}
+              {members.map((m) => {
+                const memberUser = m.user;
+                if (!memberUser) return null;
+                const memberSpent = getMemberSpentAmount(memberUser._id);
+                const isSelected = selectedMemberFilter === memberUser._id;
+
+                return (
+                  <TouchableOpacity 
+                    key={m._id}
+                    onPress={() => {
+                      setSelectedMemberFilter(memberUser._id);
+                      setMemberFilterModalVisible(false);
+                    }}
+                    style={{ 
+                      flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 14, 
+                      borderBottomWidth: 1, borderBottomColor: THEME.border,
+                      backgroundColor: isSelected ? THEME.brand + '15' : 'transparent',
+                      paddingHorizontal: 12, borderRadius: 8, marginTop: 4
+                    }}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: THEME.brand + '20', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                        <Text style={{ color: THEME.brand, fontWeight: 'bold', fontSize: 12 }}>
+                          {memberUser.name?.substring(0, 2).toUpperCase()}
+                        </Text>
+                      </View>
+                      <Text style={{ color: isSelected ? THEME.brand : '#fff', fontWeight: 'bold', fontSize: 14 }}>
+                        {memberUser.name} {m.role === 'owner' ? '(Owner)' : ''}
+                      </Text>
+                    </View>
+                    <Text style={{ color: THEME.brand, fontWeight: 'bold', fontSize: 13 }}>
+                      ₹{memberSpent.toLocaleString()}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+          </View>
+        </View>
+      </Modal>
+
       {/* View All Expenses Modal */}
       <Modal visible={allExpensesModalVisible} animationType="slide" transparent={true} onRequestClose={() => setAllExpensesModalVisible(false)}>
         <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' }}>
@@ -334,13 +442,13 @@ export default function TripBudgetScreen({ route, navigation }) {
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false}>
-              {expenses.map((exp, index) => {
+              {filteredExpenses.map((exp, index) => {
                 const cat = exp.category || 'others';
                 const catColor = EXP_CAT_COLORS[cat] || '#888';
                 const Icon = ICONS[cat] || Wallet;
 
                 return (
-                  <View key={exp._id} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: index !== expenses.length - 1 ? 1 : 0, borderBottomColor: THEME.border }}>
+                  <View key={exp._id} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: index !== filteredExpenses.length - 1 ? 1 : 0, borderBottomColor: THEME.border }}>
                     <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: catColor + '20', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
                       <Icon size={18} color={catColor} />
                     </View>
@@ -359,7 +467,7 @@ export default function TripBudgetScreen({ route, navigation }) {
                 );
               })}
 
-              {expenses.length === 0 && (
+              {filteredExpenses.length === 0 && (
                 <View style={{ paddingVertical: 40, alignItems: 'center' }}>
                   <Text style={{ color: THEME.textMuted, fontSize: 12 }}>No expenses recorded yet.</Text>
                 </View>
