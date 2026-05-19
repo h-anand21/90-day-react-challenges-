@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, ScrollView, RefreshControl, ActivityIndicator, TouchableOpacity, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, ScrollView, RefreshControl, ActivityIndicator, TouchableOpacity, Image, StyleSheet, Dimensions, Modal } from 'react-native';
 import { Text } from '../components/Typography';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Edit2, Wallet, Tag, PieChart as PieChartIcon, TrendingUp, Bed, Car, Utensils, Camera, ShoppingBag, FileText, IndianRupee } from 'lucide-react-native';
+import { ArrowLeft, Edit2, Wallet, Tag, PieChart as PieChartIcon, TrendingUp, Bed, Car, Utensils, Camera, ShoppingBag, FileText, IndianRupee, X } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PieChart } from 'react-native-chart-kit';
 import client, { getImageUri } from '../api/client';
@@ -42,6 +42,7 @@ export default function TripBudgetScreen({ route, navigation }) {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [allExpensesModalVisible, setAllExpensesModalVisible] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -262,7 +263,9 @@ export default function TripBudgetScreen({ route, navigation }) {
           <View style={{ backgroundColor: THEME.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: THEME.border, marginBottom: 20 }}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
               <Text style={{ color: '#fff', fontWeight: 'bold' }}>Recent Expenses</Text>
-              <Text style={{ color: THEME.brand, fontSize: 11, fontWeight: 'bold' }}>View All</Text>
+              <TouchableOpacity onPress={() => setAllExpensesModalVisible(true)}>
+                <Text style={{ color: THEME.brand, fontSize: 11, fontWeight: 'bold' }}>View All</Text>
+              </TouchableOpacity>
             </View>
 
             {expenses.slice(0, 5).map((exp, index) => {
@@ -271,7 +274,7 @@ export default function TripBudgetScreen({ route, navigation }) {
               const Icon = ICONS[cat] || Wallet;
 
               return (
-                <View key={exp._id} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: index !== expenses.length-1 ? 16 : 0 }}>
+                <View key={exp._id} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: index !== expenses.slice(0, 5).length-1 ? 16 : 0 }}>
                   <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: catColor + '20', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
                     <Icon size={18} color={catColor} />
                   </View>
@@ -280,7 +283,7 @@ export default function TripBudgetScreen({ route, navigation }) {
                     <Text style={{ color: THEME.textMuted, fontSize: 10 }}>
                       <Text style={{ textTransform: 'capitalize' }}>{cat}</Text> • {exp.date ? new Date(exp.date).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : ''}
                     </Text>
-                    {exp.description ? <Text style={{ color: '#666', fontSize: 9, marginTop: 2 }}>{exp.description}</Text> : null}
+                    {exp.notes ? <Text style={{ color: '#888', fontSize: 10, marginTop: 3, fontStyle: 'italic' }}>"{exp.notes}"</Text> : null}
                   </View>
                   <Text style={{ color: THEME.brand, fontSize: 14, fontWeight: 'bold' }}>₹{exp.amount?.toLocaleString()}</Text>
                 </View>
@@ -310,6 +313,57 @@ export default function TripBudgetScreen({ route, navigation }) {
 
         </View>
       </ScrollView>
+
+      {/* View All Expenses Modal */}
+      <Modal visible={allExpensesModalVisible} animationType="slide" transparent={true} onRequestClose={() => setAllExpensesModalVisible(false)}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.85)', justifyContent: 'flex-end' }}>
+          <View style={{ backgroundColor: THEME.surface, borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, height: '75%' }}>
+            
+            {/* Header */}
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <View>
+                <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#fff' }}>All Expenses</Text>
+                <Text style={{ fontSize: 11, color: THEME.textMuted }}>Total {expenses.length} expenses recorded</Text>
+              </View>
+              <TouchableOpacity onPress={() => setAllExpensesModalVisible(false)}>
+                <X size={24} color={THEME.textMuted} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {expenses.map((exp, index) => {
+                const cat = exp.category || 'others';
+                const catColor = EXP_CAT_COLORS[cat] || '#888';
+                const Icon = ICONS[cat] || Wallet;
+
+                return (
+                  <View key={exp._id} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: index !== expenses.length - 1 ? 1 : 0, borderBottomColor: THEME.border }}>
+                    <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: catColor + '20', alignItems: 'center', justifyContent: 'center', marginRight: 12 }}>
+                      <Icon size={18} color={catColor} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ color: '#fff', fontSize: 13, fontWeight: 'bold', marginBottom: 2 }}>{exp.title}</Text>
+                      <Text style={{ color: THEME.textMuted, fontSize: 10 }}>
+                        <Text style={{ textTransform: 'capitalize' }}>{cat}</Text> • {exp.date ? new Date(exp.date).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : ''}
+                      </Text>
+                      {exp.notes ? <Text style={{ color: '#888', fontSize: 10, marginTop: 3, fontStyle: 'italic' }}>"{exp.notes}"</Text> : null}
+                    </View>
+                    <Text style={{ color: THEME.brand, fontSize: 14, fontWeight: 'bold' }}>₹{exp.amount?.toLocaleString()}</Text>
+                  </View>
+                );
+              })}
+
+              {expenses.length === 0 && (
+                <View style={{ paddingVertical: 40, alignItems: 'center' }}>
+                  <Text style={{ color: THEME.textMuted, fontSize: 12 }}>No expenses recorded yet.</Text>
+                </View>
+              )}
+            </ScrollView>
+
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 }
