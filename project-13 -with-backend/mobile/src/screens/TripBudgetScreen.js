@@ -279,11 +279,14 @@ export default function TripBudgetScreen({ route, navigation }) {
                     <Icon size={18} color={catColor} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ color: '#fff', fontSize: 13, fontWeight: 'bold', marginBottom: 2 }}>{exp.title}</Text>
-                    <Text style={{ color: THEME.textMuted, fontSize: 10 }}>
-                      <Text style={{ textTransform: 'capitalize' }}>{cat}</Text> • {exp.date ? new Date(exp.date).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : ''}
+                    <Text style={{ color: catColor, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', marginBottom: 2 }}>
+                      {cat} • {exp.date ? new Date(exp.date).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : ''}
                     </Text>
-                    {exp.notes ? <Text style={{ color: '#888', fontSize: 10, marginTop: 3, fontStyle: 'italic' }}>"{exp.notes}"</Text> : null}
+                    <Text style={{ color: '#fff', fontSize: 13, fontWeight: 'bold', marginBottom: 2 }}>{exp.title}</Text>
+                    {exp.notes ? <Text style={{ color: '#aaa', fontSize: 10, marginBottom: 2, fontStyle: 'italic' }}>"{exp.notes}"</Text> : null}
+                    <Text style={{ color: THEME.textMuted, fontSize: 9 }}>
+                      Added by: {exp.paidBy?.name || 'Unknown'}
+                    </Text>
                   </View>
                   <Text style={{ color: THEME.brand, fontSize: 14, fontWeight: 'bold' }}>₹{exp.amount?.toLocaleString()}</Text>
                 </View>
@@ -342,11 +345,14 @@ export default function TripBudgetScreen({ route, navigation }) {
                       <Icon size={18} color={catColor} />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ color: '#fff', fontSize: 13, fontWeight: 'bold', marginBottom: 2 }}>{exp.title}</Text>
-                      <Text style={{ color: THEME.textMuted, fontSize: 10 }}>
-                        <Text style={{ textTransform: 'capitalize' }}>{cat}</Text> • {exp.date ? new Date(exp.date).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : ''}
+                      <Text style={{ color: catColor, fontSize: 9, fontWeight: 'bold', textTransform: 'uppercase', marginBottom: 2 }}>
+                        {cat} • {exp.date ? new Date(exp.date).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : ''}
                       </Text>
-                      {exp.notes ? <Text style={{ color: '#888', fontSize: 10, marginTop: 3, fontStyle: 'italic' }}>"{exp.notes}"</Text> : null}
+                      <Text style={{ color: '#fff', fontSize: 13, fontWeight: 'bold', marginBottom: 2 }}>{exp.title}</Text>
+                      {exp.notes ? <Text style={{ color: '#aaa', fontSize: 10, marginBottom: 2, fontStyle: 'italic' }}>"{exp.notes}"</Text> : null}
+                      <Text style={{ color: THEME.textMuted, fontSize: 9 }}>
+                        Added by: {exp.paidBy?.name || 'Unknown'}
+                      </Text>
                     </View>
                     <Text style={{ color: THEME.brand, fontSize: 14, fontWeight: 'bold' }}>₹{exp.amount?.toLocaleString()}</Text>
                   </View>
