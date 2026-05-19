@@ -103,7 +103,7 @@ export default function TripBudgetScreen({ route, navigation }) {
         {/* Hero Section */}
         <View style={{ height: 320, width: '100%', position: 'relative' }}>
           <Image 
-            source={trip.image ? { uri: trip.image } : require('../../assets/image copy.png')} 
+            source={trip.coverImage ? { uri: getImageUri(trip.coverImage) } : require('../../assets/image copy.png')} 
             style={{ width: '100%', height: '100%', position: 'absolute' }}
             resizeMode="cover"
           />
