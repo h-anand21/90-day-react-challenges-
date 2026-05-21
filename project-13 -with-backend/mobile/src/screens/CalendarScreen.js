@@ -729,9 +729,9 @@ function TimelineTab({ trips, navigation }) {
             style={{ backgroundColor: THEME.card, borderRadius: 10, padding: 4, borderWidth: 1, borderColor: THEME.border }}>
             <ChevronLeft size={14} color={THEME.textSec} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setViewMonth(today.getMonth())}
+          <TouchableOpacity onPress={() => { setViewMonth(today.getMonth()); setViewYear(today.getFullYear()); }}
             style={{ backgroundColor: THEME.brandDim, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4, borderWidth: 1, borderColor: THEME.brand + '40' }}>
-            <Text style={{ color: THEME.brand, fontSize: 10, fontWeight: '700' }}>View All</Text>
+            <Text style={{ color: THEME.brand, fontSize: 10, fontWeight: '700' }}>TODAY</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => { if (viewMonth === 11) { setViewMonth(0); setViewYear(y => y + 1); } else setViewMonth(m => m + 1); }}
             style={{ backgroundColor: THEME.card, borderRadius: 10, padding: 4, borderWidth: 1, borderColor: THEME.border }}>
