@@ -653,12 +653,12 @@ function TimelineTab({ trips, navigation }) {
   const todayCol = today.getMonth() === viewMonth && today.getFullYear() === viewYear
     ? (today.getDate() - 1) * DAY_W + DAY_W / 2 : -1;
 
-  // Free gaps between trips
-  const sortedTrips = [...trips].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  // Free gaps between trips (needs chronological order)
+  const chronologicalTrips = [...trips].sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
   let freeGap = null;
-  for (let i = 0; i < sortedTrips.length - 1; i++) {
-    const e = toLocal(sortedTrips[i].endDate);
-    const s = toLocal(sortedTrips[i + 1].startDate);
+  for (let i = 0; i < chronologicalTrips.length - 1; i++) {
+    const e = toLocal(chronologicalTrips[i].endDate);
+    const s = toLocal(chronologicalTrips[i + 1].startDate);
     if (e && s) {
       const gapDays = Math.ceil((s - e) / (1000 * 60 * 60 * 24)) - 1;
       if (gapDays >= 2) {
@@ -669,6 +669,9 @@ function TimelineTab({ trips, navigation }) {
       }
     }
   }
+
+  // Display trips in descending order (Planning -> Ongoing -> Completed)
+  const sortedTrips = [...trips].sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
