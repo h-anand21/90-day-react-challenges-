@@ -1284,22 +1284,81 @@ function MapTab({ trips, navigation }) {
                   <style>
                     body { margin: 0; padding: 0; background-color: #0a0a0f; }
                     #map { width: 100vw; height: 100vh; background-color: #0a0a0f; }
-                    .leaflet-control-container { display: none; }
-                    .custom-marker {
-                      width: 14px;
-                      height: 14px;
+                    .leaflet-layer { filter: brightness(0.65) contrast(1.3) saturate(1.1); }
+                    .marker-wrapper {
+                      position: relative;
+                      width: 40px;
+                      height: 40px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      cursor: pointer;
+                    }
+                    .premium-marker {
+                      width: 28px;
+                      height: 28px;
+                      background: radial-gradient(circle at center, rgba(0,0,0,0.5) 0%, var(--marker-color) 120%);
+                      border-radius: 50% 50% 50% 0;
+                      transform: rotate(-45deg);
+                      border: 2px solid var(--marker-color);
+                      box-shadow: 0 0 8px var(--marker-color), inset 0 0 6px rgba(0,0,0,0.6);
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      position: relative;
+                      z-index: 2;
+                      transition: all 0.3s ease;
+                    }
+                    .marker-wrapper.selected .premium-marker {
+                      transform: rotate(-45deg) scale(1.2);
+                      border-color: #fff;
+                      box-shadow: 0 0 12px #fff, inset 0 0 8px rgba(0,0,0,0.6);
+                    }
+                    .premium-marker-icon {
+                      transform: rotate(45deg);
+                      font-size: 13px;
+                      color: #fff;
+                      font-family: sans-serif;
+                      font-weight: bold;
+                      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6));
+                    }
+                    .ripple-container {
+                      position: absolute;
+                      bottom: -10px;
+                      left: 50%;
+                      transform: translateX(-50%);
+                      width: 50px;
+                      height: 50px;
+                      z-index: 1;
+                      pointer-events: none;
+                    }
+                    .ripple {
+                      position: absolute;
+                      top: 50%;
+                      left: 50%;
+                      transform: translate(-50%, -50%) rotateX(65deg);
                       border-radius: 50%;
-                      border: 2px solid #0d0d0d;
-                      box-shadow: 0 0 4px rgba(0,0,0,0.5);
-                      transition: all 0.2s ease;
+                      border: 1px solid var(--marker-color);
+                      box-shadow: 0 0 8px var(--marker-color), inset 0 0 8px var(--marker-color);
+                      animation: rippleAnim 2s infinite linear;
                     }
-                    .custom-marker.selected {
-                      width: 20px;
-                      height: 20px;
-                      border: 3px solid #fff;
-                      box-shadow: 0 0 12px rgba(255,255,255,0.8);
-                      z-index: 1000 !important;
+                    .ripple:nth-child(2) { animation-delay: 0.6s; }
+                    .ripple:nth-child(3) { animation-delay: 1.2s; }
+                    @keyframes rippleAnim {
+                      0% { width: 0; height: 0; opacity: 1; border-width: 2px; }
+                      100% { width: 50px; height: 50px; opacity: 0; border-width: 0px; }
                     }
+                    .marker-label {
+                      position: absolute;
+                      left: 36px;
+                      top: 50%;
+                      transform: translateY(-50%);
+                      white-space: nowrap;
+                      pointer-events: none;
+                      z-index: 3;
+                    }
+                    .marker-title { color: #fff; font-weight: 800; font-size: 13px; font-family: sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.8); }
+                    .marker-subtitle { color: var(--marker-color); font-size: 11px; font-weight: 600; font-family: sans-serif; margin-top: 1px; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
                   </style>
                 </head>
                 <body>
@@ -1310,24 +1369,115 @@ function MapTab({ trips, navigation }) {
 
                     var markersData = ${JSON.stringify(displayTrips.map(t => {
                       const c = getTripCoords(t);
-                      return c && typeof c.latitude === 'number' && typeof c.longitude === 'number' && !isNaN(c.latitude) ? {
+                      if (!c || typeof c.latitude !== 'number' || typeof c.longitude !== 'number' || isNaN(c.latitude)) return null;
+                      
+                      const status = getDynamicTripStatus(t.startDate, t.endDate);
+                      const color = PIN_COLORS[status] || '${THEME.brand}';
+                      
+                      let iconStr = '📍';
+                      const titleLow = t.title.toLowerCase();
+                      if (status === 'completed') iconStr = '✓';
+                      else if (titleLow.includes('beach') || titleLow.includes('goa') || titleLow.includes('bali')) iconStr = '🌴';
+                      else if (titleLow.includes('city') || titleLow.includes('york') || titleLow.includes('mumbai')) iconStr = '🏢';
+                      else if (titleLow.includes('mountain') || titleLow.includes('darjeeling')) iconStr = '⛰️';
+                      else if (status === 'planning' || status === 'upcoming') iconStr = '🤍';
+
+                      return {
                         id: t._id, lat: c.latitude, lng: c.longitude, 
-                        color: PIN_COLORS[getDynamicTripStatus(t.startDate, t.endDate)] || '${THEME.brand}',
-                        isSelected: selectedTrip?._id === t._id
-                      } : null;
-                    }).filter(Boolean))};
+                        color: color,
+                        icon: iconStr,
+                        title: t.title,
+                        subtitle: status === 'completed' ? 'Completed' : formatDateRange(t.startDate, t.endDate),
+                        isSelected: selectedTrip?._id === t._id,
+                        date: t.startDate
+                      };
+                    }).filter(Boolean).sort((a,b) => new Date(a.date) - new Date(b.date)))};
 
                     var markerGroup = L.featureGroup();
+                    var latlngs = markersData.map(m => [m.lat, m.lng]);
+                    
+                    // Bezier curve points generator for arcs
+                    function getArcPoints(lat1, lng1, lat2, lng2) {
+                        var points = [];
+                        var numOfPoints = 30;
+                        var midLat = (lat1 + lat2) / 2;
+                        var midLng = (lng1 + lng2) / 2;
+                        
+                        var dx = lng2 - lng1;
+                        var dy = lat2 - lat1;
+                        var dist = Math.sqrt(dx*dx + dy*dy);
+                        var offset = dist * 0.25; 
+                        
+                        var nx = -dy;
+                        var ny = dx;
+                        var nLen = Math.sqrt(nx*nx + ny*ny);
+                        nx = (nx / nLen) * offset;
+                        ny = (ny / nLen) * offset;
+                        
+                        // Always curve upwards (North) to look like the flight paths in the picture
+                        if (ny < 0) { nx = -nx; ny = -ny; }
+
+                        var cpLat = midLat + ny;
+                        var cpLng = midLng + nx;
+                        
+                        for (var i = 0; i <= numOfPoints; i++) {
+                            var t = i / numOfPoints;
+                            var u = 1 - t;
+                            var plat = u*u*lat1 + 2*u*t*cpLat + t*t*lat2;
+                            var plng = u*u*lng1 + 2*u*t*cpLng + t*t*lng2;
+                            points.push([plat, plng]);
+                        }
+                        return points;
+                    }
+
+                    if (latlngs.length > 1) {
+                      // Add curved flight paths and airplanes
+                      for (let i = 0; i < latlngs.length - 1; i++) {
+                        const lat1 = latlngs[i][0];
+                        const lng1 = latlngs[i][1];
+                        const lat2 = latlngs[i+1][0];
+                        const lng2 = latlngs[i+1][1];
+                        
+                        var arc = getArcPoints(lat1, lng1, lat2, lng2);
+                        
+                        L.polyline(arc, {
+                          color: '${THEME.brand}',
+                          weight: 2,
+                          dashArray: '4, 8',
+                          opacity: 0.8
+                        }).addTo(map);
+
+                        // Midpoint of arc is around index 15
+                        const midLat = arc[15][0];
+                        const midLng = arc[15][1];
+                        
+                        // Angle at midpoint for airplane rotation
+                        const pLat1 = arc[14][0];
+                        const pLng1 = arc[14][1];
+                        const pLat2 = arc[16][0];
+                        const pLng2 = arc[16][1];
+                        let angle = Math.atan2(pLng2 - pLng1, pLat2 - pLat1) * 180 / Math.PI;
+
+                        var airplaneIcon = L.divIcon({
+                          html: '<svg width="20" height="20" viewBox="0 0 24 24" fill="${THEME.brand}" style="transform: rotate(' + angle + 'deg); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>',
+                          className: '',
+                          iconSize: [20, 20],
+                          iconAnchor: [10, 10]
+                        });
+                        L.marker([midLat, midLng], { icon: airplaneIcon, interactive: false }).addTo(map);
+                      }
+                    }
 
                     markersData.forEach(function(m) {
                       var el = document.createElement('div');
-                      el.className = 'custom-marker' + (m.isSelected ? ' selected' : '');
-                      el.style.backgroundColor = m.color;
+                      el.className = 'marker-wrapper' + (m.isSelected ? ' selected' : '');
+                      el.style.setProperty('--marker-color', m.color);
+                      el.innerHTML = '<div class="ripple-container"><div class="ripple"></div><div class="ripple"></div><div class="ripple"></div></div><div class="premium-marker"><div class="premium-marker-icon">' + m.icon + '</div></div><div class="marker-label"><div class="marker-title">' + m.title + '</div><div class="marker-subtitle">' + m.subtitle + '</div></div>';
 
                       var icon = L.divIcon({
                         html: el, className: '',
-                        iconSize: m.isSelected ? [20, 20] : [14, 14],
-                        iconAnchor: m.isSelected ? [10, 10] : [7, 7]
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 36] // Pointing to the bottom tip of teardrop
                       });
 
                       var marker = L.marker([m.lat, m.lng], { icon: icon }).addTo(map);
