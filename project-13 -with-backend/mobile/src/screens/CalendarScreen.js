@@ -11,6 +11,7 @@ import {
   Platform,
   Modal,
   PanResponder,
+  Alert,
 } from 'react-native';
 import { Text } from '../components/Typography';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -598,6 +599,7 @@ function TimelineTab({ trips, navigation }) {
   const scrubberRef = useRef(null);
   const [viewMonth, setViewMonth] = useState(today.getMonth());
   const [viewYear, setViewYear] = useState(today.getFullYear());
+  const [selectedStoryTrip, setSelectedStoryTrip] = useState(null);
 
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const DAY_W = 32;
@@ -620,17 +622,15 @@ function TimelineTab({ trips, navigation }) {
     }
   }, [viewMonth, viewYear, screenW]);
 
-  // Compute stats
-  const stats = [
-    { label: 'Trips Planned', value: trips.length, Icon: Briefcase, color: THEME.brand },
-    {
-      label: 'Days Traveling',
-      value: trips.reduce((acc, t) => acc + tripDuration(t.startDate, t.endDate), 0),
-      Icon: Plane, color: THEME.info,
-    },
-    { label: 'Countries', value: new Set(trips.map(t => t.destination?.split(',').pop()?.trim()).filter(Boolean)).size, Icon: Globe, color: THEME.purple },
-    { label: 'Travel Buddies', value: trips.reduce((acc, t) => acc + (t.memberCount || 1), 0), Icon: Users, color: THEME.success },
-  ];
+  // Sort trips for stories (Ongoing -> Upcoming -> Completed)
+  const stories = [...trips].sort((a, b) => {
+    const statusA = getDynamicTripStatus(a.startDate, a.endDate);
+    const statusB = getDynamicTripStatus(b.startDate, b.endDate);
+    const wA = statusA === 'ongoing' ? 0 : (statusA === 'upcoming' || statusA === 'planning' ? 1 : 2);
+    const wB = statusB === 'ongoing' ? 0 : (statusB === 'upcoming' || statusB === 'planning' ? 1 : 2);
+    if (wA !== wB) return wA - wB;
+    return new Date(a.startDate) - new Date(b.startDate);
+  });
 
   // Filter trips visible in this month
   const monthStart = new Date(viewYear, viewMonth, 1);
@@ -678,36 +678,46 @@ function TimelineTab({ trips, navigation }) {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false}>
-      {/* Stats row */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 16, marginBottom: 16 }}>
-        {stats.map((s, i) => {
-          const IconComponent = s.Icon;
-          return (
-            <View
-              key={i}
-              style={{
-                backgroundColor: THEME.card, borderRadius: 20, padding: 16, marginRight: 12,
-                borderWidth: 1, borderColor: THEME.border, minWidth: 120,
-              }}
-            >
-              <View style={{
-                width: 36, height: 36, borderRadius: 12,
-                backgroundColor: s.color + '15',
-                alignItems: 'center', justifyContent: 'center',
-                marginBottom: 12,
-              }}>
-                <IconComponent size={18} color={s.color} />
-              </View>
-              <Text style={{ color: THEME.text, fontSize: 24, fontWeight: '900', marginBottom: 2 }}>
-                {s.value}
-              </Text>
-              <Text style={{ color: THEME.textSec, fontSize: 11, fontWeight: '700' }}>
-                {s.label}
-              </Text>
-            </View>
-          );
-        })}
-      </ScrollView>
+      {/* Instagram-Style Trip Stories */}
+      <View style={{ marginBottom: 24 }}>
+        <Text style={{ color: THEME.text, fontSize: 18, fontWeight: '900', paddingHorizontal: 16, marginBottom: 16 }}>
+          Your Stories
+        </Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
+          {stories.map(trip => {
+            const status = getDynamicTripStatus(trip.startDate, trip.endDate);
+            let ringColor = THEME.border; // past trips
+            if (status === 'ongoing') ringColor = THEME.success; // Green for ongoing
+            else if (status === 'upcoming' || status === 'planning') ringColor = THEME.info; // Blue for upcoming
+
+            return (
+              <TouchableOpacity
+                key={trip._id}
+                activeOpacity={0.8}
+                onPress={() => setSelectedStoryTrip(trip)}
+                style={{ alignItems: 'center', marginRight: 18 }}
+              >
+                <View style={{
+                  width: 74, height: 74, borderRadius: 37,
+                  borderWidth: 2.5, borderColor: ringColor,
+                  alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Image
+                    source={{ uri: getImageUri(trip.imageUrl) || getDestinationImage(trip.destination) }}
+                    style={{ width: 64, height: 64, borderRadius: 32, borderWidth: 2, borderColor: THEME.bg }}
+                  />
+                </View>
+                <Text numberOfLines={1} style={{
+                  color: THEME.text, fontSize: 12, fontWeight: '700',
+                  marginTop: 6, maxWidth: 74, textAlign: 'center'
+                }}>
+                  {trip.title}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+      </View>
 
       {/* Month label + navigation */}
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, marginBottom: 10 }}>
@@ -930,6 +940,84 @@ function TimelineTab({ trips, navigation }) {
         )}
       </View>
       <View style={{ height: 100 }} />
+
+      <Modal
+        visible={!!selectedStoryTrip}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSelectedStoryTrip(null)}
+      >
+        <TouchableOpacity 
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' }} 
+          activeOpacity={1} 
+          onPress={() => setSelectedStoryTrip(null)}
+        >
+          <TouchableOpacity activeOpacity={1} style={{
+            backgroundColor: THEME.card,
+            borderTopLeftRadius: 32,
+            borderTopRightRadius: 32,
+            padding: 24,
+            paddingBottom: 40,
+          }}>
+            {selectedStoryTrip && (
+              <>
+                <TouchableOpacity
+                  onPress={() => setSelectedStoryTrip(null)}
+                  style={{ position: 'absolute', top: 20, right: 20, zIndex: 10, padding: 8, backgroundColor: THEME.bg, borderRadius: 20, opacity: 0.8 }}
+                >
+                  <X size={20} color={THEME.text} />
+                </TouchableOpacity>
+
+                <Image
+                  source={{ uri: getImageUri(selectedStoryTrip.imageUrl) || getDestinationImage(selectedStoryTrip.destination) }}
+                  style={{ width: '100%', height: 160, borderRadius: 20, marginBottom: 20 }}
+                />
+
+                <Text style={{ color: THEME.text, fontSize: 24, fontWeight: '900', marginBottom: 4 }}>
+                  {selectedStoryTrip.title}
+                </Text>
+                
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
+                  <MapIcon size={14} color={THEME.brand} style={{ marginRight: 6 }} />
+                  <Text style={{ color: THEME.textSec, fontSize: 14, fontWeight: '600' }}>
+                    {selectedStoryTrip.destination || 'Destination TBD'}
+                  </Text>
+                </View>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', backgroundColor: THEME.bg, padding: 16, borderRadius: 16, marginBottom: 24 }}>
+                  <View>
+                    <Text style={{ color: THEME.textMuted, fontSize: 11, fontWeight: '700', marginBottom: 4, textTransform: 'uppercase' }}>Dates</Text>
+                    <Text style={{ color: THEME.text, fontSize: 13, fontWeight: '800' }}>{formatDateRange(selectedStoryTrip.startDate, selectedStoryTrip.endDate)}</Text>
+                  </View>
+                  <View>
+                    <Text style={{ color: THEME.textMuted, fontSize: 11, fontWeight: '700', marginBottom: 4, textTransform: 'uppercase' }}>Travelers</Text>
+                    <Text style={{ color: THEME.text, fontSize: 13, fontWeight: '800' }}>{selectedStoryTrip.memberCount || 1} People</Text>
+                  </View>
+                  <View>
+                    <Text style={{ color: THEME.textMuted, fontSize: 11, fontWeight: '700', marginBottom: 4, textTransform: 'uppercase' }}>Status</Text>
+                    <Text style={{ color: getDynamicTripStatus(selectedStoryTrip.startDate, selectedStoryTrip.endDate) === 'ongoing' ? THEME.success : THEME.brand, fontSize: 13, fontWeight: '900', textTransform: 'uppercase' }}>
+                      {getDynamicTripStatus(selectedStoryTrip.startDate, selectedStoryTrip.endDate)}
+                    </Text>
+                  </View>
+                </View>
+
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  onPress={() => {
+                    const id = selectedStoryTrip._id;
+                    setSelectedStoryTrip(null);
+                    navigation.navigate('TripDetail', { tripId: id });
+                  }}
+                  style={{ backgroundColor: THEME.brand, paddingVertical: 16, borderRadius: 16, alignItems: 'center' }}
+                >
+                  <Text style={{ color: '#fff', fontSize: 16, fontWeight: '800' }}>View Full Details</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </Modal>
+
     </ScrollView>
   );
 }
