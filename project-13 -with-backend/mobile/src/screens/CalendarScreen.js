@@ -1092,16 +1092,14 @@ M 250,160 L 270,155 L 288,158 L 300,168 L 305,182 L 300,196
 L 286,205 L 268,207 L 252,202 L 242,190 L 240,176 L 246,165 L 250,160 Z
 `;
 
-let MapView = null;
-let Marker = null;
+let WebView = null;
 
 if (Platform.OS !== 'web') {
   try {
-    const Maps = require('react-native-maps');
-    MapView = Maps.default || Maps.MapView || Maps;
-    Marker = Maps.Marker;
+    const WV = require('react-native-webview');
+    WebView = WV.WebView;
   } catch (e) {
-    console.log('[CalendarScreen] Failed to load react-native-maps:', e.message);
+    console.log('[CalendarScreen] Failed to load react-native-webview:', e.message);
   }
 }
 
@@ -1189,34 +1187,7 @@ function MapTab({ trips, navigation }) {
     return getCoords(trip.destination);
   };
 
-  // Zoom map to show all coordinates
-  useEffect(() => {
-    if (Platform.OS === 'web' || !MapView || !mapRef.current) return;
-
-    const coords = displayTrips
-      .map(getTripCoords)
-      .filter(c => c && typeof c.latitude === 'number' && typeof c.longitude === 'number' && !isNaN(c.latitude) && !isNaN(c.longitude) && c.latitude !== 20.5937); // filter out default central India if it's not real
-    
-    if (coords.length === 0) return;
-
-    const timeoutId = setTimeout(() => {
-      if (coords.length === 1) {
-        mapRef.current.animateToRegion({
-          latitude: coords[0].latitude,
-          longitude: coords[0].longitude,
-          latitudeDelta: 0.08,
-          longitudeDelta: 0.08
-        }, 1000);
-      } else {
-        mapRef.current.fitToCoordinates(coords, {
-          edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
-          animated: true
-        });
-      }
-    }, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [displayTrips.length, resolvedCoords]);
+  // Zoom map to show all coordinates is now handled inside WebView's HTML
 
   const PIN_COLORS = {
     planning: THEME.brand,
@@ -1227,17 +1198,6 @@ function MapTab({ trips, navigation }) {
 
   const handleMarkerPress = (trip) => {
     setSelectedTrip(trip);
-    if (Platform.OS !== 'web' && mapRef.current) {
-      const coords = getTripCoords(trip);
-      if (coords && typeof coords.latitude === 'number' && typeof coords.longitude === 'number' && !isNaN(coords.latitude) && !isNaN(coords.longitude)) {
-        mapRef.current.animateToRegion({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-          latitudeDelta: 0.05,
-          longitudeDelta: 0.05
-        }, 600);
-      }
-    }
   };
 
   const MAP_STYLE = [
@@ -1286,7 +1246,7 @@ function MapTab({ trips, navigation }) {
         backgroundColor: '#0a0a0f', borderWidth: 1, borderColor: THEME.border, marginBottom: 14,
         height: MAP_H, position: 'relative'
       }}>
-        {Platform.OS === 'web' || !MapView ? (
+        {Platform.OS === 'web' || !WebView ? (
           /* Web fallback or package failed loader */
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 }}>
             <MapIcon size={48} color={THEME.brand} style={{ opacity: 0.6, marginBottom: 12 }} />
@@ -1298,73 +1258,102 @@ function MapTab({ trips, navigation }) {
             </Text>
           </View>
         ) : (
-          /* Native Google/Apple Maps */
-          <MapView
+          <WebView
             ref={mapRef}
-            style={{ width: '100%', height: '100%' }}
-            provider={undefined}
-            customMapStyle={MAP_STYLE}
-            initialRegion={{
-              latitude: 20.5937,
-              longitude: 78.9629,
-              latitudeDelta: 15,
-              longitudeDelta: 15
-            }}
-          >
-            {displayTrips.map((trip) => {
-              const coords = getTripCoords(trip);
-              if (!coords || typeof coords.latitude !== 'number' || typeof coords.longitude !== 'number' || isNaN(coords.latitude) || isNaN(coords.longitude)) {
-                return null;
-              }
-              const status = getDynamicTripStatus(trip.startDate, trip.endDate);
-              const pinColor = PIN_COLORS[status] || THEME.brand;
-
-              return (
-                <Marker
-                  key={trip._id}
-                  coordinate={{
-                    latitude: coords.latitude,
-                    longitude: coords.longitude
-                  }}
-                  onPress={() => handleMarkerPress(trip)}
-                  title={trip.title}
-                  description={trip.destination}
-                  pinColor={pinColor}
-                />
-              );
-            })}
-          </MapView>
-        )}
-
-        {/* Map controls overlay */}
-        {Platform.OS !== 'web' && MapView && (
-          <View style={{ position: 'absolute', right: 12, bottom: 12, gap: 8 }}>
-            <TouchableOpacity
-              onPress={() => {
-                const coords = displayTrips
-                  .map(getTripCoords)
-                  .filter(c => c && typeof c.latitude === 'number' && typeof c.longitude === 'number' && !isNaN(c.latitude) && !isNaN(c.longitude));
-                if (coords.length > 0 && mapRef.current) {
-                  if (coords.length === 1) {
-                    mapRef.current.animateToRegion({
-                      latitude: coords[0].latitude,
-                      longitude: coords[0].longitude,
-                      latitudeDelta: 0.1,
-                      longitudeDelta: 0.1
-                    }, 800);
-                  } else {
-                    mapRef.current.fitToCoordinates(coords, {
-                      edgePadding: { top: 60, right: 60, bottom: 60, left: 60 },
-                      animated: true
-                    });
-                  }
+            style={{ flex: 1, backgroundColor: '#0a0a0f' }}
+            scrollEnabled={false}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            onMessage={(event) => {
+              try {
+                const data = JSON.parse(event.nativeEvent.data);
+                if (data.type === 'markerPress') {
+                  const trip = displayTrips.find(t => t._id === data.id);
+                  if (trip) setSelectedTrip(trip);
                 }
-              }}
-              style={{ width: 36, height: 36, borderRadius: 10, backgroundColor: THEME.card, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: THEME.border }}
-            >
-              <Crosshair size={16} color={THEME.textSec} />
-            </TouchableOpacity>
-          </View>
+              } catch (e) {}
+            }}
+            source={{
+              html: `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+                  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                  <style>
+                    body { margin: 0; padding: 0; background-color: #0a0a0f; }
+                    #map { width: 100vw; height: 100vh; background-color: #0a0a0f; }
+                    .leaflet-control-container { display: none; }
+                    .custom-marker {
+                      width: 14px;
+                      height: 14px;
+                      border-radius: 50%;
+                      border: 2px solid #0d0d0d;
+                      box-shadow: 0 0 4px rgba(0,0,0,0.5);
+                      transition: all 0.2s ease;
+                    }
+                    .custom-marker.selected {
+                      width: 20px;
+                      height: 20px;
+                      border: 3px solid #fff;
+                      box-shadow: 0 0 12px rgba(255,255,255,0.8);
+                      z-index: 1000 !important;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div id="map"></div>
+                  <script>
+                    var map = L.map('map', { zoomControl: false, attributionControl: false }).setView([20.5937, 78.9629], 4);
+                    L.tileLayer('https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+                    var markersData = ${JSON.stringify(displayTrips.map(t => {
+                      const c = getTripCoords(t);
+                      return c && typeof c.latitude === 'number' && typeof c.longitude === 'number' && !isNaN(c.latitude) ? {
+                        id: t._id, lat: c.latitude, lng: c.longitude, 
+                        color: PIN_COLORS[getDynamicTripStatus(t.startDate, t.endDate)] || '${THEME.brand}',
+                        isSelected: selectedTrip?._id === t._id
+                      } : null;
+                    }).filter(Boolean))};
+
+                    var markerGroup = L.featureGroup();
+
+                    markersData.forEach(function(m) {
+                      var el = document.createElement('div');
+                      el.className = 'custom-marker' + (m.isSelected ? ' selected' : '');
+                      el.style.backgroundColor = m.color;
+
+                      var icon = L.divIcon({
+                        html: el, className: '',
+                        iconSize: m.isSelected ? [20, 20] : [14, 14],
+                        iconAnchor: m.isSelected ? [10, 10] : [7, 7]
+                      });
+
+                      var marker = L.marker([m.lat, m.lng], { icon: icon }).addTo(map);
+                      markerGroup.addLayer(marker);
+                      
+                      marker.on('click', function() {
+                        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'markerPress', id: m.id }));
+                      });
+                    });
+
+                    if (markersData.length > 0) {
+                      var hasSelected = markersData.find(m => m.isSelected);
+                      if (hasSelected) {
+                         map.setView([hasSelected.lat, hasSelected.lng], 10, { animate: true });
+                      } else if (markersData.length === 1) {
+                         map.setView([markersData[0].lat, markersData[0].lng], 8);
+                      } else {
+                         map.fitBounds(markerGroup.getBounds(), { padding: [40, 40], maxZoom: 10 });
+                      }
+                    }
+                  </script>
+                </body>
+                </html>
+              `
+            }}
+          />
         )}
 
         {/* Loading overlay for Geocoder */}
@@ -1375,6 +1364,8 @@ function MapTab({ trips, navigation }) {
           </View>
         )}
       </View>
+
+
 
       {/* Selected trip card */}
       {selectedTrip ? (
