@@ -6,10 +6,11 @@ import BudgetOverviewScreen from '../screens/BudgetOverviewScreen';
 import CalendarScreen from '../screens/CalendarScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import ExploreScreen from '../screens/ExploreScreen';
 import TripDetailScreen from '../screens/TripDetailScreen';
 import TripBudgetScreen from '../screens/TripBudgetScreen';
 import CreateTripScreen from '../screens/CreateTripScreen';
-import { Home, Wallet, Calendar, Bell, User } from 'lucide-react-native';
+import { Home, Wallet, Calendar, Bell, User, Compass } from 'lucide-react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -66,6 +67,14 @@ function TabNavigator() {
         }}
       />
       <Tab.Screen 
+        name="ExploreTab" 
+        component={ExploreScreen} 
+        options={{
+          title: 'Explore',
+          tabBarIcon: ({ color, size, focused }) => <TabBarIconWithGlow icon={Compass} color={color} size={size} focused={focused} />,
+        }}
+      />
+      <Tab.Screen 
         name="BudgetTab" 
         component={BudgetOverviewScreen} 
         options={{
@@ -79,14 +88,6 @@ function TabNavigator() {
         options={{
           title: 'Calendar',
           tabBarIcon: ({ color, size, focused }) => <TabBarIconWithGlow icon={Calendar} color={color} size={size} focused={focused} />,
-        }}
-      />
-      <Tab.Screen 
-        name="ProfileTab" 
-        component={ProfileScreen} 
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ color, size, focused }) => <TabBarIconWithGlow icon={User} color={color} size={size} focused={focused} />,
         }}
       />
     </Tab.Navigator>
@@ -129,6 +130,17 @@ export default function AppNavigator() {
           headerTitle: 'Notifications',
           headerStyle: { backgroundColor: '#111111' },
           headerTintColor: '#f5f5f5',
+        }} 
+      />
+      <Stack.Screen 
+        name="Profile" 
+        component={ProfileScreen} 
+        options={{ 
+          headerShown: true,
+          headerTitle: 'Profile',
+          headerStyle: { backgroundColor: '#111111' },
+          headerTintColor: '#f5f5f5',
+          headerBackTitleVisible: false
         }} 
       />
     </Stack.Navigator>

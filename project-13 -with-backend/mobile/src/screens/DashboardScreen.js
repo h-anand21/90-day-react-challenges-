@@ -273,12 +273,9 @@ export default function DashboardScreen({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+      const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const { user } = useAuth();
-  const [showAllTripsModal, setShowAllTripsModal] = useState(false);
-
+  
   // Dynamic real-time featured trip details states
   const [featuredMembers, setFeaturedMembers] = useState([]);
   const [featuredSpent, setFeaturedSpent] = useState(0);
@@ -381,19 +378,7 @@ export default function DashboardScreen({ navigation }) {
     fetchTrips();
   }, []);
 
-  // Filter trips by both search query AND status filter (fully functional & dynamically computed!)
-  const filteredTrips = trips.filter(trip => {
-    const matchesSearch = !searchQuery || 
-      trip.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      trip.destination?.toLowerCase().includes(searchQuery.toLowerCase());
-      
-    const dynamicStatus = getDynamicTripStatus(trip.startDate, trip.endDate);
-    const matchesStatus = statusFilter === 'All' || 
-      dynamicStatus === statusFilter.toLowerCase();
-      
-    return matchesSearch && matchesStatus;
-  });
-
+  
   const [favorites, setFavorites] = useState({});
   const toggleFavorite = (tripId) => {
     setFavorites(prev => ({
@@ -418,7 +403,6 @@ export default function DashboardScreen({ navigation }) {
   const totalBudget = trips.reduce((acc, t) => acc + (t.totalBudget || 0), 0);
   // Find a dynamically ongoing trip, else fall back to the first trip
   const ongoingTrip = trips.find(t => getDynamicTripStatus(t.startDate, t.endDate) === 'ongoing') || trips[0];
-  const upcomingJourneys = filteredTrips;
 
   // Weather data mapping for the featured card
   const weather = ongoingTrip ? getDestinationWeather(ongoingTrip.destination) : { temp: '32°', desc: 'Partly Cloudy' };
@@ -440,13 +424,29 @@ export default function DashboardScreen({ navigation }) {
     <SafeAreaView className="flex-1" style={{ backgroundColor: THEME.surface }} edges={['top']}>
       {/* 1. Header Bar: Brand Logo & Top Actions */}
       <View className="flex-row justify-between items-center px-6 pt-3 pb-2">
-        <View className="flex-row items-center">
-          <View style={{ transform: [{ rotate: '15deg' }] }}>
-            <Plane size={24} color="#f97316" />
+        <View className="flex-row items-center gap-3">
+          {/* Profile Avatar */}
+          <TouchableOpacity 
+            onPress={() => navigation.navigate('Profile')}
+            activeOpacity={0.8}
+            className="w-10 h-10 rounded-full border items-center justify-center overflow-hidden"
+            style={{ borderColor: '#f97316', backgroundColor: '#1a1a1a' }}
+          >
+            {user?.avatar ? (
+              <Image source={{ uri: user.avatar }} style={{ width: '100%', height: '100%' }} />
+            ) : (
+              <Text className="text-white font-bold text-sm">{user?.name ? user.name.charAt(0) : 'U'}</Text>
+            )}
+          </TouchableOpacity>
+          {/* Logo */}
+          <View className="flex-row items-center">
+            <View style={{ transform: [{ rotate: '15deg' }] }}>
+              <Plane size={22} color="#f97316" />
+            </View>
+            <Text className="text-2xl font-black text-white ml-1.5" style={{ letterSpacing: -0.8 }}>
+              Trip<Text style={{ color: '#f97316' }}>Sync</Text>
+            </Text>
           </View>
-          <Text className="text-2xl font-black text-white ml-2" style={{ letterSpacing: -0.8 }}>
-            Trip<Text style={{ color: '#f97316' }}>Sync</Text>
-          </Text>
         </View>
 
         <View className="flex-row items-center gap-3">
@@ -480,7 +480,7 @@ export default function DashboardScreen({ navigation }) {
         </View>
       </View>
 
-      {/* 2. Greetings Section */}
+      {/* Greetings Section */}
       <View className="px-6 pt-3 pb-4">
         <Text className="text-3xl font-black text-white" style={{ letterSpacing: -0.5 }}>
           Hi, {user?.name?.split(' ')[0] || 'Himanshu'} 👋
@@ -488,19 +488,6 @@ export default function DashboardScreen({ navigation }) {
         <Text className="text-sm font-semibold mt-1" style={{ color: '#737373' }}>
           Where will your next journey take you?
         </Text>
-      </View>
-      {/* 3. Search Bar */}
-      <View className="px-6 mb-5">
-        <View className="w-full flex-row items-center border rounded-2xl px-4" style={{ backgroundColor: '#141414', borderColor: '#222222', height: 48 }}>
-          <Search size={18} color="#525252" />
-          <TextInput
-            className="flex-1 text-white text-sm ml-3 font-semibold"
-            placeholder="Search trips or places..."
-            placeholderTextColor="#525252"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
       </View>
 
       {error && (
@@ -806,7 +793,7 @@ export default function DashboardScreen({ navigation }) {
               <Text className="text-lg font-black text-white" style={{ letterSpacing: -0.3 }}>
                 Your Journeys
               </Text>
-              <TouchableOpacity onPress={() => setShowAllTripsModal(true)} className="flex-row items-center">
+              <TouchableOpacity onPress={() => navigation.navigate('ExploreTab')} className="flex-row items-center">
                 <Text className="text-xs font-bold mr-1" style={{ color: '#f97316' }}>View All</Text>
                 <ChevronRight size={12} color="#f97316" />
               </TouchableOpacity>
@@ -819,26 +806,7 @@ export default function DashboardScreen({ navigation }) {
               contentContainerStyle={{ paddingLeft: 24, paddingRight: 8 }}
               className="mb-8"
             >
-              {upcomingJourneys.length === 0 ? (
-                <View 
-                  className="items-center justify-center p-6 border rounded-[24px]" 
-                  style={{ width: 280, height: 265, borderColor: '#222222', backgroundColor: '#141414', marginRight: 16 }}
-                >
-                  <Search size={32} color="#525252" />
-                  <Text className="text-white font-extrabold text-sm mt-3 text-center">No Journeys Match</Text>
-                  <Text className="text-xs text-center mt-1 px-2 leading-4" style={{ color: '#737373' }}>
-                    Try searching for different keywords or clear the current filters!
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => { setSearchQuery(''); setStatusFilter('All'); }}
-                    className="mt-4 px-4 py-2 rounded-xl"
-                    style={{ backgroundColor: '#262626' }}
-                  >
-                    <Text className="text-white text-xs font-bold">Clear Filters</Text>
-                  </TouchableOpacity>
-                </View>
-              ) : (
-                upcomingJourneys.map(trip => {
+              {trips.map(trip => {
                   const dynamicStatus = getDynamicTripStatus(trip.startDate, trip.endDate);
                   const statusStyle = STATUS_COLORS[dynamicStatus] || STATUS_COLORS.planning;
                   const bgImage = trip.coverImage || getDestinationImage(trip.destination);
@@ -943,8 +911,7 @@ export default function DashboardScreen({ navigation }) {
                       </View>
                     </TouchableOpacity>
                   );
-                })
-              )}
+                })}
             </ScrollView>
 
             {/* 8. Premium Vertical Create Trip Banner (100% JSON Mockup Parity!) */}
@@ -1016,195 +983,7 @@ export default function DashboardScreen({ navigation }) {
         <View className="h-10" />
       </ScrollView>
 
-      {/* 9. Premium All Journeys Explorer Modal */}
-      <Modal
-        visible={showAllTripsModal}
-        animationType="slide"
-        transparent={false}
-        onRequestClose={() => setShowAllTripsModal(false)}
-      >
-        <SafeAreaView className="flex-1" style={{ backgroundColor: THEME.surface }} edges={['top', 'bottom']}>
-          {/* Drag Handle Indicator */}
-          <View style={{ alignItems: 'center', paddingTop: 8, paddingBottom: 2 }}>
-            <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: '#2e2e2e' }} />
-          </View>
-
-          {/* Modal Header */}
-          <View className="flex-row justify-between items-center px-6 py-4">
-            <View>
-              <Text className="text-2xl font-black text-white" style={{ letterSpacing: -0.5 }}>All Journeys</Text>
-              <Text className="text-xs font-semibold mt-1" style={{ color: '#737373' }}>
-                <Text style={{ color: '#f97316' }}>{trips.length}</Text> trips in your archive
-              </Text>
-            </View>
-            <TouchableOpacity 
-              onPress={() => setShowAllTripsModal(false)}
-              className="w-10 h-10 rounded-full items-center justify-center border" 
-              style={{ backgroundColor: '#141414', borderColor: '#222222' }}
-            >
-              <X size={18} color="#ffffff" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Modal Search & Filters */}
-          <View className="px-6 pt-2 pb-2">
-            {/* Inner Search input */}
-            <View className="w-full flex-row items-center border rounded-2xl px-4 mb-4" style={{ backgroundColor: '#141414', borderColor: '#222222', height: 48 }}>
-              <Search size={18} color="#525252" />
-              <TextInput
-                className="flex-1 text-white text-sm ml-3 font-semibold"
-                placeholder="Search trip archive..."
-                placeholderTextColor="#525252"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-            </View>
-
-            {/* Inner Horizontal Status Filter Capsules (Matching User Ref) */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row mb-3">
-              {['All', 'planning', 'ongoing', 'completed'].map((status) => {
-                const isActive = statusFilter.toLowerCase() === status.toLowerCase();
-                return (
-                  <TouchableOpacity
-                    key={status}
-                    onPress={() => setStatusFilter(status)}
-                    className="px-4 py-2 rounded-full mr-2.5 border"
-                    style={{
-                      backgroundColor: isActive ? 'rgba(249,115,22,0.06)' : '#111111',
-                      borderColor: isActive ? '#f97316' : '#222222'
-                    }}
-                  >
-                    <View className="flex-row items-center">
-                      {status !== 'All' && (
-                        <View 
-                          style={{ 
-                            width: 6, 
-                            height: 6, 
-                            borderRadius: 3, 
-                            backgroundColor: status === 'planning' ? '#3b82f6' : status === 'ongoing' ? '#f97316' : '#22c55e',
-                            marginRight: 6
-                          }} 
-                        />
-                      )}
-                      <Text className={`text-[10px] font-black uppercase tracking-wider ${isActive ? 'text-white' : 'text-neutral-400'}`}>
-                        {status}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          </View>
-
-          {/* Scrollable list of all journeys */}
-          <ScrollView
-            className="flex-1 px-6 pt-2"
-            contentContainerStyle={{ paddingBottom: 40 }}
-            showsVerticalScrollIndicator={false}
-          >
-            {filteredTrips.length === 0 ? (
-              <View className="items-center justify-center py-20">
-                <Search size={40} color="#525252" />
-                <Text className="text-white font-extrabold text-sm mt-3">No matching trips found</Text>
-                <Text className="text-xs text-neutral-500 mt-1">Try modifying your query or filters.</Text>
-              </View>
-            ) : (
-              <View>
-                {filteredTrips.map((trip) => {
-                  const dynamicStatus = getDynamicTripStatus(trip.startDate, trip.endDate);
-                  const statusStyle = STATUS_COLORS[dynamicStatus] || STATUS_COLORS.planning;
-                  return (
-                    <TouchableOpacity
-                      key={trip._id + '_all_modal'}
-                      onPress={() => {
-                        setShowAllTripsModal(false);
-                        navigation.navigate('TripDetail', { tripId: trip._id });
-                      }}
-                      activeOpacity={0.88}
-                      className="mb-3.5 rounded-[24px] border p-3 flex-row items-center justify-between"
-                      style={{ backgroundColor: '#111111', borderColor: '#222222' }}
-                    >
-                      {/* Left: Perfect Circle Cover Image (matching user ref exactly!) */}
-                      <View className="mr-3.5">
-                        <Image
-                          source={{ uri: getImageUri(trip.coverImage || getDestinationImage(trip.destination)) }}
-                          style={{
-                            width: 72,
-                            height: 72,
-                            borderRadius: 36,
-                            borderWidth: 1.5,
-                            borderColor: '#2e2e2e'
-                          }}
-                          resizeMode="cover"
-                        />
-                      </View>
-
-                      {/* Center: Details */}
-                      <View className="flex-1 mr-2">
-                        <Text className="text-[15px] font-black text-white mb-1.5" numberOfLines={1}>
-                          {trip.title}
-                        </Text>
-                        
-                        <View className="flex-row items-center mb-1">
-                          <MapPin size={10} color="#a3a3a3" />
-                          <Text className="text-neutral-400 text-[11px] font-bold ml-1" numberOfLines={1}>
-                            {trip.destination}
-                          </Text>
-                        </View>
-
-                        <View className="flex-row items-center">
-                          <Calendar size={10} color="#737373" />
-                          <Text className="text-neutral-500 text-[10px] font-semibold ml-1">
-                            {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
-                          </Text>
-                        </View>
-                      </View>
-
-                      {/* Right: Status, Budget, and Arrow Column */}
-                      <View className="flex-row items-center">
-                        <View className="items-end justify-center">
-                          {/* Dynamic status badge */}
-                          <View 
-                            className="px-2 py-0.5 rounded-full border mb-1.5" 
-                            style={{ 
-                              backgroundColor: 'rgba(15,15,15,0.7)', 
-                              borderColor: statusStyle.text + '30' 
-                            }}
-                          >
-                            <Text className="text-[8px] font-black uppercase tracking-wider" style={{ color: statusStyle.text }}>
-                              {dynamicStatus}
-                            </Text>
-                          </View>
-
-                          {/* Total Budget value */}
-                          <Text className="text-[14px] font-black text-emerald-500 leading-none">
-                            ₹{(trip.totalBudget || 0).toLocaleString('en-IN')}
-                          </Text>
-                          <Text className="text-[8px] text-neutral-500 font-bold mt-0.5">Total Budget</Text>
-                        </View>
-
-                        {/* Small circular chevron on far right */}
-                        <View className="w-8 h-8 rounded-full items-center justify-center border ml-3" style={{ backgroundColor: '#141414', borderColor: '#222222' }}>
-                          <ChevronRight size={12} color="#a3a3a3" />
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })}
-
-                {/* Elegant suitcase archive indicator at list footer */}
-                <View className="items-center justify-center py-6 mt-2 mb-6">
-                  <View className="w-12 h-12 rounded-2xl items-center justify-center border mb-2" style={{ backgroundColor: 'rgba(249,115,22,0.08)', borderColor: 'rgba(249,115,22,0.15)' }}>
-                    <Briefcase size={18} color="#f97316" />
-                  </View>
-                  <Text className="text-white font-extrabold text-sm text-center">No more trips here</Text>
-                  <Text className="text-xs text-neutral-500 text-center mt-1">Start planning your next adventure!</Text>
-                </View>
-              </View>
-            )}
-          </ScrollView>
-        </SafeAreaView>
-      </Modal>
+      
     </SafeAreaView>
   );
 }
