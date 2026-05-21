@@ -599,6 +599,23 @@ function TimelineTab({ trips, navigation }) {
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
   const DAY_W = 32;
   const TOTAL_W = daysInMonth * DAY_W;
+  const { width: screenW } = useWindowDimensions();
+
+  useEffect(() => {
+    if (scrubberRef.current) {
+      if (today.getMonth() === viewMonth && today.getFullYear() === viewYear) {
+        const todayX = (today.getDate() - 1) * DAY_W;
+        const scrollX = Math.max(0, todayX - screenW / 2 + DAY_W / 2);
+        setTimeout(() => {
+          scrubberRef.current?.scrollTo({ x: scrollX, animated: true });
+        }, 150);
+      } else {
+        setTimeout(() => {
+          scrubberRef.current?.scrollTo({ x: 0, animated: true });
+        }, 150);
+      }
+    }
+  }, [viewMonth, viewYear, screenW]);
 
   // Compute stats
   const stats = [
