@@ -28,6 +28,9 @@ import {
   Layers,
   Crosshair,
   X,
+  Briefcase,
+  Plane,
+  Globe,
 } from 'lucide-react-native';
 import Svg, { Path, Circle, Line, Polygon, Text as SvgText, G } from 'react-native-svg';
 import client, { getImageUri } from '../api/client';
@@ -619,14 +622,14 @@ function TimelineTab({ trips, navigation }) {
 
   // Compute stats
   const stats = [
-    { label: 'Trips Planned', value: trips.length, icon: '🧳', color: THEME.brand },
+    { label: 'Trips Planned', value: trips.length, Icon: Briefcase, color: THEME.brand },
     {
       label: 'Days Traveling',
       value: trips.reduce((acc, t) => acc + tripDuration(t.startDate, t.endDate), 0),
-      icon: '✈️', color: THEME.info,
+      Icon: Plane, color: THEME.info,
     },
-    { label: 'Countries', value: new Set(trips.map(t => t.destination?.split(',').pop()?.trim()).filter(Boolean)).size, icon: '🌍', color: THEME.purple },
-    { label: 'Travel Buddies', value: trips.reduce((acc, t) => acc + (t.memberCount || 1), 0), icon: '👥', color: THEME.success },
+    { label: 'Countries', value: new Set(trips.map(t => t.destination?.split(',').pop()?.trim()).filter(Boolean)).size, Icon: Globe, color: THEME.purple },
+    { label: 'Travel Buddies', value: trips.reduce((acc, t) => acc + (t.memberCount || 1), 0), Icon: Users, color: THEME.success },
   ];
 
   // Filter trips visible in this month
@@ -677,19 +680,33 @@ function TimelineTab({ trips, navigation }) {
     <ScrollView showsVerticalScrollIndicator={false}>
       {/* Stats row */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 16, marginBottom: 16 }}>
-        {stats.map((s, i) => (
-          <View
-            key={i}
-            style={{
-              backgroundColor: THEME.card, borderRadius: 18, padding: 14, marginRight: 10,
-              borderWidth: 1, borderColor: THEME.border, minWidth: 110, alignItems: 'center',
-            }}
-          >
-            <Text style={{ fontSize: 22, marginBottom: 4 }}>{s.icon}</Text>
-            <Text style={{ color: s.color, fontSize: 22, fontWeight: '900' }}>{s.value}</Text>
-            <Text style={{ color: THEME.textMuted, fontSize: 9, fontWeight: '700', marginTop: 2, textAlign: 'center' }}>{s.label}</Text>
-          </View>
-        ))}
+        {stats.map((s, i) => {
+          const IconComponent = s.Icon;
+          return (
+            <View
+              key={i}
+              style={{
+                backgroundColor: THEME.card, borderRadius: 20, padding: 16, marginRight: 12,
+                borderWidth: 1, borderColor: THEME.border, minWidth: 120,
+              }}
+            >
+              <View style={{
+                width: 36, height: 36, borderRadius: 12,
+                backgroundColor: s.color + '15',
+                alignItems: 'center', justifyContent: 'center',
+                marginBottom: 12,
+              }}>
+                <IconComponent size={18} color={s.color} />
+              </View>
+              <Text style={{ color: THEME.text, fontSize: 24, fontWeight: '900', marginBottom: 2 }}>
+                {s.value}
+              </Text>
+              <Text style={{ color: THEME.textSec, fontSize: 11, fontWeight: '700' }}>
+                {s.label}
+              </Text>
+            </View>
+          );
+        })}
       </ScrollView>
 
       {/* Month label + navigation */}
