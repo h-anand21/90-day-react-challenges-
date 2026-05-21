@@ -8,6 +8,8 @@ const baseTripSchema = z.object({
     .trim(),
   description: z.string().max(500).trim().optional().default(''),
   destination: z.string({ required_error: 'Destination is required' }).trim().min(1),
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
   startDate: z.coerce.date({ required_error: 'Start date is required' }),
   endDate: z.coerce.date({ required_error: 'End date is required' }),
   totalBudget: z.coerce.number().min(0).optional().default(0),

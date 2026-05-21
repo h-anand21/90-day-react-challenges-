@@ -19,6 +19,14 @@ const tripSchema = new mongoose.Schema(
       required: [true, 'Destination is required'],
       trim: true,
     },
+    latitude: {
+      type: Number,
+      default: null,
+    },
+    longitude: {
+      type: Number,
+      default: null,
+    },
     coverImage: {
       type: String,
       default: '',

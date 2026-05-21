@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { View, ScrollView, RefreshControl, ActivityIndicator, TouchableOpacity, Image, StyleSheet, Dimensions, Modal } from 'react-native';
 import { Text } from '../components/Typography';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Edit2, Wallet, Tag, PieChart as PieChartIcon, TrendingUp, Bed, Car, Utensils, Camera, ShoppingBag, FileText, IndianRupee, X, Users } from 'lucide-react-native';
+import { ArrowLeft, Edit2, Wallet, Tag, PieChart as PieChartIcon, TrendingUp, Bed, Car, Utensils, Camera, ShoppingBag, FileText, IndianRupee, X, Users, Heart, Globe } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PieChart } from 'react-native-chart-kit';
 import client, { getImageUri } from '../api/client';
@@ -24,7 +24,9 @@ const EXP_CAT_COLORS = {
   food: '#eab308', 
   entertainment: '#8b5cf6', 
   shopping: '#ec4899', 
-  others: '#06b6d4'
+  health: '#22c55e', 
+  visa: '#a855f7', 
+  misc: '#06b6d4'
 };
 
 const ICONS = {
@@ -33,7 +35,9 @@ const ICONS = {
   food: Utensils,
   entertainment: Camera,
   shopping: ShoppingBag,
-  others: Wallet
+  health: Heart,
+  visa: Globe,
+  misc: Wallet
 };
 
 export default function TripBudgetScreen({ route, navigation }) {
@@ -99,7 +103,7 @@ export default function TripBudgetScreen({ route, navigation }) {
   // Categories
   const catTotals = {};
   filteredExpenses.forEach(e => {
-    const c = e.category || 'others';
+    const c = e.category || 'misc';
     catTotals[c] = (catTotals[c] || 0) + (e.amount || 0);
   });
   
@@ -304,7 +308,7 @@ export default function TripBudgetScreen({ route, navigation }) {
             </View>
 
             {filteredExpenses.slice(0, 5).map((exp, index) => {
-              const cat = exp.category || 'others';
+              const cat = exp.category || 'misc';
               const catColor = EXP_CAT_COLORS[cat] || '#888';
               const Icon = ICONS[cat] || Wallet;
 
@@ -429,7 +433,7 @@ export default function TripBudgetScreen({ route, navigation }) {
 
             <ScrollView showsVerticalScrollIndicator={false}>
               {filteredExpenses.map((exp, index) => {
-                const cat = exp.category || 'others';
+                const cat = exp.category || 'misc';
                 const catColor = EXP_CAT_COLORS[cat] || '#888';
                 const Icon = ICONS[cat] || Wallet;
 

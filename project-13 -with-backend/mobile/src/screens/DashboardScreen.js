@@ -206,7 +206,7 @@ const getGradientColor = (str) => {
   return colors[Math.abs(hash) % colors.length];
 };
 
-const getDestinationImage = (destination) => {
+export const getDestinationImage = (destination) => {
   const dest = (destination || '').toLowerCase();
   
   if (dest.includes('kolkata')) {
@@ -599,7 +599,7 @@ export default function DashboardScreen({ navigation }) {
                 >
                   {/* Backdrop scenic full-bleed Unsplash image */}
                   <Image
-                    source={{ uri: getImageUri(ongoingTrip.coverImage) || getDestinationImage(ongoingTrip.destination) }}
+                    source={{ uri: getImageUri(ongoingTrip.coverImage || getDestinationImage(ongoingTrip.destination)) }}
                     style={{ position: 'absolute', width: '100%', height: 300 }}
                     resizeMode="cover"
                   />
@@ -1127,7 +1127,7 @@ export default function DashboardScreen({ navigation }) {
                       {/* Left: Perfect Circle Cover Image (matching user ref exactly!) */}
                       <View className="mr-3.5">
                         <Image
-                          source={{ uri: getImageUri(trip.coverImage) || getDestinationImage(trip.destination) }}
+                          source={{ uri: getImageUri(trip.coverImage || getDestinationImage(trip.destination)) }}
                           style={{
                             width: 72,
                             height: 72,

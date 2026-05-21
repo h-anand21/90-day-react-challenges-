@@ -4,12 +4,8 @@ import { Text } from './Typography';
 export const Input = ({ 
   label, 
   error, 
-  placeholder, 
-  secureTextEntry, 
-  value, 
-  onChangeText,
-  keyboardType = 'default',
-  className = ''
+  className = '',
+  ...rest
 }) => {
   return (
     <View className={`mb-4 ${className}`}>
@@ -21,14 +17,10 @@ export const Input = ({
         `}
       >
         <TextInput
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
           placeholderTextColor="#525252"
-          secureTextEntry={secureTextEntry}
-          keyboardType={keyboardType}
           className="text-text-primary text-base"
           autoCapitalize="none"
+          {...rest}
         />
       </View>
       {error && <Text className="text-danger text-xs mt-1">{error}</Text>}

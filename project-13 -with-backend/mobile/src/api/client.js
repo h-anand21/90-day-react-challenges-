@@ -40,7 +40,12 @@ client.interceptors.request.use(async (config) => {
 
 export const getImageUri = (imageUrl) => {
   if (!imageUrl) return '';
-  if (imageUrl.startsWith('https://pixabay.com')) {
+  if (
+    imageUrl.startsWith('https://pixabay.com') ||
+    imageUrl.startsWith('https://cdn.pixabay.com') ||
+    imageUrl.startsWith('https://upload.wikimedia.org') ||
+    imageUrl.startsWith('https://images.unsplash.com')
+  ) {
     const baseUrl = getBaseURL();
     return `${baseUrl}/trips/image-proxy?url=${encodeURIComponent(imageUrl)}`;
   }

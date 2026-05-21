@@ -12,6 +12,8 @@ import {
 } from '../controllers/trip.controller.js';
 import { protect } from '../middleware/auth.middleware.js';
 import { requireTripRole } from '../middleware/tripRole.middleware.js';
+import Trip from '../models/Trip.js';
+import { fetchDestinationImage } from '../utils/imageSearch.js';
 
 const router = Router();
 
@@ -27,7 +29,8 @@ router.get('/image-proxy', async (req, res) => {
     const allowedPrefixes = [
       'https://images.unsplash.com/',
       'https://pixabay.com/',
-      'https://cdn.pixabay.com/'
+      'https://cdn.pixabay.com/',
+      'https://upload.wikimedia.org/'
     ];
 
     const isAllowed = allowedPrefixes.some(prefix => url.startsWith(prefix));
@@ -37,10 +40,83 @@ router.get('/image-proxy', async (req, res) => {
     }
 
     console.log(`[image-proxy] Proxying image request for: "${url}"`);
-    const response = await fetch(url);
+    let response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
     if (!response.ok) {
       console.warn(`[image-proxy] Target image fetch failed with status: ${response.status}`);
-      return res.status(response.status).send('Failed to fetch target image');
+
+      // Auto-Healing System: If it's a Pixabay URL and it fails (e.g. 400 Expired), we try to heal it!
+      if (url.includes('pixabay.com')) {
+        console.log(`[image-proxy] Attempting to auto-heal Pixabay URL: "${url}"`);
+        try {
+          let newUrl = null;
+          const parsedUrl = new URL(url);
+          const pixabayId = parsedUrl.searchParams.get('pixabay_id');
+
+          if (pixabayId && process.env.PIXABAY_API_KEY) {
+            console.log(`[image-proxy] Healing via Pixabay ID: ${pixabayId}`);
+            const queryByIdUrl = `https://pixabay.com/api/?key=${process.env.PIXABAY_API_KEY}&id=${pixabayId}`;
+            const idRes = await fetch(queryByIdUrl, {
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+              }
+            });
+            if (idRes.ok) {
+              const idData = await idRes.json();
+              if (idData.hits && idData.hits.length > 0) {
+                newUrl = `${idData.hits[0].webformatURL}?pixabay_id=${pixabayId}`;
+                console.log(`[image-proxy] Successfully fetched new URL by ID: ${newUrl}`);
+              }
+            }
+          }
+
+          // If no ID found or ID query failed, fallback to database lookup by old URL
+          if (!newUrl) {
+            console.log(`[image-proxy] Looking up Trip by coverImage: "${url}"`);
+            const trip = await Trip.findOne({ coverImage: url });
+            if (trip) {
+              console.log(`[image-proxy] Found Trip "${trip.title}" (${trip._id}). Regenerating cover image...`);
+              newUrl = await fetchDestinationImage(trip.destination);
+              console.log(`[image-proxy] Regenerated cover image: ${newUrl}`);
+            }
+          }
+
+          // If we successfully resolved a new URL, update the database and fetch the new image
+          if (newUrl) {
+            console.log(`[image-proxy] Updating database coverImage from "${url}" to "${newUrl}"`);
+            await Trip.updateMany({ coverImage: url }, { coverImage: newUrl });
+
+            // Fetch the new image URL
+            response = await fetch(newUrl, {
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+              }
+            });
+            if (response.ok) {
+              console.log(`[image-proxy] Fetch succeeded with the healed URL!`);
+            }
+          }
+        } catch (healError) {
+          console.error('[image-proxy] Auto-healing failed:', healError);
+        }
+      }
+
+      if (!response.ok) {
+        // Fallback to default Unsplash image
+        const fallbackUrl = 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80';
+        console.log(`[image-proxy] Proxy failed completely. Serving fallback image: ${fallbackUrl}`);
+        response = await fetch(fallbackUrl, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          }
+        });
+        if (!response.ok) {
+          return res.status(response.status).send('Failed to fetch target image');
+        }
+      }
     }
 
     const contentType = response.headers.get('content-type') || 'image/jpeg';

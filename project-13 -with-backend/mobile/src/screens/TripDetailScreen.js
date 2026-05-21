@@ -123,7 +123,7 @@ export default function TripDetailScreen({ route, navigation }) {
           {/* Scenic Full-Width Destination Cover Banner */}
           <View style={{ height: 180, borderRadius: 24, overflow: 'hidden', marginBottom: 20, borderWidth: 1, borderColor: '#2e2e2e', position: 'relative' }}>
             <Image
-              source={{ uri: getImageUri(trip.coverImage) || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80' }}
+              source={{ uri: getImageUri(trip.coverImage || 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80') }}
               style={{ width: '100%', height: '100%' }}
               resizeMode="cover"
             />

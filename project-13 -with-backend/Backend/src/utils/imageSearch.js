@@ -19,7 +19,7 @@ const CURATED_DESTINATIONS = {
   tokyo: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26', // Shibuya / Tokyo Tower glowing night skyline
   london: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad', // Tower Bridge illuminated at twilight
   newyork: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9', // New York skyline sunset / Times Square at night
-  manali: 'https://images.unsplash.com/photo-1548263591-192366ca9749', // Snowy Himalayan peak & misty valley
+  manali: 'https://images.unsplash.com/photo-1454496522488-7a8e488e8606', // Snowy Himalayan peak & misty valley
   shimla: 'https://images.unsplash.com/photo-1562979314-bee7453e911c', // Snowy Shimla hills under warm streetlights
   kerala: 'https://images.unsplash.com/photo-1593693397690-362cb9666fc2', // Kerala houseboat at sunset on scenic backwaters
   kashmir: 'https://images.unsplash.com/photo-1605649487212-47bdab064df7', // Majestic Dal lake reflecting snowy mountains
@@ -45,6 +45,14 @@ const THEME_IMAGES = {
   default: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4' // Cozy camper campfire under starry dark sky
 };
 
+// Country names set to exclude from Wikipedia landmark search
+const COUNTRIES = new Set([
+  'india', 'usa', 'uk', 'united kingdom', 'united states', 'canada', 
+  'australia', 'france', 'germany', 'italy', 'spain', 'japan', 
+  'china', 'brazil', 'mexico', 'russia', 'nepal', 'bangladesh', 
+  'sri lanka', 'pakistan'
+]);
+
 // Helper to clean, optimize, and append image dimension parameters to Unsplash images
 const optimizeImageUrl = (url) => {
   if (!url) return '';
@@ -59,43 +67,229 @@ const optimizeImageUrl = (url) => {
  * @param {string} destination - The name of the destination (e.g. "Goa, India", "Darjeeling", "Trip to Paris")
  * @returns {Promise<string>} The high-quality image URL
  */
+const fetchWikiImage = async (place) => {
+  const url = `https://en.wikipedia.org/w/api.php?action=query&prop=pageimages&format=json&piprop=original&titles=${encodeURIComponent(place)}&redirects=true`;
+  try {
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data.query || !data.query.pages) return null;
+    const pages = data.query.pages;
+    const pageId = Object.keys(pages)[0];
+    if (pageId && pageId !== '-1' && pages[pageId].original) {
+      return pages[pageId].original.source;
+    }
+  } catch (err) {
+    console.error(`[imageSearch] [Wiki] Error fetching image for ${place}:`, err.message);
+  }
+  return null;
+};
+
+/**
+ * Determines whether a Pixabay illustration is actually relatable to the place queried,
+ * avoiding generic keyword matching (e.g. matching pills/viruses for a medical institute).
+ */
+const isRelatableIllustration = (hit, place) => {
+  if (!hit || !hit.tags) return false;
+  const tags = hit.tags.toLowerCase();
+  const placeLower = place.toLowerCase();
+
+  // Direct match first
+  if (tags.includes(placeLower)) return true;
+
+  // Key-word based matching, filtering out common stop words
+  const stopWords = new Set([
+    'of', 'and', 'in', 'the', 'for', 'at', 'with', 'on', 'by', 'an',
+    'institute', 'medical', 'sciences', 'science', 'university', 'college', 'school',
+    'hotel', 'resort', 'temple', 'station', 'airport', 'park', 'garden', 'museum',
+    'bihar', 'india', 'bengal', 'delhi', 'mumbai', 'goa', 'pradesh', 'kerala', 'west'
+  ]);
+
+  const keywords = placeLower
+    .split(/[^a-z0-9]+/i)
+    .filter(w => w.length >= 3 && !stopWords.has(w));
+
+  if (keywords.length === 0) return true; // Accept hit if query has no keywords left after filtering
+
+  // Enforce that tags contain at least one unique keyword of the place name
+  return keywords.some(kw => tags.includes(kw));
+};
+
+/**
+ * Automatically resolves a gorgeous, highly optimized, dark-friendly travel card cover image based on the destination name.
+ * 
+ * @param {string} destination - The name of the destination (e.g. "Goa, India", "Darjeeling", "Trip to Paris")
+ * @returns {Promise<string>} The high-quality image URL
+ */
 export const fetchDestinationImage = async (destination) => {
   if (!destination) {
     return optimizeImageUrl(THEME_IMAGES.default);
   }
 
-  // Broad query term that yields the absolute best, most premium travel illustrations on Pixabay
-  const queryTerm = 'travel adventure';
-
-  // 1. DYNAMIC PIXABAY SYSTEM: Query for cute travel illustrations dynamically using our travel engine
   const pixabayKey = process.env.PIXABAY_API_KEY;
-  if (pixabayKey) {
-    try {
-      console.log(`[imageSearch] Querying Pixabay dynamically for premium travel illustration: "${queryTerm}"`);
-      const pixabayUrl = `https://pixabay.com/api/?key=${pixabayKey}&q=${encodeURIComponent(
-        queryTerm
-      )}&image_type=illustration&safesearch=true&per_page=50`;
 
-      const response = await fetch(pixabayUrl);
+  // Parse the destination into parts
+  let parts = destination.split(',').map(p => p.trim()).filter(Boolean);
+  if (parts.length === 0) {
+    parts = [destination];
+  }
+
+  // If the user didn't write commas but wrote spaces (e.g. "kudra bihar"), extract individual words as fallbacks
+  if (parts.length === 1 && destination.includes(' ')) {
+    const words = destination.split(/\s+/).map(w => w.trim()).filter(w => w.length > 2);
+    words.forEach(word => {
+      if (word.toLowerCase() !== destination.toLowerCase() && !parts.includes(word)) {
+        parts.push(word);
+      }
+    });
+  }
+
+  const place = parts[0];
+
+  // 1. Check curated premium destination library first (e.g. "Kolkata", "Paris")
+  const cleanPlace = place.toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (CURATED_DESTINATIONS[cleanPlace]) {
+    console.log(`[imageSearch] Found curated premium image for "${place}": ${CURATED_DESTINATIONS[cleanPlace]}`);
+    return optimizeImageUrl(CURATED_DESTINATIONS[cleanPlace]);
+  }
+
+  // 2. Wikipedia Famous Landmark photo for the specific place (e.g., "Rajgir" -> Shanti Stupa, "Patna" -> Patna High Court)
+  console.log(`[imageSearch] Checking Wikipedia famous landmark for: "${place}"`);
+  const placeWikiImg = await fetchWikiImage(place);
+  if (placeWikiImg) {
+    console.log(`[imageSearch] Dynamically matched Wikipedia famous landmark image for "${place}": ${placeWikiImg}`);
+    return placeWikiImg;
+  }
+
+  // 3. Try Pixabay specifically for a RELATABLE illustration of the place
+  if (pixabayKey) {
+    console.log(`[imageSearch] Checking Pixabay illustration for place: "${place}"`);
+    const placeUrl = `https://pixabay.com/api/?key=${pixabayKey}&q=${encodeURIComponent(place)}&image_type=illustration&safesearch=true&per_page=15`;
+    try {
+      const response = await fetch(placeUrl);
       if (response.ok) {
         const data = await response.json();
-        if (data.hits && data.hits.length > 0) {
-          // Symmetrical hashing to pick one of the top hits consistently for this destination name!
+        const hits = data.hits || [];
+        // Filter for relatable illustrations to avoid generic visual spam
+        const relatableHits = hits.filter(hit => isRelatableIllustration(hit, place));
+        if (relatableHits.length > 0) {
           let hash = 0;
-          for (let i = 0; i < destination.length; i++) hash = destination.charCodeAt(i) + ((hash << 5) - hash);
-          const index = Math.abs(hash) % Math.min(50, data.hits.length);
-          const selectedHit = data.hits[index];
-          console.log(`[imageSearch] Dynamically matched Pixabay travel illustration for "${destination}" at index ${index}: ${selectedHit.webformatURL}`);
-          return selectedHit.webformatURL;
+          for (let i = 0; i < destination.length; i++) {
+            hash = destination.charCodeAt(i) + ((hash << 5) - hash);
+          }
+          const index = Math.abs(hash) % relatableHits.length;
+          const selectedHit = relatableHits[index];
+          console.log(`[imageSearch] Dynamically matched relatable Pixabay illustration for "${place}" at index ${index}/${relatableHits.length}: ${selectedHit.webformatURL}`);
+          return `${selectedHit.webformatURL}?pixabay_id=${selectedHit.id}`;
+        } else {
+          console.log(`[imageSearch] No relatable Pixabay illustration found for: "${place}" (total hits: ${hits.length})`);
         }
-      } else {
-        console.warn(`[imageSearch] Pixabay API returned status: ${response.status}`);
       }
-    } catch (pixabayError) {
-      console.error('[imageSearch] Failed to query Pixabay API:', pixabayError);
+    } catch (err) {
+      console.error(`[imageSearch] Pixabay query failed for place:`, err.message);
     }
   }
 
-  // 2. Fallback: Pre-curated high-quality illustration fallback
+  // 4. Fallback to Wikipedia famous landmark for the Region/State (e.g., "Nalanda" -> Ruins, "Bihar" -> Mahabodhi Temple)
+  if (parts.length > 1) {
+    for (let i = 1; i < parts.length; i++) {
+      const region = parts[i];
+      if (COUNTRIES.has(region.toLowerCase())) {
+        continue;
+      }
+      console.log(`[imageSearch] Checking Wikipedia famous landmark for region: "${region}"`);
+      const regionWikiImg = await fetchWikiImage(region);
+      if (regionWikiImg) {
+        console.log(`[imageSearch] Dynamically matched Wikipedia region famous landmark image for "${region}": ${regionWikiImg}`);
+        return regionWikiImg;
+      }
+    }
+  }
+
+  // 5. Fallback to Pixabay illustration for Region/State
+  if (pixabayKey && parts.length > 1) {
+    for (let i = 1; i < parts.length; i++) {
+      const region = parts[i];
+      if (COUNTRIES.has(region.toLowerCase())) {
+        continue;
+      }
+      console.log(`[imageSearch] Checking Pixabay illustration for region: "${region}"`);
+      const regionUrl = `https://pixabay.com/api/?key=${pixabayKey}&q=${encodeURIComponent(region)}&image_type=illustration&safesearch=true&per_page=10`;
+      try {
+        const response = await fetch(regionUrl);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.hits && data.hits.length > 0) {
+            let hash = 0;
+            for (let i = 0; i < destination.length; i++) {
+              hash = destination.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const index = Math.abs(hash) % data.hits.length;
+            const selectedHit = data.hits[index];
+            console.log(`[imageSearch] Dynamically matched Pixabay region illustration for "${region}" at index ${index}/${data.hits.length}: ${selectedHit.webformatURL}`);
+            return `${selectedHit.webformatURL}?pixabay_id=${selectedHit.id}`;
+          }
+        }
+      } catch (err) {
+        console.error(`[imageSearch] Pixabay query failed for region:`, err.message);
+      }
+    }
+  }
+
+  // 6. Fallback to Country illustration on Pixabay
+  if (pixabayKey) {
+    const country = parts[parts.length - 1];
+    if (country && country.toLowerCase() !== place.toLowerCase()) {
+      console.log(`[imageSearch] Checking Pixabay illustration for country: "${country}"`);
+      const countryUrl = `https://pixabay.com/api/?key=${pixabayKey}&q=${encodeURIComponent(country)}&image_type=illustration&safesearch=true&per_page=20`;
+      try {
+        const response = await fetch(countryUrl);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.hits && data.hits.length > 0) {
+            let hash = 0;
+            for (let i = 0; i < destination.length; i++) {
+              hash = destination.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const index = Math.abs(hash) % data.hits.length;
+            const selectedHit = data.hits[index];
+            console.log(`[imageSearch] Dynamically matched Pixabay country illustration for "${country}" at index ${index}/${data.hits.length}: ${selectedHit.webformatURL}`);
+            return `${selectedHit.webformatURL}?pixabay_id=${selectedHit.id}`;
+          }
+        }
+      } catch (err) {
+        console.error(`[imageSearch] Pixabay query failed for country:`, err.message);
+      }
+    }
+  }
+
+  // 7. Ultimate Fallback to global adventure illustration
+  if (pixabayKey) {
+    console.log(`[imageSearch] Checking Pixabay default global fallback illustration`);
+    const fallbackUrl = `https://pixabay.com/api/?key=${pixabayKey}&q=travel+adventure&image_type=illustration&safesearch=true&per_page=50`;
+    try {
+      const response = await fetch(fallbackUrl);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.hits && data.hits.length > 0) {
+          let hash = 0;
+          for (let i = 0; i < destination.length; i++) {
+            hash = destination.charCodeAt(i) + ((hash << 5) - hash);
+          }
+          const index = Math.abs(hash) % data.hits.length;
+          const selectedHit = data.hits[index];
+          console.log(`[imageSearch] Dynamically matched Pixabay default fallback for "${destination}" at index ${index}/${data.hits.length}: ${selectedHit.webformatURL}`);
+          return `${selectedHit.webformatURL}?pixabay_id=${selectedHit.id}`;
+        }
+      }
+    } catch (err) {
+      console.error(`[imageSearch] Pixabay default query failed:`, err.message);
+    }
+  }
+
   return optimizeImageUrl(THEME_IMAGES.default);
 };

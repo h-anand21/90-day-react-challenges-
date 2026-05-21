@@ -4,7 +4,7 @@ import { Text } from '../components/Typography';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ChevronLeft, ChevronRight, Calendar, Info, MapPin, Tag, Award } from 'lucide-react-native';
+import { ChevronLeft, ChevronRight, Calendar, Info, MapPin, Tag, Award, Search, Globe, Check } from 'lucide-react-native';
 import client from '../api/client';
 
 const THEME = {
@@ -26,6 +26,8 @@ export default function CreateTripScreen({ navigation }) {
   const [formData, setFormData] = useState({
     title: '',
     destination: '',
+    latitude: null,
+    longitude: null,
     startDate: getLocalDateString(), // Default: today (safe local timezone)
     endDate: getLocalDateString(new Date(Date.now() + 86400000 * 3)), // Default: today + 3 days
     totalBudget: '',
@@ -41,6 +43,104 @@ export default function CreateTripScreen({ navigation }) {
   const [pickerType, setPickerType] = useState('startDate'); // 'startDate' or 'endDate'
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
+  // Country & Destination Suggestions States
+  const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [showCountryModal, setShowCountryModal] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
+
+  const [suggestions, setSuggestions] = useState([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState(null);
+
+  // Fetch all countries on component mount
+  React.useEffect(() => {
+    let active = true;
+    const fetchCountries = async () => {
+      try {
+        const res = await fetch('https://restcountries.com/v3.1/all?fields=name,cca2');
+        if (res.ok && active) {
+          const data = await res.json();
+          const sorted = data
+            .map(c => ({
+              name: c.name.common,
+              cca2: c.cca2
+            }))
+            .sort((a, b) => a.name.localeCompare(b.name));
+          setCountries(sorted);
+        }
+      } catch (err) {
+        console.error('[CreateTripScreen] Error fetching countries:', err);
+      }
+    };
+    fetchCountries();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleDestinationChange = (text) => {
+    setFormData(prev => ({ ...prev, destination: text, latitude: null, longitude: null }));
+
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    if (!text || text.trim().length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    setTypingTimeout(
+      setTimeout(() => {
+        fetchSuggestions(text);
+      }, 300)
+    );
+  };
+
+  const fetchSuggestions = async (query) => {
+    if (!selectedCountry) return;
+    setSuggestionsLoading(true);
+    try {
+      const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&countrycode=${selectedCountry.cca2}&limit=5`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.features) {
+          const places = data.features.map(f => {
+            const p = f.properties;
+            const parts = [];
+            if (p.name) parts.push(p.name);
+            if (p.state && p.state !== p.name) parts.push(p.state);
+            if (p.country) parts.push(p.country);
+            return {
+              label: parts.join(', '),
+              latitude: f.geometry.coordinates[1],
+              longitude: f.geometry.coordinates[0]
+            };
+          });
+          const uniquePlaces = [];
+          const labels = new Set();
+          places.forEach(item => {
+            if (!labels.has(item.label)) {
+              labels.add(item.label);
+              uniquePlaces.push(item);
+            }
+          });
+          setSuggestions(uniquePlaces);
+        }
+      }
+    } catch (err) {
+      console.error('[CreateTripScreen] Error fetching suggestions:', err);
+    } finally {
+      setSuggestionsLoading(false);
+    }
+  };
+
+  const filteredCountries = countries.filter(c =>
+    c.name.toLowerCase().includes(countrySearch.toLowerCase())
+  );
+
   // Custom formatted date for human reading
   const formatDateDisplay = (dateString) => {
     if (!dateString) return 'Select Date';
@@ -50,6 +150,11 @@ export default function CreateTripScreen({ navigation }) {
   };
 
   const handleCreate = async () => {
+    if (!selectedCountry) {
+      Alert.alert('Error', 'Please select a Country first.');
+      return;
+    }
+
     if (!formData.title || !formData.destination || !formData.startDate || !formData.endDate) {
       Alert.alert('Error', 'Please fill in all required fields (Title, Destination, Dates)');
       return;
@@ -198,13 +303,82 @@ export default function CreateTripScreen({ navigation }) {
             onChangeText={(val) => setFormData({...formData, title: val})}
           />
 
-          {/* Destination Input */}
-          <Input 
-            label="Destination"
-            placeholder="e.g. Goa, India"
-            value={formData.destination}
-            onChangeText={(val) => setFormData({...formData, destination: val})}
-          />
+          {/* Country Trigger Input */}
+          <TouchableOpacity 
+            activeOpacity={0.8} 
+            onPress={() => setShowCountryModal(true)}
+            className="mb-4"
+          >
+            <View pointerEvents="none">
+              <Input 
+                label="Country"
+                placeholder="Select travel destination country"
+                value={selectedCountry ? selectedCountry.name : ''}
+                editable={false}
+              />
+            </View>
+          </TouchableOpacity>
+
+          {/* Destination Input (w/ Autocomplete suggestions) */}
+          <View className="mb-4 relative">
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => {
+                if (!selectedCountry) {
+                  setShowCountryModal(true);
+                }
+              }}
+            >
+              <View pointerEvents={selectedCountry ? "auto" : "none"}>
+                <Input 
+                  label="Destination"
+                  placeholder={selectedCountry ? "e.g. Paris, Tokyo, Goa" : "Please select country first"}
+                  value={formData.destination}
+                  onChangeText={handleDestinationChange}
+                  editable={!!selectedCountry}
+                  style={!selectedCountry ? { opacity: 0.5 } : {}}
+                />
+              </View>
+            </TouchableOpacity>
+
+            {/* Suggestions list */}
+            {suggestions.length > 0 && (
+              <View 
+                className="border rounded-2xl p-2 mb-4 -mt-2"
+                style={{ backgroundColor: THEME.surfaceCard, borderColor: THEME.border }}
+              >
+                {suggestions.map((suggestion, idx) => (
+                  <TouchableOpacity
+                    key={idx}
+                    onPress={() => {
+                      setFormData(prev => ({
+                        ...prev,
+                        destination: suggestion.label,
+                        latitude: suggestion.latitude,
+                        longitude: suggestion.longitude
+                      }));
+                      setSuggestions([]);
+                    }}
+                    className={`flex-row items-center py-3 px-4 ${
+                      idx < suggestions.length - 1 ? 'border-b' : ''
+                    }`}
+                    style={{ borderColor: THEME.border }}
+                  >
+                    <MapPin size={16} color={THEME.brand} />
+                    <Text className="text-white text-xs font-semibold ml-3 flex-1">
+                      {suggestion.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
+
+            {suggestionsLoading && (
+              <View className="px-4 pb-4 -mt-2">
+                <Text className="text-xs" style={{ color: THEME.textSecondary }}>Searching suggestions...</Text>
+              </View>
+            )}
+          </View>
           
           {/* Budget Input (INR) */}
           <Input 
@@ -329,6 +503,93 @@ export default function CreateTripScreen({ navigation }) {
             </TouchableOpacity>
           </TouchableOpacity>
         </TouchableOpacity>
+      </Modal>
+
+      {/* Premium Searchable Country Selector Modal */}
+      <Modal
+        visible={showCountryModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => {
+          setShowCountryModal(false);
+          setCountrySearch('');
+        }}
+      >
+        <SafeAreaView className="flex-1" style={{ backgroundColor: THEME.surface }}>
+          {/* Modal Header */}
+          <View className="flex-row items-center px-6 py-4 border-b" style={{ borderColor: THEME.border }}>
+            <TouchableOpacity 
+              onPress={() => {
+                setShowCountryModal(false);
+                setCountrySearch('');
+              }} 
+              className="p-1.5 rounded-full" 
+              style={{ backgroundColor: THEME.surfaceCard }}
+            >
+              <ChevronLeft size={20} color="#ffffff" />
+            </TouchableOpacity>
+            <Text className="text-xl font-black text-white ml-4">Select Country</Text>
+          </View>
+
+          {/* Search Input */}
+          <View className="px-6 pt-4 pb-2">
+            <View 
+              className="flex-row items-center border rounded-2xl px-4 py-1.5"
+              style={{ backgroundColor: THEME.surfaceCard, borderColor: THEME.border }}
+            >
+              <Search size={16} color={THEME.textSecondary} />
+              <TextInput
+                placeholder="Search country..."
+                placeholderTextColor="#525252"
+                value={countrySearch}
+                onChangeText={setCountrySearch}
+                className="text-white text-sm ml-3 flex-1 py-1.5"
+                style={{ color: '#ffffff' }}
+                autoFocus={true}
+              />
+            </View>
+          </View>
+
+          {/* Scrollable list of countries */}
+          <ScrollView 
+            className="flex-1 px-6 mt-2"
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {countries.length === 0 ? (
+              <View className="items-center py-12">
+                <Text style={{ color: THEME.textSecondary }} className="text-xs font-semibold">Loading countries list...</Text>
+              </View>
+            ) : filteredCountries.length === 0 ? (
+              <View className="items-center py-12">
+                <Text style={{ color: THEME.textSecondary }} className="text-xs font-semibold">No countries found</Text>
+              </View>
+            ) : (
+              filteredCountries.map((c) => (
+                <TouchableOpacity
+                  key={c.cca2}
+                  onPress={() => {
+                    setSelectedCountry(c);
+                    setFormData(prev => ({ ...prev, destination: '' }));
+                    setSuggestions([]);
+                    setShowCountryModal(false);
+                    setCountrySearch('');
+                  }}
+                  className="flex-row items-center justify-between py-4 border-b"
+                  style={{ borderColor: THEME.border }}
+                >
+                  <View className="flex-row items-center">
+                    <Globe size={16} color={THEME.textSecondary} />
+                    <Text className="text-white text-sm font-semibold ml-3">{c.name}</Text>
+                  </View>
+                  {selectedCountry?.cca2 === c.cca2 && (
+                    <Check size={16} color={THEME.brand} />
+                  )}
+                </TouchableOpacity>
+              ))
+            )}
+          </ScrollView>
+        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );

@@ -84,7 +84,7 @@ export default function BudgetOverviewScreen({ navigation }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [expenseTitle, setExpenseTitle] = useState('');
   const [expenseAmount, setExpenseAmount] = useState('');
-  const [expenseCategory, setExpenseCategory] = useState('others');
+  const [expenseCategory, setExpenseCategory] = useState('misc');
   const [expenseNotes, setExpenseNotes] = useState('');
   const [selectedTripForExpense, setSelectedTripForExpense] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -108,7 +108,7 @@ export default function BudgetOverviewScreen({ navigation }) {
         setModalVisible(false);
         setExpenseTitle('');
         setExpenseAmount('');
-        setExpenseCategory('others');
+        setExpenseCategory('misc');
         setExpenseNotes('');
         fetchTripsAndExpenses(); // Refresh data
         Alert.alert('Success', 'Expense added successfully!');
@@ -485,7 +485,7 @@ export default function BudgetOverviewScreen({ navigation }) {
                 {/* Category */}
                 <Text style={{ color: THEME.textMuted, fontSize: 12, marginBottom: 8, fontWeight: 'bold' }}>CATEGORY</Text>
                 <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 20 }}>
-                  {['accommodation', 'transport', 'food', 'entertainment', 'shopping', 'others'].map(cat => (
+                  {['accommodation', 'transport', 'food', 'entertainment', 'shopping', 'health', 'visa', 'misc'].map(cat => (
                     <TouchableOpacity 
                       key={cat}
                       onPress={() => setExpenseCategory(cat)}
@@ -535,7 +535,9 @@ export default function BudgetOverviewScreen({ navigation }) {
           food: 0,
           entertainment: 0,
           shopping: 0,
-          others: 0
+          health: 0,
+          visa: 0,
+          misc: 0
         };
         
         let maxSpentTrip = 'None';
@@ -556,11 +558,11 @@ export default function BudgetOverviewScreen({ navigation }) {
           }
 
           expenses.forEach(e => {
-            const cat = e.category?.toLowerCase() || 'others';
+            const cat = e.category?.toLowerCase() || 'misc';
             if (categoryTotals.hasOwnProperty(cat)) {
               categoryTotals[cat] += (e.amount || 0);
             } else {
-              categoryTotals.others += (e.amount || 0);
+              categoryTotals.misc += (e.amount || 0);
             }
           });
         });
