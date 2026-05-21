@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { View, ScrollView, RefreshControl, ActivityIndicator, TouchableOpacity, Image, StyleSheet, Modal, TextInput, Alert, KeyboardAvoidingView, Platform, Dimensions } from 'react-native';
 import { Text } from '../components/Typography';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Wallet, Filter, ChevronRight, Lightbulb, Calendar as CalendarIcon, Plus, X } from 'lucide-react-native';
+import { ArrowLeft, Wallet, Filter, ChevronRight, Lightbulb, Calendar as CalendarIcon, Plus, X, MapPin } from 'lucide-react-native';
 import client, { getImageUri } from '../api/client';
 import Svg, { Circle } from 'react-native-svg';
 import { PieChart } from 'react-native-chart-kit';
@@ -346,56 +346,56 @@ export default function BudgetOverviewScreen({ navigation }) {
                 <View className="flex-1">
                   {/* Title and Status */}
                   <View className="flex-row items-center mb-1">
-                    <Text className="text-sm font-bold text-white mr-2" numberOfLines={1}>{t.title}</Text>
+                    <Text className="text-[15px] font-bold text-white mr-2" numberOfLines={1}>{t.title}</Text>
                     <View className="rounded-full px-2 py-0.5" style={{ backgroundColor: statusColor + '20' }}>
-                      <Text className="text-[9px] font-bold" style={{ color: statusColor }}>{status}</Text>
+                      <Text className="text-[9px] font-bold uppercase tracking-wider" style={{ color: statusColor }}>{status}</Text>
                     </View>
                   </View>
 
+                  {/* Destination */}
+                  <View className="flex-row items-center mb-1">
+                    <MapPin size={10} color={THEME.textMuted} />
+                    <Text className="text-[11px] font-semibold ml-1" style={{ color: THEME.textMuted }} numberOfLines={1}>
+                      {t.destination}
+                    </Text>
+                  </View>
+
                   {/* Dates */}
-                  <View className="flex-row items-center mb-2.5">
+                  <View className="flex-row items-center mb-3">
                     <CalendarIcon size={10} color={THEME.textMuted} />
-                    <Text className="text-[10px] ml-1" style={{ color: THEME.textMuted }}>
+                    <Text className="text-[10px] ml-1 font-medium" style={{ color: THEME.textMuted }}>
                       {t.startDate ? new Date(t.startDate).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : ''} - {t.endDate ? new Date(t.endDate).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : ''}
                     </Text>
                   </View>
 
                   {/* Finances */}
-                  <View className="flex-row items-center justify-between pr-2">
+                  <View className="flex-row items-center pr-2">
                     <View>
-                      <Text className="text-xs font-bold text-white">₹{b.toLocaleString()}</Text>
-                      <Text className="text-[9px]" style={{ color: THEME.textMuted }}>Budget</Text>
-                    </View>
-                    <View>
-                      <Text className="text-xs font-bold text-white">₹{s.toLocaleString()}</Text>
-                      <Text className="text-[9px]" style={{ color: THEME.textMuted }}>Spent</Text>
-                    </View>
-                    <View>
-                      <Text className="text-xs font-bold" style={{ color: leftColor }}>₹{l.toLocaleString()}</Text>
-                      <Text className="text-[9px]" style={{ color: THEME.textMuted }}>Left</Text>
+                      <Text className="text-[17px] font-bold text-white tracking-tight">₹{b.toLocaleString()}</Text>
+                      <Text className="text-[10px] font-semibold mt-0.5 uppercase tracking-wider" style={{ color: THEME.textMuted }}>Total Budget</Text>
                     </View>
                   </View>
                 </View>
 
                 {/* Progress Ring */}
                 <View className="ml-2 flex-row items-center mt-3">
-                  <CircularProgress percentage={p > 100 ? 100 : p} color={themeColor} size={54} strokeWidth={4} />
-                  <ChevronRight size={16} color={THEME.brand} style={{ marginLeft: 8 }} />
+                  <CircularProgress percentage={p > 100 ? 100 : p} color={themeColor} size={64} strokeWidth={5} />
+                  <ChevronRight size={16} color={THEME.textMuted} style={{ marginLeft: 10 }} />
                 </View>
 
                 {/* Top Right Add Expense Button */}
                 <TouchableOpacity
                   style={{
                     position: 'absolute',
-                    top: 12,
-                    right: 12,
-                    width: 28,
-                    height: 28,
-                    borderRadius: 14,
-                    backgroundColor: themeColor + '20',
+                    top: 14,
+                    right: 14,
+                    width: 36,
+                    height: 36,
+                    borderRadius: 18,
+                    backgroundColor: themeColor + '15',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    borderWidth: 1,
+                    borderWidth: 1.5,
                     borderColor: themeColor
                   }}
                   onPress={(e) => {
@@ -403,7 +403,7 @@ export default function BudgetOverviewScreen({ navigation }) {
                     setModalVisible(true);
                   }}
                 >
-                  <Plus size={16} color={themeColor} />
+                  <Plus size={20} color={themeColor} strokeWidth={2.5} />
                 </TouchableOpacity>
 
               </TouchableOpacity>

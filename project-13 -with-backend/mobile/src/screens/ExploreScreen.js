@@ -35,8 +35,26 @@ export default function ExploreScreen({ navigation }) {
     try {
       const { data } = await client.get('/trips?limit=100');
       if (data.success) {
-        // Sort trips by start date (newest first, or upcoming first)
-        const sorted = (data.trips || []).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+        const getStatusWeight = (status) => {
+          if (status === 'planning') return 1;
+          if (status === 'ongoing') return 2;
+          if (status === 'completed') return 3;
+          return 4;
+        };
+
+        const sorted = (data.trips || []).sort((a, b) => {
+          const statusA = getDynamicTripStatus(a.startDate, a.endDate);
+          const statusB = getDynamicTripStatus(b.startDate, b.endDate);
+          const weightA = getStatusWeight(statusA);
+          const weightB = getStatusWeight(statusB);
+
+          if (weightA !== weightB) {
+            return weightA - weightB; // Primary sort by status weight
+          }
+          
+          // Secondary sort by date
+          return new Date(a.startDate) - new Date(b.startDate);
+        });
         setTrips(sorted);
       }
     } catch (error) {
