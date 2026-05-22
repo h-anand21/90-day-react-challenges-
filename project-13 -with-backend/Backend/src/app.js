@@ -11,6 +11,7 @@ import commentRoutes from './routes/comment.routes.js';
 import checklistRoutes from './routes/checklist.routes.js';
 import expenseRoutes from './routes/expense.routes.js';
 import reservationRoutes from './routes/reservation.routes.js';
+import notificationRoutes from './routes/notification.routes.js';
 
 const app = express();
 
@@ -54,6 +55,7 @@ app.use('/api', commentRoutes);
 app.use('/api', checklistRoutes);
 app.use('/api', expenseRoutes);
 app.use('/api', reservationRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // ─── 404 ──────────────────────────────────────────────────────────────────────
 app.use((req, res) => {

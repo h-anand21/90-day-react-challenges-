@@ -134,3 +134,21 @@ export const firebaseAuth = async (req, res) => {
     return res.status(401).json({ success: false, message: error.message || 'Authentication failed' });
   }
 };
+
+// ─── POST /api/auth/push-token ─────────────────────────────────────────────
+export const updatePushToken = async (req, res) => {
+  try {
+    const { pushToken } = req.body;
+    if (!pushToken) {
+      return res.status(400).json({ success: false, message: 'Push token is required' });
+    }
+
+    req.user.expoPushToken = pushToken;
+    await req.user.save();
+
+    return res.status(200).json({ success: true, message: 'Push token updated successfully' });
+  } catch (error) {
+    console.error('[updatePushToken]', error);
+    return res.status(500).json({ success: false, message: 'Server error' });
+  }
+};

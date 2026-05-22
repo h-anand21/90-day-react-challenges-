@@ -126,10 +126,7 @@ export default function AppNavigator() {
         name="Notifications" 
         component={NotificationsScreen} 
         options={{ 
-          headerShown: true,
-          headerTitle: 'Notifications',
-          headerStyle: { backgroundColor: '#111111' },
-          headerTintColor: '#f5f5f5',
+          headerShown: false,
         }} 
       />
       <Stack.Screen 

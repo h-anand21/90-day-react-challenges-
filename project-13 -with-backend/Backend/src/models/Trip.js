@@ -44,6 +44,11 @@ const tripSchema = new mongoose.Schema(
       enum: ['planning', 'upcoming', 'ongoing', 'completed', 'cancelled'],
       default: 'planning',
     },
+    notificationState: {
+      notified24h: { type: Boolean, default: false },
+      notified1h: { type: Boolean, default: false },
+      notifiedDays: [{ type: String }],
+    },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
