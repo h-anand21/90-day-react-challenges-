@@ -427,7 +427,8 @@ export default function BudgetOverviewScreen({ navigation }) {
           <ChevronRight size={16} color={THEME.brand} />
         </TouchableOpacity>
 
-        <View className="h-20" />
+        {/* Bottom Spacer for Floating Navbar */}
+        <View className="h-32" />
       </ScrollView>
 
       {/* Add Expense Modal */}
