@@ -49,7 +49,7 @@ export default function NotificationsScreen() {
   const getIconInfo = (type) => {
     switch(type) {
       case 'TRIP_START_24H': return { Icon: Map, color: '#3b82f6', bg: 'rgba(59,130,246,0.15)' };
-      case 'TRIP_START_1H': return { Icon: MapPin, color: '#f97316', bg: 'rgba(249,115,22,0.15)' };
+      case 'TRIP_START_1H': return { Icon: MapPin, color: '#ec9006', bg: 'rgba(236, 144, 6,0.15)' };
       case 'TRIP_ONGOING_DAILY': return { Icon: Check, color: '#22c55e', bg: 'rgba(34,197,94,0.15)' };
       default: return { Icon: Bell, color: '#a3a3a3', bg: 'rgba(163,163,163,0.15)' };
     }
@@ -81,7 +81,7 @@ export default function NotificationsScreen() {
             className="p-3 rounded-2xl border"
             style={{ 
               backgroundColor: item.isRead ? '#111111' : '#1a1410', 
-              borderColor: item.isRead ? '#222222' : 'rgba(249,115,22,0.3)' 
+              borderColor: item.isRead ? '#222222' : 'rgba(236, 144, 6,0.3)' 
             }}
           >
             <View className="flex-row">
@@ -127,7 +127,7 @@ export default function NotificationsScreen() {
   if (loading && !refreshing) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center" style={{ backgroundColor: '#050505' }}>
-        <ActivityIndicator size="large" color="#f97316" />
+        <ActivityIndicator size="large" color="#ec9006" />
       </SafeAreaView>
     );
   }
@@ -158,7 +158,7 @@ export default function NotificationsScreen() {
         keyExtractor={(item) => item._id}
         renderItem={renderItem}
         contentContainerStyle={{ paddingVertical: 10, paddingRight: 10, flexGrow: 1 }}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#f97316" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#ec9006" />}
         ListEmptyComponent={
           <View className="flex-1 items-center justify-center py-20">
             <View className="w-16 h-16 bg-neutral-900 rounded-full items-center justify-center mb-4">

@@ -19,6 +19,12 @@ export const checkAndSendNotifications = async () => {
       if (!trip.owner || !trip.owner.expoPushToken) continue;
 
       const pushToken = trip.owner.expoPushToken;
+      
+      // Validate push token before attempting to send
+      if (!Expo.isExpoPushToken(pushToken)) {
+        console.error(`Push token ${pushToken} is not a valid Expo push token`);
+        continue;
+      }
       const start = new Date(trip.startDate);
       const end = new Date(trip.endDate);
       const timeToStart = start.getTime() - now.getTime();

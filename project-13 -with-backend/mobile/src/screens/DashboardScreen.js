@@ -8,8 +8,9 @@ import { Plus, Plane, AlertCircle, Search, MapPin, Calendar, ChevronRight, Chevr
 import Svg, { Path, Circle } from 'react-native-svg';
 import client, { getImageUri } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import { getAvatarSource } from '../utils/avatars';
 
-const THEME = { surface: '#0d0d0d', brand: '#f97316', textMuted: '#525252', textSecondary: '#a3a3a3', border: '#2e2e2e' };
+const THEME = { surface: '#0d0d0d', brand: '#ec9006', textMuted: '#525252', textSecondary: '#a3a3a3', border: '#2e2e2e' };
 
 // Device-aware responsive dimensions for the entire Dashboard to automatically adjust on all mobile screen widths!
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -70,9 +71,9 @@ const VictoriaMemorialSVG = () => (
     <Path d="M 12,42 L 52,42 L 52,46 L 12,46 Z" fill="#f3f4f6" />
     <Path d="M 18,28 L 46,28 L 46,42 L 18,42 Z" fill="#f3f4f6" />
     <Path d="M 22,28 L 24,42 M 30,28 L 30,42 M 34,28 L 34,42 M 42,28 L 40,42" stroke="#d1d5db" strokeWidth="2" />
-    <Path d="M 27,42 L 27,33 A 5,5 0 0,1 37,33 L 37,42 Z" fill="#f97316" />
+    <Path d="M 27,42 L 27,33 A 5,5 0 0,1 37,33 L 37,42 Z" fill="#ec9006" />
     <Path d="M 24,28 A 8,8 0 0,1 40,28 Z" fill="#9ca3af" />
-    <Path d="M 26,28 A 6,6 0 0,1 38,28 Z" fill="#f97316" />
+    <Path d="M 26,28 A 6,6 0 0,1 38,28 Z" fill="#ec9006" />
     <Path d="M 32,22 L 32,15" stroke="#9ca3af" strokeWidth="2" />
     <Path d="M 15,28 A 3,3 0 0,1 21,28 Z" fill="#9ca3af" />
     <Path d="M 43,28 A 3,3 0 0,1 49,28 Z" fill="#9ca3af" />
@@ -88,19 +89,19 @@ const GatewaySVG = () => (
     <Path d="M 20,22 L 24,22 L 24,46 L 20,46 Z" fill="#d1d5db" />
     <Path d="M 40,22 L 44,22 L 44,46 L 40,46 Z" fill="#d1d5db" />
     <Path d="M 12,16 L 52,16 L 52,22 L 12,22 Z" fill="#9ca3af" />
-    <Path d="M 14,12 L 50,12 L 50,16 L 14,16 Z" fill="#f97316" />
+    <Path d="M 14,12 L 50,12 L 50,16 L 14,16 Z" fill="#ec9006" />
     <Path d="M 26,12 A 6,6 0 0,1 38,12 Z" fill="#f3f4f6" />
-    <Path d="M 24,46 L 24,30 A 8,8 0 0,1 40,30 L 40,46 Z" fill="#ea580c" />
+    <Path d="M 24,46 L 24,30 A 8,8 0 0,1 40,30 L 40,46 Z" fill="#dc6601" />
   </Svg>
 );
 
 const MountainsSVG = () => (
   <Svg width="48" height="48" viewBox="0 0 64 64">
     <Path d="M 6,48 A 26,26 0 0,1 58,48 Z" fill="#e5e7eb" />
-    <Path d="M 22,28 A 10,10 0 1,1 42,28 Z" fill="#f97316" />
+    <Path d="M 22,28 A 10,10 0 1,1 42,28 Z" fill="#ec9006" />
     <Path d="M 8,46 L 28,18 L 46,46 Z" fill="#9ca3af" />
     <Path d="M 22,46 L 42,12 L 58,46 Z" fill="#f3f4f6" />
-    <Path d="M 38,18 L 42,12 L 46,18 L 42,22 Z" fill="#f97316" />
+    <Path d="M 38,18 L 42,12 L 46,18 L 42,22 Z" fill="#ec9006" />
     <Path d="M 8,46 L 56,46 L 56,50 L 8,50 Z" fill="#9ca3af" />
   </Svg>
 );
@@ -108,14 +109,14 @@ const MountainsSVG = () => (
 const BeachSVG = () => (
   <Svg width="48" height="48" viewBox="0 0 64 64">
     <Path d="M 6,48 A 26,26 0 0,1 58,48 Z" fill="#e5e7eb" />
-    <Path d="M 18,34 A 12,12 0 1,1 42,34 Z" fill="#f97316" />
+    <Path d="M 18,34 A 12,12 0 1,1 42,34 Z" fill="#ec9006" />
     <Path d="M 8,44 C 16,42 20,46 28,44 C 36,42 40,46 56,44 L 56,50 L 8,50 Z" fill="#9ca3af" />
     <Path d="M 8,47 C 16,45 20,49 28,47 C 36,45 40,49 56,47 L 56,50 L 8,50 Z" fill="#f3f4f6" />
     <Path d="M 46,47 Q 40,30 24,24" fill="none" stroke="#9ca3af" strokeWidth="3.5" />
-    <Path d="M 24,24 Q 16,26 12,28" fill="none" stroke="#f97316" strokeWidth="2.5" />
-    <Path d="M 24,24 Q 18,18 16,14" fill="none" stroke="#f97316" strokeWidth="2.5" />
-    <Path d="M 24,24 Q 28,16 32,12" fill="none" stroke="#f97316" strokeWidth="2.5" />
-    <Path d="M 24,24 Q 30,26 36,28" fill="none" stroke="#f97316" strokeWidth="2.5" />
+    <Path d="M 24,24 Q 16,26 12,28" fill="none" stroke="#ec9006" strokeWidth="2.5" />
+    <Path d="M 24,24 Q 18,18 16,14" fill="none" stroke="#ec9006" strokeWidth="2.5" />
+    <Path d="M 24,24 Q 28,16 32,12" fill="none" stroke="#ec9006" strokeWidth="2.5" />
+    <Path d="M 24,24 Q 30,26 36,28" fill="none" stroke="#ec9006" strokeWidth="2.5" />
   </Svg>
 );
 
@@ -125,7 +126,7 @@ const WaterfallSVG = () => (
     <Path d="M 8,46 L 22,22 L 28,46 Z" fill="#9ca3af" />
     <Path d="M 38,46 L 44,18 L 56,46 Z" fill="#9ca3af" />
     <Path d="M 26,28 L 38,28 L 36,46 L 28,46 Z" fill="#f3f4f6" />
-    <Path d="M 29,28 L 35,28 L 34,46 L 30,46 Z" fill="#f97316" />
+    <Path d="M 29,28 L 35,28 L 34,46 L 30,46 Z" fill="#ec9006" />
     <Path d="M 18,45 L 46,45 L 46,48 L 18,48 Z" fill="#f3f4f6" />
     <Path d="M 14,48 L 50,48 L 50,51 L 14,51 Z" fill="#9ca3af" />
   </Svg>
@@ -137,7 +138,7 @@ const TempleSVG = () => (
     <Path d="M 12,46 L 52,46 L 52,50 L 12,50 Z" fill="#9ca3af" />
     <Path d="M 16,42 L 48,42 L 48,46 L 16,46 Z" fill="#f3f4f6" />
     <Path d="M 20,28 L 44,28 L 44,42 L 20,42 Z" fill="#f3f4f6" />
-    <Path d="M 28,28 L 36,28 L 32,8 Z" fill="#f97316" />
+    <Path d="M 28,28 L 36,28 L 32,8 Z" fill="#ec9006" />
     <Path d="M 27,42 L 27,33 A 5,5 0 0,1 37,33 L 37,42 Z" fill="#9ca3af" />
     <Path d="M 32,8 A 2,2 0 1,1 32,4 A 2,2 0 1,1 32,8 Z" fill="#f3f4f6" />
   </Svg>
@@ -175,7 +176,7 @@ const TripIllustrationThumbnail = ({ destination }) => {
       marginRight: 12,
       backgroundColor: '#f5f5f5',
       borderWidth: 2,
-      borderColor: '#f97316', // Sleek orange frame highlight matching brand color!
+      borderColor: '#ec9006', // Sleek orange frame highlight matching brand color!
       alignItems: 'center',
       justifyContent: 'center',
       shadowColor: '#000',
@@ -191,7 +192,7 @@ const TripIllustrationThumbnail = ({ destination }) => {
 
 const STATUS_FILTERS = ['All', 'upcoming', 'planning', 'ongoing', 'completed'];
 const STATUS_COLORS = {
-  upcoming: { bg: '#f9731620', text: '#f97316' },
+  upcoming: { bg: '#ec900620', text: '#ec9006' },
   planning: { bg: '#3b82f620', text: '#3b82f6' },
   ongoing: { bg: '#22c55e20', text: '#22c55e' },
   completed: { bg: '#a3a3a320', text: '#a3a3a3' },
@@ -200,7 +201,7 @@ const STATUS_COLORS = {
 
 // Generate a consistent gradient color from a string (destination name)
 const getGradientColor = (str) => {
-  const colors = ['#f97316', '#3b82f6', '#8b5cf6', '#22c55e', '#ec4899', '#06b6d4', '#f59e0b', '#ef4444'];
+  const colors = ['#ec9006', '#3b82f6', '#8b5cf6', '#22c55e', '#ec4899', '#06b6d4', '#f59e0b', '#ef4444'];
   let hash = 0;
   for (let i = 0; i < (str || '').length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
   return colors[Math.abs(hash) % colors.length];
@@ -430,10 +431,10 @@ export default function DashboardScreen({ navigation }) {
             onPress={() => navigation.navigate('Profile')}
             activeOpacity={0.8}
             className="w-10 h-10 rounded-full border items-center justify-center overflow-hidden"
-            style={{ borderColor: '#f97316', backgroundColor: '#1a1a1a' }}
+            style={{ borderColor: '#ec9006', backgroundColor: '#1a1a1a' }}
           >
             {user?.avatar ? (
-              <Image source={{ uri: user.avatar }} style={{ width: '100%', height: '100%' }} />
+              <Image source={getAvatarSource(user.avatar)} style={{ width: '100%', height: '100%' }} />
             ) : (
               <Text className="text-white font-bold text-sm">{user?.name ? user.name.charAt(0) : 'U'}</Text>
             )}
@@ -441,10 +442,10 @@ export default function DashboardScreen({ navigation }) {
           {/* Logo */}
           <View className="flex-row items-center">
             <View style={{ transform: [{ rotate: '15deg' }] }}>
-              <Plane size={22} color="#f97316" />
+              <Plane size={22} color="#ec9006" />
             </View>
             <Text className="text-2xl font-black text-white ml-1.5" style={{ letterSpacing: -0.8 }}>
-              Trip<Text style={{ color: '#f97316' }}>Sync</Text>
+              Trip<Text style={{ color: '#ec9006' }}>Sync</Text>
             </Text>
           </View>
         </View>
@@ -458,7 +459,7 @@ export default function DashboardScreen({ navigation }) {
             style={{ backgroundColor: '#141414', borderColor: '#222222' }}
           >
             <Bell size={18} color="#ffffff" />
-            <View className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-orange-500 border border-[#141414]" />
+            <View className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-brand-500 border border-[#141414]" />
           </TouchableOpacity>
 
           {/* Plus Add button */}
@@ -468,7 +469,7 @@ export default function DashboardScreen({ navigation }) {
             className="w-10 h-10 rounded-full items-center justify-center"
             style={{ 
               backgroundColor: THEME.brand, 
-              shadowColor: '#f97316', 
+              shadowColor: '#ec9006', 
               shadowOffset: { width: 0, height: 4 }, 
               shadowOpacity: 0.3, 
               shadowRadius: 6, 
@@ -510,10 +511,10 @@ export default function DashboardScreen({ navigation }) {
             className="mx-6 border mt-8 p-6 items-center justify-center relative overflow-hidden" 
             style={{ 
               backgroundColor: '#141414', 
-              borderColor: 'rgba(249,115,22,0.15)', 
+              borderColor: 'rgba(236, 144, 6, 0.15)', 
               borderWidth: 1.5,
               borderRadius: 28,
-              shadowColor: '#f97316',
+              shadowColor: '#ec9006',
               shadowOffset: { width: 0, height: 8 },
               shadowOpacity: 0.15,
               shadowRadius: 20,
@@ -534,7 +535,7 @@ export default function DashboardScreen({ navigation }) {
             {/* Center Content Section */}
             <View className="items-center mb-6 px-2">
               <Text className="text-white font-extrabold text-[19px] text-center mb-2">
-                No trips <Text style={{ color: '#f97316' }}>planned yet?</Text>
+                No trips <Text style={{ color: '#ec9006' }}>planned yet?</Text>
               </Text>
               <Text className="text-neutral-400 font-semibold text-[12.5px] text-center leading-5" style={{ maxWidth: '90%' }}>
                 Create a new trip and start exploring the world.
@@ -548,9 +549,9 @@ export default function DashboardScreen({ navigation }) {
               className="w-full flex-row items-center justify-center"
               style={{ 
                 height: 52,
-                backgroundColor: '#f97316',
+                backgroundColor: '#ec9006',
                 borderRadius: 999,
-                shadowColor: '#f97316',
+                shadowColor: '#ec9006',
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.3,
                 shadowRadius: 10,
@@ -597,7 +598,7 @@ export default function DashboardScreen({ navigation }) {
                   <View style={{ height: 300, paddingTop: 18, paddingBottom: 22, paddingHorizontal: 20, justifyContent: 'space-between' }}>
                     {/* Upper row: Status Pill left, Heart & Delete actions right */}
                     <View className="flex-row justify-between items-center">
-                      <View className="px-3 py-1 rounded-full bg-orange-500">
+                      <View className="px-3 py-1 rounded-full bg-brand-500">
                         <Text className="text-[9px] font-black text-white uppercase tracking-wider">
                           {getDynamicTripStatus(ongoingTrip.startDate, ongoingTrip.endDate)}
                         </Text>
@@ -658,11 +659,11 @@ export default function DashboardScreen({ navigation }) {
                         <View className="flex-row items-center mb-2.5">
                           <View className="flex-row items-center">
                             {displayMembers.map((member, i) => {
-                              const avatarUri = member.user?.avatar || `https://ui-avatars.com/api/?background=f97316&color=fff&size=100&bold=true&name=${encodeURIComponent(member.user?.name || 'User')}`;
+                              const avatarSource = getAvatarSource(member.user?.avatar);
                               return (
                                 <Image
                                   key={i}
-                                  source={{ uri: avatarUri }}
+                                  source={avatarSource}
                                   style={{
                                     width: 20,
                                     height: 20,
@@ -675,8 +676,8 @@ export default function DashboardScreen({ navigation }) {
                               );
                             })}
                             {remainingCount > 0 && (
-                              <View className="w-[20px] h-[20px] rounded-full items-center justify-center bg-orange-500/20 border border-orange-500/40 ml-[-6px]">
-                                <Text className="text-[7px] font-black text-orange-500">+{remainingCount}</Text>
+                              <View className="w-[20px] h-[20px] rounded-full items-center justify-center bg-brand-500/20 border border-brand-500/40 ml-[-6px]">
+                                <Text className="text-[7px] font-black text-brand-500">+{remainingCount}</Text>
                               </View>
                             )}
                           </View>
@@ -693,10 +694,10 @@ export default function DashboardScreen({ navigation }) {
                           className="flex-row items-center px-3 py-1.5 rounded-full border self-start"
                           style={{ backgroundColor: 'rgba(15,15,15,0.7)', borderColor: 'rgba(255,255,255,0.1)' }}
                         >
-                          <Text className="text-orange-500 font-extrabold text-[9px] mr-1" numberOfLines={1} ellipsizeMode="tail">
+                          <Text className="text-brand-500 font-extrabold text-[9px] mr-1" numberOfLines={1} ellipsizeMode="tail">
                             View Itinerary
                           </Text>
-                          <ChevronRight size={8} color="#f97316" />
+                          <ChevronRight size={8} color="#ec9006" />
                         </TouchableOpacity>
                       </View>
 
@@ -708,7 +709,7 @@ export default function DashboardScreen({ navigation }) {
                         
                         {/* Progress Bar slider */}
                         <View className="w-full h-1 bg-[#262626] rounded-full mt-1.5 overflow-hidden">
-                          <View className="h-full rounded-full" style={{ width: `${budgetPercent}%`, backgroundColor: '#f97316' }} />
+                          <View className="h-full rounded-full" style={{ width: `${budgetPercent}%`, backgroundColor: '#ec9006' }} />
                         </View>
                         <Text className="text-right text-[7px] font-extrabold mt-0.5 text-white/60">{budgetPercent}%</Text>
                       </View>
@@ -727,12 +728,12 @@ export default function DashboardScreen({ navigation }) {
                 className="flex-1 border rounded-[20px] p-3 items-center justify-between" 
                 style={{ backgroundColor: '#111111', borderColor: '#222222', height: 110, position: 'relative' }}
               >
-                <View className="w-8 h-8 rounded-lg items-center justify-center" style={{ backgroundColor: 'rgba(249,115,22,0.15)' }}>
-                  <Briefcase size={16} color="#f97316" />
+                <View className="w-8 h-8 rounded-lg items-center justify-center" style={{ backgroundColor: 'rgba(236, 144, 6, 0.15)' }}>
+                  <Briefcase size={16} color="#ec9006" />
                 </View>
                 <Text className="text-[11px] font-black text-white mt-1">Upcoming</Text>
                 <Text className="text-[9px] font-bold text-neutral-500 mt-0.5">{trips.length} Trips</Text>
-                <View style={{ position: 'absolute', bottom: 0, left: 16, right: 16, height: 2.5, backgroundColor: '#f97316', borderRadius: 1.25 }} />
+                <View style={{ position: 'absolute', bottom: 0, left: 16, right: 16, height: 2.5, backgroundColor: '#ec9006', borderRadius: 1.25 }} />
               </TouchableOpacity>
               
               {/* Card 2: Flights booked */}
@@ -794,8 +795,8 @@ export default function DashboardScreen({ navigation }) {
                 Your Journeys
               </Text>
               <TouchableOpacity onPress={() => navigation.navigate('ExploreTab')} className="flex-row items-center">
-                <Text className="text-xs font-bold mr-1" style={{ color: '#f97316' }}>View All</Text>
-                <ChevronRight size={12} color="#f97316" />
+                <Text className="text-xs font-bold mr-1" style={{ color: '#ec9006' }}>View All</Text>
+                <ChevronRight size={12} color="#ec9006" />
               </TouchableOpacity>
             </View>
 
@@ -841,7 +842,7 @@ export default function DashboardScreen({ navigation }) {
                         {/* Top elements: Calendar Tag left, Actions Row right */}
                         <View className="flex-row justify-between items-start">
                           {/* Floating Calendar day Pill */}
-                          <View className="items-center justify-center rounded-xl p-1.5" style={{ backgroundColor: 'rgba(249,115,22,0.85)', minWidth: 42 }}>
+                          <View className="items-center justify-center rounded-xl p-1.5" style={{ backgroundColor: 'rgba(236, 144, 6,0.85)', minWidth: 42 }}>
                             <Text className="text-[8px] font-black text-white uppercase tracking-wider">
                               {getMonthAbbrev(trip.startDate)}
                             </Text>
@@ -855,12 +856,12 @@ export default function DashboardScreen({ navigation }) {
                             <TouchableOpacity 
                               onPress={() => toggleFavorite(trip._id)}
                               className="w-8 h-8 rounded-full items-center justify-center" 
-                              style={{ backgroundColor: favorites[trip._id] ? 'rgba(249,115,22,0.2)' : 'rgba(15,15,15,0.5)' }}
+                              style={{ backgroundColor: favorites[trip._id] ? 'rgba(236, 144, 6,0.2)' : 'rgba(15,15,15,0.5)' }}
                             >
                               <Bookmark 
                                 size={14} 
-                                color={favorites[trip._id] ? '#f97316' : '#ffffff'} 
-                                fill={favorites[trip._id] ? '#f97316' : 'transparent'} 
+                                color={favorites[trip._id] ? '#ec9006' : '#ffffff'} 
+                                fill={favorites[trip._id] ? '#ec9006' : 'transparent'} 
                               />
                             </TouchableOpacity>
 
@@ -919,10 +920,10 @@ export default function DashboardScreen({ navigation }) {
               className="mx-6 border mb-6 p-6 items-center justify-center relative overflow-hidden" 
               style={{ 
                 backgroundColor: '#141414', 
-                borderColor: 'rgba(249,115,22,0.15)', 
+                borderColor: 'rgba(236, 144, 6,0.15)', 
                 borderWidth: 1.5,
                 borderRadius: 28,
-                shadowColor: '#f97316',
+                shadowColor: '#ec9006',
                 shadowOffset: { width: 0, height: 8 },
                 shadowOpacity: 0.15,
                 shadowRadius: 20,
@@ -943,7 +944,7 @@ export default function DashboardScreen({ navigation }) {
               {/* Center Content Section */}
               <View className="items-center mb-6 px-2">
                 <Text className="text-white font-extrabold text-[19px] text-center mb-2">
-                  No trips <Text style={{ color: '#f97316' }}>planned yet?</Text>
+                  No trips <Text style={{ color: '#ec9006' }}>planned yet?</Text>
                 </Text>
                 <Text className="text-neutral-400 font-semibold text-[12.5px] text-center leading-5" style={{ maxWidth: '90%' }}>
                   Create a new trip and start exploring the world.
@@ -957,9 +958,9 @@ export default function DashboardScreen({ navigation }) {
                 className="w-full flex-row items-center justify-center"
                 style={{ 
                   height: 52,
-                  backgroundColor: '#f97316',
+                  backgroundColor: '#ec9006',
                   borderRadius: 999,
-                  shadowColor: '#f97316',
+                  shadowColor: '#ec9006',
                   shadowOffset: { width: 0, height: 4 },
                   shadowOpacity: 0.3,
                   shadowRadius: 10,
@@ -980,7 +981,7 @@ export default function DashboardScreen({ navigation }) {
           </View>
         )}
 
-        <View className="h-10" />
+        <View className="h-28" />
       </ScrollView>
 
       

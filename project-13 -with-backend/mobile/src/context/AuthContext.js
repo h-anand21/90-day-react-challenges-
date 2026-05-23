@@ -10,6 +10,7 @@ import {
 } from 'firebase/auth';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
 Notifications.setNotificationHandler({
@@ -59,12 +60,16 @@ export const AuthProvider = ({ children }) => {
       }
       // Learn more about projectId: https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
       try {
-        const projectId = 'your-project-id'; // Can be retrieved from Constants.expoConfig.extra.eas.projectId if set
-        token = (await Notifications.getExpoPushTokenAsync()).data;
+        const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+        if (!projectId) {
+          console.warn('No EAS Project ID found. Push notifications will not work in this environment.');
+          return;
+        }
+        token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
         console.log("Push Token:", token);
         await client.post('/auth/push-token', { pushToken: token });
       } catch (e) {
-        console.log("Error getting push token", e);
+        console.log("Error getting push token:", e.message || e);
       }
     }
   };
@@ -189,7 +194,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, loginWithGoogle, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, setUser, loading, login, register, loginWithGoogle, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

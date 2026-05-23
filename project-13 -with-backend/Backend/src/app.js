@@ -12,6 +12,7 @@ import checklistRoutes from './routes/checklist.routes.js';
 import expenseRoutes from './routes/expense.routes.js';
 import reservationRoutes from './routes/reservation.routes.js';
 import notificationRoutes from './routes/notification.routes.js';
+import userRoutes from './routes/user.routes.js';
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.use(cookieParser());
 app.get('/', (req, res) => res.json({ success: true, message: 'TripSync API v1' }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api', itineraryRoutes);
 app.use('/api', commentRoutes);

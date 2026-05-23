@@ -10,7 +10,7 @@ import { PieChart } from 'react-native-chart-kit';
 const THEME = { 
   bg: '#050505', 
   surface: '#121212', 
-  brand: '#ff6b00', 
+  brand: '#ec9006', 
   textMuted: '#888888', 
   textWhite: '#ffffff',
   green: '#22c55e',
@@ -21,7 +21,7 @@ const THEME = {
 };
 
 const TRIP_COLORS = [
-  '#ff6b00', // Orange
+  '#ec9006', // Orange
   '#3b82f6', // Blue
   '#22c55e', // Green
   '#a855f7', // Purple
@@ -234,7 +234,7 @@ export default function BudgetOverviewScreen({ navigation }) {
                 const isActive = filterStatus === f;
                 let chipColor = THEME.textMuted;
                 if (isActive) {
-                  if (f === 'Ongoing') chipColor = '#ff6b00';
+                  if (f === 'Ongoing') chipColor = '#ec9006';
                   else if (f === 'Planning') chipColor = '#3b82f6';
                   else if (f === 'Completed') chipColor = '#22c55e';
                   else chipColor = THEME.brand;
@@ -265,7 +265,7 @@ export default function BudgetOverviewScreen({ navigation }) {
         {/* Top Total Card */}
         <View className="rounded-2xl p-4 mb-5 border" style={{ backgroundColor: THEME.surface, borderColor: THEME.border }}>
           <View className="flex-row items-center mb-3">
-            <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: '#ff6b0020' }}>
+            <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: '#ec900620' }}>
               <Wallet size={20} color={THEME.brand} />
             </View>
             <Text className="text-xs" style={{ color: THEME.textMuted }}>
@@ -323,7 +323,7 @@ export default function BudgetOverviewScreen({ navigation }) {
             
             if (start <= now && end >= now) {
               status = 'Ongoing';
-              statusColor = '#ff6b00'; // Orange for Ongoing
+              statusColor = '#ec9006'; // Orange for Ongoing
             } else if (end < now) {
               status = 'Completed';
               statusColor = '#22c55e'; // Green for Completed
@@ -568,7 +568,7 @@ export default function BudgetOverviewScreen({ navigation }) {
         });
 
         const pieData = Object.keys(categoryTotals).map((cat, idx) => {
-          const colors = ['#ff6b00', '#3b82f6', '#22c55e', '#a855f7', '#eab308', '#64748b'];
+          const colors = ['#ec9006', '#3b82f6', '#22c55e', '#a855f7', '#eab308', '#64748b'];
           return {
             name: cat.charAt(0).toUpperCase() + cat.slice(1),
             population: categoryTotals[cat],

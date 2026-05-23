@@ -7,10 +7,10 @@ import { useFocusEffect } from '@react-navigation/native';
 import client, { getImageUri } from '../api/client';
 import { getDynamicTripStatus, getDestinationImage } from './DashboardScreen'; // Import helpers from Dashboard
 
-const THEME = { surface: '#0d0d0d', brand: '#f97316', textMuted: '#525252', textSecondary: '#a3a3a3', border: '#2e2e2e' };
+const THEME = { surface: '#0d0d0d', brand: '#ec9006', textMuted: '#525252', textSecondary: '#a3a3a3', border: '#2e2e2e' };
 
 const STATUS_COLORS = {
-  upcoming: { bg: '#f9731620', text: '#f97316' },
+  upcoming: { bg: '#ec900620', text: '#ec9006' },
   planning: { bg: '#3b82f620', text: '#3b82f6' },
   ongoing: { bg: '#22c55e20', text: '#22c55e' },
   completed: { bg: '#a3a3a320', text: '#a3a3a3' },
@@ -129,8 +129,8 @@ export default function ExploreScreen({ navigation }) {
                 onPress={() => setStatusFilter(status)}
                 className="px-4 py-2 rounded-full mr-2.5 border"
                 style={{
-                  backgroundColor: isActive ? 'rgba(249,115,22,0.06)' : '#111111',
-                  borderColor: isActive ? '#f97316' : '#222222'
+                  backgroundColor: isActive ? 'rgba(236, 144, 6,0.06)' : '#111111',
+                  borderColor: isActive ? '#ec9006' : '#222222'
                 }}
               >
                 <View className="flex-row items-center">
@@ -140,7 +140,7 @@ export default function ExploreScreen({ navigation }) {
                         width: 6, 
                         height: 6, 
                         borderRadius: 3, 
-                        backgroundColor: status === 'planning' ? '#3b82f6' : status === 'ongoing' ? '#f97316' : '#22c55e',
+                        backgroundColor: status === 'planning' ? '#3b82f6' : status === 'ongoing' ? '#ec9006' : '#22c55e',
                         marginRight: 6
                       }} 
                     />
@@ -158,7 +158,7 @@ export default function ExploreScreen({ navigation }) {
       {/* Main List */}
       <ScrollView
         className="flex-1 px-6 pt-2"
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingBottom: 120 }}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={THEME.brand} />}
       >
@@ -174,7 +174,7 @@ export default function ExploreScreen({ navigation }) {
               className="flex-row items-center justify-center px-6"
               style={{ 
                 height: 48,
-                backgroundColor: '#f97316',
+                backgroundColor: '#ec9006',
                 borderRadius: 999,
               }}
             >
@@ -188,7 +188,7 @@ export default function ExploreScreen({ navigation }) {
           <View>
             <View className="flex-row items-center mb-3">
               <Text className="text-xs font-semibold" style={{ color: '#737373' }}>Showing </Text>
-              <Text className="text-xs font-bold" style={{ color: '#f97316' }}>{filteredTrips.length}</Text>
+              <Text className="text-xs font-bold" style={{ color: '#ec9006' }}>{filteredTrips.length}</Text>
               <Text className="text-xs font-semibold" style={{ color: '#737373' }}> trips</Text>
             </View>
             
@@ -269,8 +269,8 @@ export default function ExploreScreen({ navigation }) {
             })}
 
             <View className="items-center justify-center py-6 mt-2 mb-6">
-              <View className="w-12 h-12 rounded-2xl items-center justify-center border mb-2" style={{ backgroundColor: 'rgba(249,115,22,0.08)', borderColor: 'rgba(249,115,22,0.15)' }}>
-                <Briefcase size={18} color="#f97316" />
+              <View className="w-12 h-12 rounded-2xl items-center justify-center border mb-2" style={{ backgroundColor: 'rgba(236, 144, 6,0.08)', borderColor: 'rgba(236, 144, 6,0.15)' }}>
+                <Briefcase size={18} color="#ec9006" />
               </View>
               <Text className="text-white font-extrabold text-sm text-center">No more trips here</Text>
               <Text className="text-xs text-neutral-500 text-center mt-1">Start planning your next adventure!</Text>

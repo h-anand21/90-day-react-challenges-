@@ -10,7 +10,7 @@ import client from '../api/client';
 const THEME = {
   surface: '#0d0d0d',
   surfaceCard: '#141414',
-  brand: '#f97316',
+  brand: '#ec9006',
   border: '#222222',
   textSecondary: '#a3a3a3'
 };
@@ -260,7 +260,7 @@ export default function CreateTripScreen({ navigation }) {
           disabled={isDisabled}
           onPress={() => handleDateSelect(day)}
           className={`w-[12%] aspect-square items-center justify-center rounded-full my-0.5 ${
-            isSelected ? 'bg-orange-500 shadow shadow-orange-500' : 'bg-transparent'
+            isSelected ? 'bg-brand-500 shadow shadow-brand-500' : 'bg-transparent'
           }`}
           style={isDisabled ? { opacity: 0.15 } : {}}
         >

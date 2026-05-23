@@ -61,7 +61,7 @@ export default function OnboardingScreen({ navigation }) {
             <Text style={styles.titleWhite}>Every</Text>
             <Text style={styles.titleOrange}>unforgettable</Text>
             <Text style={styles.titleWhite}>trip starts</Text>
-            <Text style={styles.titleWhite}>with a plan<Text style={{color: '#ea580c'}}>.</Text></Text>
+            <Text style={styles.titleWhite}>with a plan<Text style={{color: '#dc6601'}}>.</Text></Text>
           </View>
           <View style={styles.dash} />
           <Text style={styles.heroSubtitle}>
@@ -71,8 +71,8 @@ export default function OnboardingScreen({ navigation }) {
           <View style={styles.bottomArea}>
             <View style={styles.glassCard}>
               <View style={styles.featureCol}>
-                <View style={[styles.iconBadge, { shadowColor: '#f97316' }]}>
-                  <MapPin size={22} color="#f97316" />
+                <View style={[styles.iconBadge, { shadowColor: '#ec9006' }]}>
+                  <MapPin size={22} color="#ec9006" />
                 </View>
                 <Text style={styles.featureTitle}>Plan Better</Text>
                 <Text style={styles.featureSub}>Organize itineraries with smart day-by-day planning.</Text>
@@ -157,7 +157,7 @@ export default function OnboardingScreen({ navigation }) {
                       <Text style={styles.timelineLocation} numberOfLines={1}>Agra, Uttar Pradesh</Text>
                     </View>
                     <View style={styles.usersCountBadge}>
-                      <Users size={8} color="#f97316" />
+                      <Users size={8} color="#ec9006" />
                       <Text style={styles.usersCountText}>4</Text>
                     </View>
                   </View>
@@ -191,7 +191,7 @@ export default function OnboardingScreen({ navigation }) {
             <View style={styles.infoCardWrapper}>
               <View style={styles.infoCard}>
                 <View style={styles.infoIconWrapper}>
-                  <Users size={18} color="#f97316" />
+                  <Users size={18} color="#ec9006" />
                 </View>
                 <Text style={styles.infoTitle}>Everyone{"\n"}in the loop</Text>
                 <Text style={styles.infoSub}>Real-time updates keep everyone informed and on the same page.</Text>
@@ -255,7 +255,7 @@ export default function OnboardingScreen({ navigation }) {
                     <Wallet size={12} color="#fff" />
                   </View>
                   <View style={styles.legendContainer}>
-                    <View style={styles.legendItem}><View style={[styles.legendDot, {backgroundColor: '#f97316'}]}/><Text style={styles.legendText}>Accom.</Text><Text style={styles.legendPct}>41%</Text></View>
+                    <View style={styles.legendItem}><View style={[styles.legendDot, {backgroundColor: '#ec9006'}]}/><Text style={styles.legendText}>Accom.</Text><Text style={styles.legendPct}>41%</Text></View>
                     <View style={styles.legendItem}><View style={[styles.legendDot, {backgroundColor: '#8b5cf6'}]}/><Text style={styles.legendText}>Food</Text><Text style={styles.legendPct}>24%</Text></View>
                     <View style={styles.legendItem}><View style={[styles.legendDot, {backgroundColor: '#3b82f6'}]}/><Text style={styles.legendText}>Transp.</Text><Text style={styles.legendPct}>16%</Text></View>
                     <View style={styles.legendItem}><View style={[styles.legendDot, {backgroundColor: '#10b981'}]}/><Text style={styles.legendText}>Activ.</Text><Text style={styles.legendPct}>11%</Text></View>
@@ -277,7 +277,7 @@ export default function OnboardingScreen({ navigation }) {
                 </View>
                 
                 <View style={styles.bookingItem}>
-                  <View style={[styles.bookingIcon, {backgroundColor: 'rgba(249, 115, 22, 0.2)'}]}><Building2 size={12} color="#f97316" /></View>
+                  <View style={[styles.bookingIcon, {backgroundColor: 'rgba(236, 144, 6, 0.2)'}]}><Building2 size={12} color="#ec9006" /></View>
                   <View style={styles.bookingTextCont}><Text style={styles.bookingTitle}>Sunset Resort</Text><Text style={styles.bookingSub}>May 12 - May 20</Text></View>
                   <View style={styles.statusBadge}><Text style={styles.statusText}>Confirmed</Text></View>
                 </View>
@@ -295,12 +295,12 @@ export default function OnboardingScreen({ navigation }) {
               <View style={[styles.dashCard, { flex: 0.8, marginLeft: 8 }]}>
                 <View style={styles.checklistHeader}>
                   <Text style={styles.dashCardTitle}>Checklist</Text>
-                  <Text style={styles.checklistCount}><Text style={{color: '#f97316'}}>12</Text> / 18</Text>
+                  <Text style={styles.checklistCount}><Text style={{color: '#ec9006'}}>12</Text> / 18</Text>
                 </View>
                 
-                <View style={styles.checkItem}><CheckCircle2 size={12} color="#f97316" /><Text style={styles.checkText}>Passport</Text></View>
-                <View style={styles.checkItem}><CheckCircle2 size={12} color="#f97316" /><Text style={styles.checkText}>Flight Tickets</Text></View>
-                <View style={styles.checkItem}><CheckCircle2 size={12} color="#f97316" /><Text style={styles.checkText}>Hotel Voucher</Text></View>
+                <View style={styles.checkItem}><CheckCircle2 size={12} color="#ec9006" /><Text style={styles.checkText}>Passport</Text></View>
+                <View style={styles.checkItem}><CheckCircle2 size={12} color="#ec9006" /><Text style={styles.checkText}>Flight Tickets</Text></View>
+                <View style={styles.checkItem}><CheckCircle2 size={12} color="#ec9006" /><Text style={styles.checkText}>Hotel Voucher</Text></View>
                 <View style={styles.checkItem}><Circle size={12} color="#555" /><Text style={styles.checkTextOff}>Travel Insur.</Text></View>
                 <View style={styles.checkItem}><Circle size={12} color="#555" /><Text style={styles.checkTextOff}>Universal Adap.</Text></View>
               </View>
@@ -313,7 +313,7 @@ export default function OnboardingScreen({ navigation }) {
                 
                 <View style={styles.itineraryHItem}>
                   <Text style={styles.itineraryHDateOrange}>May 12</Text>
-                  <View style={[styles.itineraryHCircle, {borderColor: '#f97316'}]}><Plane size={14} color="#f97316" /></View>
+                  <View style={[styles.itineraryHCircle, {borderColor: '#ec9006'}]}><Plane size={14} color="#ec9006" /></View>
                   <Text style={styles.itineraryHTitle}>Arrival</Text>
                 </View>
                 <View style={styles.itineraryHDash} />
@@ -402,7 +402,7 @@ export default function OnboardingScreen({ navigation }) {
             onPress={scrollToNext}
           >
             <LinearGradient
-              colors={['#f97316', '#ea580c']}
+              colors={['#ec9006', '#dc6601']}
               style={styles.nextArrowGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
@@ -428,13 +428,13 @@ const styles = StyleSheet.create({
   mainContent: { flex: 1 },
   scrollContent: { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 140, justifyContent: 'center' },
   stepIndicator: { flexDirection: 'row', alignItems: 'center', marginBottom: 20, borderWidth: 1, borderColor: 'rgba(234, 88, 12, 0.4)', borderRadius: 20, paddingHorizontal: 14, paddingVertical: 6, alignSelf: 'flex-start', backgroundColor: 'rgba(0,0,0,0.4)' },
-  stepText: { color: '#ea580c', fontSize: 16, fontWeight: '700', marginRight: 10 },
+  stepText: { color: '#dc6601', fontSize: 16, fontWeight: '700', marginRight: 10 },
   stepDots: { flexDirection: 'row', alignItems: 'center' },
   dotSmall: { width: 4, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.3)', marginHorizontal: 3 },
   titleContainer: { marginBottom: 20 },
   titleWhite: { color: '#ffffff', fontSize: width < 380 ? 32 : 40, fontWeight: '900', lineHeight: width < 380 ? 38 : 46, letterSpacing: -0.5 },
-  titleOrange: { color: '#f97316', fontSize: width < 380 ? 32 : 40, fontWeight: '900', lineHeight: width < 380 ? 38 : 46, letterSpacing: -0.5 },
-  dash: { width: 36, height: 4, backgroundColor: '#ea580c', borderRadius: 2, marginBottom: 20 },
+  titleOrange: { color: '#ec9006', fontSize: width < 380 ? 32 : 40, fontWeight: '900', lineHeight: width < 380 ? 38 : 46, letterSpacing: -0.5 },
+  dash: { width: 36, height: 4, backgroundColor: '#dc6601', borderRadius: 2, marginBottom: 20 },
   heroSubtitle: { color: '#d4d4d4', fontSize: 15, fontWeight: '400', lineHeight: 22, marginBottom: 20 },
   
   /* Slide 1 Bottom Area */
@@ -452,25 +452,25 @@ const styles = StyleSheet.create({
   itineraryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   itineraryTitle: { color: '#fff', fontSize: 14, fontWeight: '700' },
   daysBadge: { backgroundColor: 'rgba(234, 88, 12, 0.15)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
-  daysText: { color: '#ea580c', fontSize: 10, fontWeight: '700' },
+  daysText: { color: '#dc6601', fontSize: 10, fontWeight: '700' },
   avatarsRow: { flexDirection: 'row', marginBottom: 20 },
   avatar: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: '#111' },
   avatarPlus: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: '#111', backgroundColor: '#333', alignItems: 'center', justifyContent: 'center' },
   
   timelineContainer: { flex: 1, position: 'relative' },
   timelineLine: { position: 'absolute', left: 4, top: 10, bottom: 20, width: 1, backgroundColor: 'rgba(255,255,255,0.1)' },
-  timelineLineActive: { position: 'absolute', left: 4, top: 10, height: 40, width: 1, backgroundColor: '#ea580c' },
+  timelineLineActive: { position: 'absolute', left: 4, top: 10, height: 40, width: 1, backgroundColor: '#dc6601' },
   timelineItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   timelineDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#555', marginLeft: 1, marginRight: 12 },
-  timelineDotActive: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#ea580c', marginRight: 11, shadowColor: '#ea580c', shadowOpacity: 0.8, shadowRadius: 6, elevation: 4 },
+  timelineDotActive: { width: 10, height: 10, borderRadius: 5, backgroundColor: '#dc6601', marginRight: 11, shadowColor: '#dc6601', shadowOpacity: 0.8, shadowRadius: 6, elevation: 4 },
   timelineBox: { flex: 1, flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.03)', padding: 8, borderRadius: 12 },
   timelineBoxActive: { backgroundColor: 'rgba(234, 88, 12, 0.08)', borderWidth: 1, borderColor: 'rgba(234, 88, 12, 0.2)' },
   timelineImageMock: { width: 32, height: 32, borderRadius: 8, marginRight: 10 },
   timelineDay: { color: '#a3a3a3', fontSize: 10, fontWeight: '500' },
-  timelineDayOrange: { color: '#ea580c', fontSize: 10, fontWeight: '700' },
+  timelineDayOrange: { color: '#dc6601', fontSize: 10, fontWeight: '700' },
   timelineLocation: { color: '#fff', fontSize: 11, fontWeight: '600' },
   usersCountBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(234, 88, 12, 0.1)', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, marginLeft: 5 },
-  usersCountText: { color: '#ea580c', fontSize: 9, fontWeight: '700', marginLeft: 3 },
+  usersCountText: { color: '#dc6601', fontSize: 9, fontWeight: '700', marginLeft: 3 },
   
   infoCardWrapper: { flex: 0.35, justifyContent: 'flex-end' },
   infoCard: { backgroundColor: 'rgba(20,20,20,0.85)', borderRadius: 24, padding: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
@@ -488,13 +488,13 @@ const styles = StyleSheet.create({
   budgetMainRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   budgetAmount: { color: '#fff', fontSize: 16, fontWeight: '800' },
   budgetSub: { color: '#9ca3af', fontSize: 8, marginTop: 2 },
-  budgetRing: { width: 36, height: 36, borderRadius: 18, borderWidth: 3, borderColor: '#333', borderTopColor: '#f97316', alignItems: 'center', justifyContent: 'center' },
+  budgetRing: { width: 36, height: 36, borderRadius: 18, borderWidth: 3, borderColor: '#333', borderTopColor: '#ec9006', alignItems: 'center', justifyContent: 'center' },
   budgetRingText: { color: '#fff', fontSize: 9, fontWeight: '700' },
-  sparklineMock: { height: 10, borderBottomWidth: 1, borderColor: '#f97316', marginTop: 10, opacity: 0.5 },
+  sparklineMock: { height: 10, borderBottomWidth: 1, borderColor: '#ec9006', marginTop: 10, opacity: 0.5 },
 
   /* Expense Card */
   expenseRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  donutMock: { width: 40, height: 40, borderRadius: 20, borderWidth: 6, borderColor: '#3b82f6', borderTopColor: '#f97316', borderRightColor: '#8b5cf6', alignItems: 'center', justifyContent: 'center' },
+  donutMock: { width: 40, height: 40, borderRadius: 20, borderWidth: 6, borderColor: '#3b82f6', borderTopColor: '#ec9006', borderRightColor: '#8b5cf6', alignItems: 'center', justifyContent: 'center' },
   legendContainer: { flex: 1, marginLeft: 10 },
   legendItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
   legendDot: { width: 6, height: 6, borderRadius: 3, marginRight: 4 },
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
   bookingSub: { color: '#9ca3af', fontSize: 8 },
   statusBadge: { backgroundColor: 'rgba(16, 185, 129, 0.15)', paddingHorizontal: 4, paddingVertical: 2, borderRadius: 4 },
   statusText: { color: '#10b981', fontSize: 7, fontWeight: '700' },
-  viewAllText: { color: '#f97316', fontSize: 9, fontWeight: '700', marginTop: 4 },
+  viewAllText: { color: '#ec9006', fontSize: 9, fontWeight: '700', marginTop: 4 },
 
   /* Checklist Card */
   checklistHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
   itineraryHScroll: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 4, paddingVertical: 8 },
   itineraryHItem: { alignItems: 'center' },
   itineraryHDate: { color: '#9ca3af', fontSize: 8, marginBottom: 4 },
-  itineraryHDateOrange: { color: '#f97316', fontSize: 8, marginBottom: 4, fontWeight: '700' },
+  itineraryHDateOrange: { color: '#ec9006', fontSize: 8, marginBottom: 4, fontWeight: '700' },
   itineraryHCircle: { width: 30, height: 30, borderRadius: 15, borderWidth: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.05)', marginBottom: 4 },
   itineraryHTitle: { color: '#fff', fontSize: 8 },
   itineraryHDash: { height: 1, width: 16, backgroundColor: 'rgba(255,255,255,0.2)', marginBottom: 12 },
@@ -531,8 +531,8 @@ const styles = StyleSheet.create({
   globalFooter: { position: 'absolute', bottom: Platform.OS === 'ios' ? 40 : 20, left: 24, right: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   backButton: { width: 48, height: 48, borderRadius: 24, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.4)' },
   pagination: { flexDirection: 'row', alignItems: 'center' },
-  dotActive: { width: 20, height: 6, borderRadius: 3, backgroundColor: '#ea580c', marginHorizontal: 4 },
+  dotActive: { width: 20, height: 6, borderRadius: 3, backgroundColor: '#dc6601', marginHorizontal: 4 },
   dotInactive: { width: 6, height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.2)', marginHorizontal: 4 },
-  nextArrowButton: { width: 56, height: 56, borderRadius: 28, shadowColor: '#ea580c', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.5, shadowRadius: 15, elevation: 8 },
+  nextArrowButton: { width: 56, height: 56, borderRadius: 28, shadowColor: '#dc6601', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.5, shadowRadius: 15, elevation: 8 },
   nextArrowGradient: { flex: 1, borderRadius: 28, alignItems: 'center', justifyContent: 'center' }
 });

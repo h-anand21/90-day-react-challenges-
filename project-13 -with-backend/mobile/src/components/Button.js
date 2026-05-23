@@ -35,7 +35,7 @@ export const Button = ({
       `}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? 'white' : '#f97316'} />
+        <ActivityIndicator color={variant === 'primary' ? 'white' : '#ec9006'} />
       ) : (
         <View className="flex-row items-center">
           {Icon && <View className="mr-2"><Icon size={18} color={variant === 'danger' ? '#ef4444' : variant === 'ghost' ? '#a3a3a3' : 'white'} /></View>}

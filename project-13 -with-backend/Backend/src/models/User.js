@@ -10,6 +10,11 @@ const userSchema = new mongoose.Schema(
       minlength: [2, 'Name must be at least 2 characters'],
       maxlength: [50, 'Name must be at most 50 characters'],
     },
+    gender: {
+      type: String,
+      enum: ['Male', 'Female', 'Neutral'],
+      default: 'Neutral',
+    },
     email: {
       type: String,
       required: [true, 'Email is required'],
@@ -27,6 +32,10 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
       default: '',
+    },
+    isProfileSetupCompleted: {
+      type: Boolean,
+      default: false,
     },
     role: {
       type: String,

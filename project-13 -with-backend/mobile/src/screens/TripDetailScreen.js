@@ -16,6 +16,7 @@ import {
   MessageSquare, Crown, Eye, Edit3, UserX, Shield, BarChart2
 } from 'lucide-react-native';
 import client, { getImageUri } from '../api/client';
+import { getAvatarSource } from '../utils/avatars';
 import { useAuth } from '../context/AuthContext';
 import { PieChart, BarChart } from 'react-native-chart-kit';
 import { getDynamicTripStatus } from './DashboardScreen';
@@ -25,7 +26,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
 }
 
 const THEME = {
-  brand: '#f97316',
+  brand: '#ec9006',
   surface: '#111111',
   surface2: '#1a1a1a',
   border: '#2e2e2e',
@@ -39,7 +40,7 @@ const THEME = {
 
 const CAT_COLORS = {
   transport: '#3b82f6', accommodation: '#8b5cf6', food: '#f59e0b',
-  activity: '#f97316', sightseeing: '#22c55e', other: '#6b7280',
+  activity: '#ec9006', sightseeing: '#22c55e', other: '#6b7280',
 };
 
 export default function TripDetailScreen({ route, navigation }) {
@@ -131,7 +132,7 @@ export default function TripDetailScreen({ route, navigation }) {
             
             {/* Floating weather pill on cover image */}
             <View className="absolute bottom-4 right-4 flex-row items-center px-3 py-1.5 rounded-full border" style={{ backgroundColor: 'rgba(17,17,17,0.85)', borderColor: '#2e2e2e' }}>
-              <Compass size={12} color="#f97316" />
+              <Compass size={12} color="#ec9006" />
               <Text className="text-[10px] font-black text-white ml-1.5">Explore {trip.destination}</Text>
             </View>
           </View>
@@ -139,8 +140,8 @@ export default function TripDetailScreen({ route, navigation }) {
           <Text className="text-4xl font-bold text-white leading-tight" style={{ color: '#FFFFFF' }}>{trip.title}</Text>
           <View className="flex-row flex-wrap items-center mt-3 mb-2 gap-2">
             {trip.destination && <View className="flex-row items-center bg-white/5 border border-white/10 px-2.5 py-1 rounded-full"><Globe size={11} color={THEME.textSecondary} /><Text className="text-[10px] text-text-secondary ml-1" style={{ color: THEME.textSecondary }}>{trip.destination}</Text></View>}
-            <View className="px-2.5 py-1 rounded-full" style={{ backgroundColor: getDynamicTripStatus(trip.startDate, trip.endDate) === 'ongoing' ? '#22c55e20' : getDynamicTripStatus(trip.startDate, trip.endDate) === 'completed' ? '#f9731620' : '#3b82f620' }}><Text className="text-[10px] font-bold uppercase" style={{ color: getDynamicTripStatus(trip.startDate, trip.endDate) === 'ongoing' ? '#22c55e' : getDynamicTripStatus(trip.startDate, trip.endDate) === 'completed' ? '#f97316' : '#3b82f6' }}>{getDynamicTripStatus(trip.startDate, trip.endDate)}</Text></View>
-            <View className="px-2.5 py-1 rounded-full" style={{ backgroundColor: '#f9731620' }}><Text className="text-[10px] font-bold uppercase" style={{ color: '#f97316' }}>{myRole}</Text></View>
+            <View className="px-2.5 py-1 rounded-full" style={{ backgroundColor: getDynamicTripStatus(trip.startDate, trip.endDate) === 'ongoing' ? '#22c55e20' : getDynamicTripStatus(trip.startDate, trip.endDate) === 'completed' ? '#ec900620' : '#3b82f620' }}><Text className="text-[10px] font-bold uppercase" style={{ color: getDynamicTripStatus(trip.startDate, trip.endDate) === 'ongoing' ? '#22c55e' : getDynamicTripStatus(trip.startDate, trip.endDate) === 'completed' ? '#ec9006' : '#3b82f6' }}>{getDynamicTripStatus(trip.startDate, trip.endDate)}</Text></View>
+            <View className="px-2.5 py-1 rounded-full" style={{ backgroundColor: '#ec900620' }}><Text className="text-[10px] font-bold uppercase" style={{ color: '#ec9006' }}>{myRole}</Text></View>
           </View>
           <Text className="text-base text-text-secondary mt-1 mb-8 leading-6">{trip.description || 'Enjoy your journey!'}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
@@ -213,7 +214,7 @@ export default function TripDetailScreen({ route, navigation }) {
                   <Text className="text-[10px] text-text-muted font-bold uppercase mb-2">Category</Text>
                   <View className="flex-row flex-wrap gap-2 mb-4">
                     {['transport', 'accommodation', 'food', 'entertainment', 'shopping', 'health', 'visa', 'misc'].map(c => {
-                      const expCatColors = { transport: '#3b82f6', accommodation: '#8b5cf6', food: '#f59e0b', entertainment: '#ec4899', shopping: '#06b6d4', health: '#22c55e', visa: '#f97316', misc: '#6b7280' };
+                      const expCatColors = { transport: '#3b82f6', accommodation: '#8b5cf6', food: '#f59e0b', entertainment: '#ec4899', shopping: '#06b6d4', health: '#22c55e', visa: '#ec9006', misc: '#6b7280' };
                       const isActive = formData.category === c;
                       return (
                         <TouchableOpacity key={c} onPress={() => setFormData({...formData, category: c})} className="px-3 py-1.5 rounded-xl border" style={{ backgroundColor: isActive ? expCatColors[c] + '20' : 'transparent', borderColor: isActive ? expCatColors[c] : THEME.border }}>
@@ -231,7 +232,7 @@ export default function TripDetailScreen({ route, navigation }) {
                   <Text className="text-[10px] text-text-muted font-bold uppercase mb-2">Type</Text>
                   <View className="flex-row flex-wrap gap-2 mb-4">
                     {['flight', 'hotel', 'car', 'tour', 'restaurant', 'other'].map(t => {
-                      const tColors = { flight: '#3b82f6', hotel: '#8b5cf6', car: '#f59e0b', tour: '#22c55e', restaurant: '#f97316', other: '#6b7280' };
+                      const tColors = { flight: '#3b82f6', hotel: '#8b5cf6', car: '#f59e0b', tour: '#22c55e', restaurant: '#ec9006', other: '#6b7280' };
                       const isActive = formData.type === t;
                       return (
                         <TouchableOpacity key={t} onPress={() => setFormData({...formData, type: t})} className="px-3 py-1.5 rounded-xl border" style={{ backgroundColor: isActive ? tColors[t] + '20' : 'transparent', borderColor: isActive ? tColors[t] : THEME.border }}>
@@ -277,7 +278,7 @@ export default function TripDetailScreen({ route, navigation }) {
                   <Text className="text-[10px] text-text-muted font-bold uppercase mb-2 mt-4">Category</Text>
                   <View className="flex-row flex-wrap gap-2 mb-6">
                     {['packing', 'todo', 'documents', 'shopping', 'other'].map(c => {
-                      const catColors = { packing: '#f97316', todo: '#3b82f6', documents: '#f59e0b', shopping: '#22c55e', other: '#6b7280' };
+                      const catColors = { packing: '#ec9006', todo: '#3b82f6', documents: '#f59e0b', shopping: '#22c55e', other: '#6b7280' };
                       const isActive = formData.category === c;
                       return (
                         <TouchableOpacity key={c} onPress={() => setFormData({...formData, category: c})} className="px-4 py-2 rounded-xl border" style={{ backgroundColor: isActive ? catColors[c] + '20' : 'transparent', borderColor: isActive ? catColors[c] : THEME.border }}>
@@ -376,7 +377,7 @@ const ItineraryTab = ({ data, canEdit, currency, onAdd, onDelete }) => {
   );
 };
 
-const ROLE_BADGE_COLORS = { owner: '#f97316', editor: '#3b82f6', viewer: '#a3a3a3' };
+const ROLE_BADGE_COLORS = { owner: '#ec9006', editor: '#3b82f6', viewer: '#a3a3a3' };
 const ROLE_ICONS_MAP = { owner: Crown, editor: Edit3, viewer: Eye };
 
 const MembersTab = ({ members, myRole, currentUserId, onInvite, onChangeRole, onRemove }) => {
@@ -408,8 +409,12 @@ const MembersTab = ({ members, myRole, currentUserId, onInvite, onChangeRole, on
           <View key={m._id} className="bg-surface-100 border border-border rounded-2xl" style={{ padding: 12, marginBottom: 6 }}>
             <View className="flex-row items-center">
               {/* Avatar */}
-              <View className="w-10 h-10 rounded-full items-center justify-center mr-3" style={{ backgroundColor: `${badgeColor}20`, borderWidth: 1, borderColor: `${badgeColor}40` }}>
-                <Text className="font-bold text-sm" style={{ color: badgeColor }}>{m.user.name?.charAt(0).toUpperCase()}</Text>
+              <View className="w-10 h-10 rounded-full items-center justify-center mr-3 overflow-hidden" style={{ backgroundColor: `${badgeColor}20`, borderWidth: 1, borderColor: `${badgeColor}40` }}>
+                {m.user.avatar ? (
+                  <Image source={getAvatarSource(m.user.avatar)} style={{ width: '100%', height: '100%' }} />
+                ) : (
+                  <Text className="font-bold text-sm" style={{ color: badgeColor }}>{m.user.name?.charAt(0).toUpperCase()}</Text>
+                )}
               </View>
 
               {/* Name + Email */}
@@ -464,7 +469,7 @@ const MembersTab = ({ members, myRole, currentUserId, onInvite, onChangeRole, on
           <Text className="ml-2 font-bold text-sm text-text-primary">Role Permissions</Text>
         </View>
         {[
-          { role: 'owner', icon: Crown, color: '#f97316', perms: 'Manage everything, Delete trip, Change roles' },
+          { role: 'owner', icon: Crown, color: '#ec9006', perms: 'Manage everything, Delete trip, Change roles' },
           { role: 'editor', icon: Edit3, color: '#3b82f6', perms: 'Edit itinerary, Manage checklists, Add expenses' },
           { role: 'viewer', icon: Eye, color: '#a3a3a3', perms: 'View all content, Add comments' },
         ].map(r => (
@@ -483,7 +488,7 @@ const MembersTab = ({ members, myRole, currentUserId, onInvite, onChangeRole, on
   );
 };
 
-const CL_CAT_COLORS = { packing: '#f97316', todo: '#3b82f6', documents: '#f59e0b', shopping: '#22c55e', other: '#6b7280' };
+const CL_CAT_COLORS = { packing: '#ec9006', todo: '#3b82f6', documents: '#f59e0b', shopping: '#22c55e', other: '#6b7280' };
 
 const ChecklistTab = ({ data, onToggle, canEdit, onAddItem, onDeleteItem, onDeleteList, onCreateChecklist }) => (
   <View>
@@ -569,7 +574,7 @@ const ChecklistTab = ({ data, onToggle, canEdit, onAddItem, onDeleteItem, onDele
   </View>
 );
 
-const RES_TYPE_COLORS = { flight: '#3b82f6', hotel: '#8b5cf6', car: '#f59e0b', tour: '#22c55e', restaurant: '#f97316', other: '#6b7280' };
+const RES_TYPE_COLORS = { flight: '#3b82f6', hotel: '#8b5cf6', car: '#f59e0b', tour: '#22c55e', restaurant: '#ec9006', other: '#6b7280' };
 const RES_STATUS_COLORS = { pending: '#f59e0b', confirmed: '#22c55e', cancelled: '#ef4444', completed: '#a3a3a3' };
 
 const ReservationsTab = ({ data, canEdit, onAdd, onDelete }) => {
@@ -652,7 +657,7 @@ const ReservationsTab = ({ data, canEdit, onAdd, onDelete }) => {
   );
 };
 
-const EXP_CAT_COLORS = { transport: '#3b82f6', accommodation: '#8b5cf6', food: '#f59e0b', entertainment: '#ec4899', shopping: '#06b6d4', health: '#22c55e', visa: '#f97316', misc: '#6b7280' };
+const EXP_CAT_COLORS = { transport: '#3b82f6', accommodation: '#8b5cf6', food: '#f59e0b', entertainment: '#ec4899', shopping: '#06b6d4', health: '#22c55e', visa: '#ec9006', misc: '#6b7280' };
 
 const BudgetTab = ({ trip, expenses, canEdit, onAdd, onDelete }) => {
   const spent = expenses.reduce((acc, c) => acc + (c.amount || 0), 0);

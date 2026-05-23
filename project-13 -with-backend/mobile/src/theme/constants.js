@@ -1,6 +1,6 @@
 export const THEME = {
   colors: {
-    brand: '#f97316',
+    brand: '#ec9006',
     surface: '#111111',
     surfaceSecondary: '#1a1a1a',
     surfaceTertiary: '#242424',

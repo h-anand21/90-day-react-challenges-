@@ -195,7 +195,7 @@ export default function LoginScreen({ navigation }) {
                   >
                     <Text style={styles.loginBtnText}>Log In</Text>
                     <View style={styles.arrowBadge}>
-                      <ArrowRight size={14} color="#f97316" strokeWidth={3.5} />
+                      <ArrowRight size={14} color="#ec9006" strokeWidth={3.5} />
                     </View>
                   </TouchableOpacity>
 
@@ -206,7 +206,7 @@ export default function LoginScreen({ navigation }) {
                     onPress={() => setScreenState('signup_fields')}
                   >
                     <Text style={styles.signupBtnText}>Sign Up</Text>
-                    <User size={18} color="#f97316" style={styles.userIcon} />
+                    <User size={18} color="#ec9006" style={styles.userIcon} />
                   </TouchableOpacity>
 
                   {/* OR SEPARATOR */}
@@ -291,7 +291,7 @@ export default function LoginScreen({ navigation }) {
                       <>
                         <Text style={styles.loginBtnText}>Proceed Securely</Text>
                         <View style={styles.arrowBadge}>
-                          <ArrowRight size={14} color="#f97316" strokeWidth={3.5} />
+                          <ArrowRight size={14} color="#ec9006" strokeWidth={3.5} />
                         </View>
                       </>
                     )}
@@ -346,7 +346,7 @@ export default function LoginScreen({ navigation }) {
 
                   <TouchableOpacity 
                     activeOpacity={0.9}
-                    style={[styles.signupButton, { marginTop: 12, backgroundColor: '#f97316', borderColor: '#f97316' }]}
+                    style={[styles.signupButton, { marginTop: 12, backgroundColor: '#ec9006', borderColor: '#ec9006' }]}
                     onPress={handleSignupSubmit}
                     disabled={loading}
                   >
@@ -405,7 +405,7 @@ export default function LoginScreen({ navigation }) {
 
             {loading ? (
               <View style={{ marginVertical: 30, alignItems: 'center' }}>
-                <ActivityIndicator size="large" color="#f97316" />
+                <ActivityIndicator size="large" color="#ec9006" />
                 <Text style={{ color: '#a3a3a3', marginTop: 12, fontSize: 13, fontWeight: '600' }}>Signing you in...</Text>
               </View>
             ) : !showCustomGoogleInput ? (
@@ -415,7 +415,7 @@ export default function LoginScreen({ navigation }) {
                   style={styles.googleAccountItem}
                   onPress={() => handleGoogleAccountSelect('h.anand21@gmail.com', 'Himanshu Anand')}
                 >
-                  <View style={[styles.miniAvatar, { backgroundColor: '#f97316' }]}>
+                  <View style={[styles.miniAvatar, { backgroundColor: '#ec9006' }]}>
                     <Text style={styles.miniAvatarText}>HA</Text>
                   </View>
                   <View>
@@ -447,7 +447,7 @@ export default function LoginScreen({ navigation }) {
                     <User size={14} color="#ffffff" />
                   </View>
                   <View>
-                    <Text style={[styles.accountName, { color: '#f97316' }]}>Use another account</Text>
+                    <Text style={[styles.accountName, { color: '#ec9006' }]}>Use another account</Text>
                     <Text style={styles.accountEmail}>Type a custom email address</Text>
                   </View>
                 </TouchableOpacity>
@@ -581,7 +581,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'rgba(20, 20, 20, 0.82)',
     borderWidth: 1,
-    borderColor: 'rgba(249, 115, 22, 0.16)',
+    borderColor: 'rgba(236, 144, 6, 0.16)',
     borderRadius: 28,
     padding: 24,
     marginVertical: 10,
@@ -641,12 +641,12 @@ const styles = StyleSheet.create({
   loginButton: {
     width: '100%',
     height: 56,
-    backgroundColor: '#f97316',
+    backgroundColor: '#ec9006',
     borderRadius: 999,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#f97316',
+    shadowColor: '#ec9006',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 12,
@@ -673,7 +673,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 56,
     borderWidth: 1.5,
-    borderColor: '#f97316',
+    borderColor: '#ec9006',
     borderRadius: 999,
     flexDirection: 'row',
     alignItems: 'center',
@@ -682,7 +682,7 @@ const styles = StyleSheet.create({
     marginBottom: 24
   },
   signupBtnText: {
-    color: '#f97316',
+    color: '#ec9006',
     fontSize: 16,
     fontWeight: '800',
     marginRight: 6
@@ -756,7 +756,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: '#141414',
     borderWidth: 1,
-    borderColor: 'rgba(249, 115, 22, 0.2)',
+    borderColor: 'rgba(236, 144, 6, 0.2)',
     borderRadius: 28,
     padding: 24,
     shadowColor: '#000000',
@@ -836,7 +836,7 @@ const styles = StyleSheet.create({
   confirmBtn: {
     flex: 1.2,
     height: 48,
-    backgroundColor: '#f97316',
+    backgroundColor: '#ec9006',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',

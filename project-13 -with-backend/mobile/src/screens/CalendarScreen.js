@@ -47,9 +47,9 @@ const THEME = {
   card2: '#1a1a1a',
   border: '#222222',
   border2: '#2e2e2e',
-  brand: '#f97316',
-  brandDim: 'rgba(249,115,22,0.15)',
-  brandGlow: 'rgba(249,115,22,0.08)',
+  brand: '#ec9006',
+  brandDim: 'rgba(236, 144, 6,0.15)',
+  brandGlow: 'rgba(236, 144, 6,0.08)',
   text: '#f5f5f5',
   textSec: '#a3a3a3',
   textMuted: '#525252',
@@ -69,7 +69,7 @@ const DAYS_SHORT = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
 
 // ─── Color palette for timeline bars ────────────────────────────────────────
 const BAR_COLORS = [
-  '#f97316', '#8b5cf6', '#a16207', '#0891b2', '#16a34a', '#dc2626', '#7c3aed',
+  '#ec9006', '#8b5cf6', '#a16207', '#0891b2', '#16a34a', '#dc2626', '#7c3aed',
 ];
 
 const getBarColor = (str, idx) => BAR_COLORS[idx % BAR_COLORS.length];
@@ -83,8 +83,8 @@ const STATUS_DOT = {
 };
 
 const STATUS_LABEL_COLOR = {
-  planning:  { bg: '#f9731618', text: '#f97316' },
-  upcoming:  { bg: '#f9731618', text: '#f97316' },
+  planning:  { bg: '#ec900618', text: '#ec9006' },
+  upcoming:  { bg: '#ec900618', text: '#ec9006' },
   ongoing:   { bg: '#22c55e18', text: '#22c55e' },
   completed: { bg: '#a3a3a318', text: '#a3a3a3' },
 };
@@ -127,7 +127,7 @@ const tripDuration = (start, end) => {
 
 // ─── Avatar stack ────────────────────────────────────────────────────────────
 const AvatarStack = ({ count = 3, size = 22 }) => {
-  const colors = ['#f97316','#8b5cf6','#3b82f6','#22c55e','#ec4899'];
+  const colors = ['#ec9006','#8b5cf6','#3b82f6','#22c55e','#ec4899'];
   const initials = ['H','A','R','K','S'];
   const shown = Math.min(count, 4);
   return (
@@ -481,7 +481,7 @@ function CalendarTab({ trips, navigation }) {
             borderTopRightRadius: 24,
             paddingTop: 16,
             paddingHorizontal: 20,
-            paddingBottom: Platform.OS === 'ios' ? 40 : 24,
+            paddingBottom: Platform.OS === 'ios' ? 120 : 110,
             borderTopWidth: 1,
             borderColor: THEME.border,
             maxHeight: '75%',
@@ -957,7 +957,7 @@ function TimelineTab({ trips, navigation }) {
             borderTopLeftRadius: 32,
             borderTopRightRadius: 32,
             padding: 24,
-            paddingBottom: 40,
+            paddingBottom: 120,
           }}>
             {selectedStoryTrip && (
               <>

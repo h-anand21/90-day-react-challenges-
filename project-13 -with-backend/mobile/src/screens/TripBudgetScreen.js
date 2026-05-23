@@ -11,7 +11,7 @@ const { width } = Dimensions.get('window');
 const THEME = { 
   bg: '#050505', 
   surface: '#121212', 
-  brand: '#ff6b00', 
+  brand: '#ec9006', 
   textMuted: '#888888', 
   textWhite: '#ffffff',
   green: '#22c55e',
@@ -19,7 +19,7 @@ const THEME = {
 };
 
 const EXP_CAT_COLORS = { 
-  accommodation: '#ff6b00', 
+  accommodation: '#ec9006', 
   transport: '#3b82f6', 
   food: '#eab308', 
   entertainment: '#8b5cf6', 
@@ -167,7 +167,7 @@ export default function TripBudgetScreen({ route, navigation }) {
                 const end = trip.endDate ? new Date(trip.endDate) : now;
                 let status = 'Planning';
                 let statusColor = '#3b82f6';
-                if (start <= now && end >= now) { status = 'Ongoing'; statusColor = '#ff6b00'; }
+                if (start <= now && end >= now) { status = 'Ongoing'; statusColor = '#ec9006'; }
                 else if (end < now) { status = 'Completed'; statusColor = '#22c55e'; }
                 return (
                   <View style={{ backgroundColor: statusColor + '40', paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20 }}>
@@ -180,7 +180,7 @@ export default function TripBudgetScreen({ route, navigation }) {
             {/* 4 Stats */}
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <View style={{ alignItems: 'center', flex: 1 }}>
-                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,107,0,0.2)', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(236, 144, 6,0.2)', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
                   <Wallet size={16} color={THEME.brand} />
                 </View>
                 <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 15 }}>₹{budget.toLocaleString()}</Text>
@@ -210,7 +210,7 @@ export default function TripBudgetScreen({ route, navigation }) {
               <View style={{ width: 1, backgroundColor: 'rgba(255,255,255,0.1)', marginVertical: 10 }} />
 
               <View style={{ alignItems: 'center', flex: 1 }}>
-                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,107,0,0.2)', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+                <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(236, 144, 6,0.2)', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
                   <PieChartIcon size={16} color={THEME.brand} />
                 </View>
                 <Text style={{ color: '#fff', fontWeight: 'bold', fontSize: 15 }}>{pct.toFixed(0)}%</Text>
@@ -245,7 +245,7 @@ export default function TripBudgetScreen({ route, navigation }) {
           <View style={{ backgroundColor: THEME.surface, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: THEME.border, marginBottom: 20 }}>
             <Text style={{ color: '#fff', fontWeight: 'bold', marginBottom: 12 }}>Budget Usage</Text>
             <View style={{ height: 24, backgroundColor: '#222', borderRadius: 12, overflow: 'hidden', flexDirection: 'row' }}>
-              <LinearGradient colors={['#ff8c00', '#ff4500']} start={{x:0, y:0}} end={{x:1, y:0}} style={{ width: `${pct}%`, height: '100%', justifyContent: 'center', paddingRight: 10 }}>
+              <LinearGradient colors={['#ec9006', '#dc6601']} start={{x:0, y:0}} end={{x:1, y:0}} style={{ width: `${pct}%`, height: '100%', justifyContent: 'center', paddingRight: 10 }}>
                 <Text style={{ color: '#fff', fontSize: 10, fontWeight: 'bold', textAlign: 'right' }}>{pct.toFixed(0)}%</Text>
               </LinearGradient>
             </View>
