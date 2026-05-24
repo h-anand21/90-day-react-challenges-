@@ -574,6 +574,7 @@ const ChecklistTab = ({ data, onToggle, canEdit, onAddItem, onDeleteItem, onDele
   </View>
 );
 
+const RES_TYPE_ICONS = { flight: Plane, hotel: Hotel, car: Car, tour: MapIcon, restaurant: Utensils, other: Package };
 const RES_TYPE_COLORS = { flight: '#3b82f6', hotel: '#8b5cf6', car: '#f59e0b', tour: '#22c55e', restaurant: '#ec9006', other: '#6b7280' };
 const RES_STATUS_COLORS = { pending: '#f59e0b', confirmed: '#22c55e', cancelled: '#ef4444', completed: '#a3a3a3' };
 
