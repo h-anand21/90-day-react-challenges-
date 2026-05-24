@@ -18,6 +18,19 @@ import { ArrowRight, User, Globe, ArrowLeft, Mail, Lock, CheckCircle2 } from 'lu
 import Svg, { Path, Circle, Defs, LinearGradient as SvgLinearGradient, Stop, Rect } from 'react-native-svg';
 import { useAuth } from '../context/AuthContext';
 import { LinearGradient } from 'expo-linear-gradient';
+// Dynamic import to prevent Expo Go crashes
+let GoogleSignin = null;
+let statusCodes = null;
+
+if (!__DEV__) {
+  const GSignin = require('@react-native-google-signin/google-signin');
+  GoogleSignin = GSignin.GoogleSignin;
+  statusCodes = GSignin.statusCodes;
+  
+  GoogleSignin.configure({
+    webClientId: '830478854843-ctvau4rfg69iifn7hekfugfdffk64qcl.apps.googleusercontent.com',
+  });
+}
 
 const { width, height } = Dimensions.get('window');
 
@@ -32,7 +45,7 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   
-  // Google sign in states
+  // Google sign in states (for DEV only)
   const [showGoogleChooser, setShowGoogleChooser] = useState(false);
   const [customGoogleEmail, setCustomGoogleEmail] = useState('');
   const [showCustomGoogleInput, setShowCustomGoogleInput] = useState(false);
@@ -42,7 +55,7 @@ export default function LoginScreen({ navigation }) {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Google account chooser select
+  // Google account chooser select (DEV ONLY)
   const handleGoogleAccountSelect = async (selectedEmail, displayName) => {
     setLoading(true);
     setError('');
@@ -58,24 +71,41 @@ export default function LoginScreen({ navigation }) {
     }
   };
 
-  // Automated Production Toggle: Bypasses Expo Go limitations in dev, triggers native SSO in prod!
+  // Hybrid Google Sign In
   const handleGoogleButtonPress = async () => {
     if (__DEV__) {
-      // Local development: open the beautiful interactive test account chooser
+      // Local development (Expo Go): open the mock interactive test account chooser
       setShowGoogleChooser(true);
     } else {
-      // Production standalone build (.apk / .ipa): triggers the official native Google Sign-In SDK!
+      // Production standalone build (.apk): triggers the official native Google Sign-In SDK!
       setLoading(true);
       setError('');
       try {
-        // Here, the native Google Sign-In package triggers the native Google credential picker:
-        // const { idToken } = await GoogleSignin.signIn();
-        // const credential = GoogleAuthProvider.credential(idToken);
-        // const userCredential = await signInWithCredential(auth, credential);
-        // const firebaseToken = await userCredential.user.getIdToken();
-        // await loginWithGoogle(firebaseToken);
-      } catch (prodError) {
-        setError('Production Google Sign-In failed or was cancelled');
+        await GoogleSignin.hasPlayServices();
+        const userInfo = await GoogleSignin.signIn();
+        // Support both old and new (v12+) return formats of GoogleSignin
+        const idToken = userInfo.data?.idToken || userInfo.idToken;
+        
+        if (!idToken) {
+          throw new Error('Google Sign-In succeeded, but no ID token was returned.');
+        }
+        
+        const result = await loginWithGoogle(idToken);
+        
+        if (!result.success) {
+          setError(result.message);
+        }
+      } catch (error) {
+        if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+          setError('Google login cancelled');
+        } else if (error.code === statusCodes.IN_PROGRESS) {
+          setError('Login already in progress');
+        } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+          setError('Play services not available or outdated');
+        } else {
+          setError(error.message || 'Something went wrong with Google Login');
+        }
+      } finally {
         setLoading(false);
       }
     }
@@ -375,7 +405,7 @@ export default function LoginScreen({ navigation }) {
         </SafeAreaView>
       </ImageBackground>
 
-      {/* GOOGLE ACCOUNT CHOOSER BOTTOM SHEET OVERLAY */}
+      {/* GOOGLE ACCOUNT CHOOSER BOTTOM SHEET OVERLAY (DEV ONLY) */}
       {showGoogleChooser && (
         <View style={styles.modalOverlay}>
           <View style={styles.googleSheet}>

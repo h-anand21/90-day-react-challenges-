@@ -350,7 +350,7 @@ export default function OnboardingScreen({ navigation }) {
   return (
     <View style={styles.container}>
       <ImageBackground 
-        source={require('../../assets/sunset_bg.png')} 
+        source={require('../../assets/sunset_bg.jpg')} 
         style={styles.backgroundImage}
         resizeMode="cover"
       >

@@ -2,40 +2,49 @@
   "expo": {
     "name": "TripSync",
     "slug": "tripsync-mobile",
+    "scheme": "tripsync-mobile",
     "version": "1.0.0",
     "newArchEnabled": true,
-
     "icon": "./assets/icon.png",
-
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
-
-    "assetBundlePatterns": ["**/*"],
-
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "splash": {
       "image": "./assets/image copy.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
-
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tripsync.app"
     },
-
     "android": {
       "package": "com.tripsync.app",
       "versionCode": 1,
       "googleServicesFile": "./google-services.json",
-
       "adaptiveIcon": {
         "foregroundImage": "./assets/image.png",
         "backgroundColor": "#000000"
       }
     },
-
     "extra": {
-      "apiUrl": "https://tripsync-backend-9mle.onrender.com/api"
-    }
+      "apiUrl": "https://tripsync-backend-9mle.onrender.com/api",
+      "eas": {
+        "projectId": "7ee6bb54-b0e5-42e8-a07e-a2cce9f2b088"
+      }
+    },
+    "plugins": [
+      "@react-native-google-signin/google-signin",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "1.9.25"
+          }
+        }
+      ]
+    ]
   }
 }

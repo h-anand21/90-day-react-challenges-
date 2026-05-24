@@ -523,7 +523,7 @@ export default function DashboardScreen({ navigation }) {
           >
             {/* Top Illustration: Premium 3D Travel Assets */}
             <Image 
-              source={require('../assets/travel_banner_asset.png')} 
+              source={require('../assets/travel_banner_asset.jpg')} 
               style={{ 
                 width: 140,
                 height: 100,
@@ -932,7 +932,7 @@ export default function DashboardScreen({ navigation }) {
             >
               {/* Top Illustration: Premium 3D Travel Assets */}
               <Image 
-                source={require('../assets/travel_banner_asset.png')} 
+                source={require('../assets/travel_banner_asset.jpg')} 
                 style={{ 
                   width: 140,
                   height: 100,

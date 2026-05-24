@@ -12,7 +12,20 @@
           "package_name": "com.tripsync.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "830478854843-fss638aigfm3ogts0ilgambba846tvc7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tripsync.app",
+            "certificate_hash": "7cdaf6ad5a1880c415d708e94089c05f0ffd3a17"
+          }
+        },
+        {
+          "client_id": "830478854843-ctvau4rfg69iifn7hekfugfdffk64qcl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCJEeWVzIqUUtxaGMCmYLndCKxnjIYAtno"

@@ -14,5 +14,3 @@ yarn-error.*
 # package-lock.json ko track karna zaroori hai production ke liye
 # isliye ise yahan se hata diya gaya hai.
 
-
-google-services.json
