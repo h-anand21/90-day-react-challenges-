@@ -20,6 +20,7 @@ import { getAvatarSource } from '../utils/avatars';
 import { useAuth } from '../context/AuthContext';
 import { PieChart, BarChart } from 'react-native-chart-kit';
 import { getDynamicTripStatus } from './DashboardScreen';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -55,6 +56,33 @@ export default function TripDetailScreen({ route, navigation }) {
   const [modalType, setModalType] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
   const [formData, setFormData] = useState({});
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [locationSuggestions, setLocationSuggestions] = useState([]);
+  const [locSearchTimeout, setLocSearchTimeout] = useState(null);
+
+  const handleLocationChange = (text) => {
+    setFormData(prev => ({...prev, location: text}));
+    if (locSearchTimeout) clearTimeout(locSearchTimeout);
+    if (!text || text.length < 3) {
+      setLocationSuggestions([]);
+      return;
+    }
+    setLocSearchTimeout(setTimeout(async () => {
+      try {
+        const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(text)}&limit=5`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.features) {
+            const places = data.features.map(f => {
+              const p = f.properties;
+              return [p.name, p.state, p.country].filter(Boolean).join(', ');
+            });
+            setLocationSuggestions([...new Set(places)]);
+          }
+        }
+      } catch (err) {}
+    }, 400));
+  };
 
   const fetchData = async () => {
     try {
@@ -198,7 +226,48 @@ export default function TripDetailScreen({ route, navigation }) {
                       <TouchableOpacity key={c} onPress={() => setFormData({...formData, category: c})} className={`px-3 py-1.5 rounded-full border ${formData.category === c ? 'bg-brand-500 border-brand-500' : 'bg-surface border-border'}`}><Text className={`text-[10px] font-bold ${formData.category === c ? 'text-white' : 'text-text-secondary'}`}>{c.toUpperCase()}</Text></TouchableOpacity>
                     ))}
                   </View>
-                  <View className="flex-row gap-4"><View className="flex-1"><Input label="Time" placeholder="10:00 AM" onChangeText={t => setFormData({...formData, startTime: t})} /></View><View className="flex-1"><Input label="Location" placeholder="Address..." onChangeText={t => setFormData({...formData, location: t})} /></View></View>
+                  <View className="flex-row gap-4">
+                    <View className="flex-1">
+                      <TouchableOpacity onPress={() => setShowTimePicker(true)}>
+                        <View pointerEvents="none">
+                          <Input label="Time" placeholder="10:00 AM" value={formData.startTime || ''} editable={false} />
+                        </View>
+                      </TouchableOpacity>
+                      {showTimePicker && (
+                        <DateTimePicker
+                          value={new Date()}
+                          mode="time"
+                          is24Hour={false}
+                          display="default"
+                          onChange={(event, selectedDate) => {
+                            setShowTimePicker(Platform.OS === 'ios');
+                            if (selectedDate) {
+                              let hours = selectedDate.getHours();
+                              let minutes = selectedDate.getMinutes();
+                              const ampm = hours >= 12 ? 'PM' : 'AM';
+                              hours = hours % 12;
+                              hours = hours ? hours : 12; 
+                              minutes = minutes < 10 ? '0' + minutes : minutes;
+                              const strTime = hours + ':' + minutes + ' ' + ampm;
+                              setFormData({...formData, startTime: strTime});
+                            }
+                          }}
+                        />
+                      )}
+                    </View>
+                    <View className="flex-1 relative z-50">
+                      <Input label="Location" placeholder="Address..." value={formData.location || ''} onChangeText={handleLocationChange} />
+                      {locationSuggestions.length > 0 && (
+                        <View className="absolute top-[70px] left-0 right-0 border rounded-xl z-50 overflow-hidden shadow-lg" style={{ backgroundColor: THEME.surface2, borderColor: THEME.border, elevation: 5 }}>
+                          {locationSuggestions.map((s, i) => (
+                            <TouchableOpacity key={i} className={`p-3 ${i < locationSuggestions.length - 1 ? 'border-b' : ''}`} style={{ borderColor: THEME.border }} onPress={() => { setFormData({...formData, location: s}); setLocationSuggestions([]); }}>
+                              <Text className="text-white text-xs font-semibold" numberOfLines={1}>{s}</Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      )}
+                    </View>
+                  </View>
                   <View className="flex-row gap-4"><View className="flex-1"><Input label="Cost" placeholder="0" keyboardType="numeric" onChangeText={t => setFormData({...formData, cost: Number(t)})} /></View><View className="flex-1"><Input label="Status" placeholder="planned" value={formData.status} onChangeText={t => setFormData({...formData, status: t})} /></View></View>
                   <Input label="Notes" placeholder="Some notes..." onChangeText={t => setFormData({...formData, notes: t})} multiline />
                   <Button title="Save Activity" onPress={() => handleAction('POST', `/days/${selectedDay}/activities`, formData)} className="mt-4" />
