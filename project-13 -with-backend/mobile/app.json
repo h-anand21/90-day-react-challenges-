@@ -12,7 +12,7 @@
       "**/*"
     ],
     "splash": {
-      "image": "./assets/image copy.png",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
@@ -27,7 +27,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/image.png",
         "backgroundColor": "#000000"
-      }
+      },
+      "backgroundColor": "#000000"
     },
     "extra": {
       "apiUrl": "https://tripsync-backend-9mle.onrender.com/api",

@@ -15,7 +15,7 @@ export default function RootNavigator() {
 
   if (loading) {
     return (
-      <View className="flex-1 bg-surface items-center justify-center">
+      <View style={{ flex: 1, backgroundColor: '#000000', alignItems: 'center', justifyContent: 'center' }}>
         <ActivityIndicator size="large" color="#ec9006" />
       </View>
     );

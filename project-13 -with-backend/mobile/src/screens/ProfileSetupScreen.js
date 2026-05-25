@@ -132,12 +132,18 @@ export default function ProfileSetupScreen() {
 
       if (res.data.success) {
         // Update local user state
-        setUser({
+        const updatedUser = {
           ...user,
           name: username,
           gender: gender,
           avatar: avatarUri ? avatarUri.id : '',
           isProfileSetupCompleted: true,
+        };
+        setUser(updatedUser);
+        
+        // Ensure AsyncStorage is updated so the app remembers profile is setup on reload
+        import('@react-native-async-storage/async-storage').then(({ default: AsyncStorage }) => {
+          AsyncStorage.setItem('user', JSON.stringify(updatedUser));
         });
         
         // Navigate if editing
