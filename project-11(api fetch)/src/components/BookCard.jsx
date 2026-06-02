@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 
-const BookCard = ({ book }) => {
+const BookCard = ({ book, onBookSelect }) => {
   const { volumeInfo } = book;
-  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div className="book-card">
@@ -27,11 +26,9 @@ const BookCard = ({ book }) => {
         )}
         <p className="book-description">
           {volumeInfo?.description 
-            ? isExpanded 
-              ? volumeInfo.description 
-              : volumeInfo.description.length > 120 
-                ? volumeInfo.description.substring(0, 120) + '...'
-                : volumeInfo.description
+            ? volumeInfo.description.length > 120 
+              ? volumeInfo.description.substring(0, 120) + '...'
+              : volumeInfo.description
             : 'No description available for this book.'}
         </p>
         <div className="card-footer">
@@ -40,9 +37,9 @@ const BookCard = ({ book }) => {
           </span>
           <button 
             className="read-more-btn" 
-            onClick={() => setIsExpanded(!isExpanded)}
+            onClick={() => onBookSelect(book)}
           >
-            {isExpanded ? 'Read Less' : 'Read More'}
+            Read More
           </button>
         </div>
       </div>

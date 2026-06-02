@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import BookCard from './BookCard';
 
-const BookList = ({ books }) => {
+const BookList = ({ books, onBookSelect }) => {
   const [visibleCount, setVisibleCount] = useState(6);
 
   const loadNextCard = () => {
@@ -18,7 +18,7 @@ const BookList = ({ books }) => {
     <div className="book-list-wrapper">
       <div className="books-grid">
         {books.slice(0, visibleCount).map((item) => (
-          <BookCard key={item.id} book={item} />
+          <BookCard key={item.id} book={item} onBookSelect={onBookSelect} />
         ))}
       </div>
       

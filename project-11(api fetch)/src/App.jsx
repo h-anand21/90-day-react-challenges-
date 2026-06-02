@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import BookList from './components/BookList';
+import BookDetail from './pages/BookDetail';
 import './App.css';
 
 function App() {
   const [book, setBook] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBook, setSelectedBook] = useState(null);
 
   const fetchBook = async () => {
     try {
@@ -37,6 +39,10 @@ function App() {
     return title.toLowerCase().includes(searchQuery.toLowerCase()) || authors.toLowerCase().includes(searchQuery.toLowerCase());
   });
 
+  if (selectedBook) {
+    return <BookDetail book={selectedBook} onBack={() => setSelectedBook(null)} />;
+  }
+
   return (
     <div className="app-container">
       <nav className="navbar">
@@ -60,7 +66,7 @@ function App() {
       {loading ? (
         <div className="loader">Loading amazing books...</div>
       ) : (
-        <BookList books={filteredBooks} />
+        <BookList books={filteredBooks} onBookSelect={setSelectedBook} />
       )}
     </div>
   );
