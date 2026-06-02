@@ -254,5 +254,3 @@ const StyledWrapper = styled.div`
     display: block;
   }
 `;
-
-export default Profile;
