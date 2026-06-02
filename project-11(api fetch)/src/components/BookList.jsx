@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import BookCard from './BookCard';
 
 const BookList = ({ books }) => {
-  const [visibleCount, setVisibleCount] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(6);
 
   const loadNextCard = () => {
     if (visibleCount < books.length) {
-      setVisibleCount(prev => prev + 1);
+      setVisibleCount(prev => prev + 6);
     }
   };
 

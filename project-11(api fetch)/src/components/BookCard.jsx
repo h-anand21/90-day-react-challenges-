@@ -16,7 +16,13 @@ const BookCard = ({ book }) => {
       <div className="card-content">
         <h3 className="book-title">{volumeInfo?.title || 'Unknown Title'}</h3>
         {volumeInfo?.authors && (
-          <p className="book-authors">{volumeInfo.authors.join(', ')}</p>
+          <p className="book-authors">Author: {volumeInfo.authors.join(', ')}</p>
+        )}
+        {volumeInfo?.publisher && (
+          <p className="book-meta">Publisher: {volumeInfo.publisher}</p>
+        )}
+        {volumeInfo?.publishedDate && (
+          <p className="book-meta">Published: {volumeInfo.publishedDate}</p>
         )}
         <p className="book-description">
           {volumeInfo?.description 
