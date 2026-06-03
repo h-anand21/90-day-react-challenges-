@@ -1,6 +1,6 @@
 import React from 'react';
 
-const BookDetail = ({ book, onBack }) => {
+const BookDetail = ({ book, onBack, theme, toggleTheme }) => {
   if (!book) {
     return (
       <div className="app-container not-found-container">
@@ -14,8 +14,24 @@ const BookDetail = ({ book, onBack }) => {
 
   return (
     <div className="app-container">
-      <nav className="navbar book-detail-nav" onClick={onBack}>
-        <div className="nav-logo">← Back to Discover</div>
+      <nav className="navbar book-detail-nav">
+        <div className="nav-logo" onClick={onBack} style={{cursor: 'pointer'}}>← Back to Discover</div>
+        <button 
+          onClick={toggleTheme} 
+          style={{
+            background: 'var(--card-bg)', 
+            border: '1px solid var(--card-border)', 
+            color: 'var(--text-primary)', 
+            padding: '0.6rem 1rem', 
+            borderRadius: '20px', 
+            cursor: 'pointer',
+            fontWeight: '600',
+            marginLeft: 'auto',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          {theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
+        </button>
       </nav>
 
       <div className="book-detail-card">
