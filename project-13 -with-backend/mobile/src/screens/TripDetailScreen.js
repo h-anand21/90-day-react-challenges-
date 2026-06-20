@@ -21,6 +21,7 @@ import { useAuth } from '../context/AuthContext';
 import { PieChart, BarChart } from 'react-native-chart-kit';
 import { getDynamicTripStatus } from './DashboardScreen';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { searchPlaces } from '../utils/locationService';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -69,18 +70,12 @@ export default function TripDetailScreen({ route, navigation }) {
     }
     setLocSearchTimeout(setTimeout(async () => {
       try {
-        const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(text)}&limit=5`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.features) {
-            const places = data.features.map(f => {
-              const p = f.properties;
-              return [p.name, p.state, p.country].filter(Boolean).join(', ');
-            });
-            setLocationSuggestions([...new Set(places)]);
-          }
-        }
-      } catch (err) {}
+        // 3-tier fallback: Google → Photon → Hardcoded
+        const results = await searchPlaces(text);
+        setLocationSuggestions(results.map(r => r.label));
+      } catch (err) {
+        setLocationSuggestions([]);
+      }
     }, 400));
   };
 

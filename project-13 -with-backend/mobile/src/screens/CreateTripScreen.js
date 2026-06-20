@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, ChevronRight, Calendar, Info, MapPin, Tag, Award, Search, Globe, Check } from 'lucide-react-native';
 import client from '../api/client';
 import { ALL_COUNTRIES } from '../data/countries';
+import { searchPlaces } from '../utils/locationService';
 
 const THEME = {
   surface: '#0d0d0d',
@@ -80,36 +81,12 @@ export default function CreateTripScreen({ navigation }) {
     if (!selectedCountry) return;
     setSuggestionsLoading(true);
     try {
-      const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&countrycode=${selectedCountry.cca2}&limit=5`;
-      const res = await fetch(url);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.features) {
-          const places = data.features.map(f => {
-            const p = f.properties;
-            const parts = [];
-            if (p.name) parts.push(p.name);
-            if (p.state && p.state !== p.name) parts.push(p.state);
-            if (p.country) parts.push(p.country);
-            return {
-              label: parts.join(', '),
-              latitude: f.geometry.coordinates[1],
-              longitude: f.geometry.coordinates[0]
-            };
-          });
-          const uniquePlaces = [];
-          const labels = new Set();
-          places.forEach(item => {
-            if (!labels.has(item.label)) {
-              labels.add(item.label);
-              uniquePlaces.push(item);
-            }
-          });
-          setSuggestions(uniquePlaces);
-        }
-      }
+      // 3-tier fallback: Google → Photon → Hardcoded
+      const results = await searchPlaces(query, selectedCountry.cca2);
+      setSuggestions(results);
     } catch (err) {
-      console.error('[CreateTripScreen] Error fetching suggestions:', err);
+      console.warn('[CreateTripScreen] searchPlaces error:', err.message);
+      setSuggestions([]);
     } finally {
       setSuggestionsLoading(false);
     }

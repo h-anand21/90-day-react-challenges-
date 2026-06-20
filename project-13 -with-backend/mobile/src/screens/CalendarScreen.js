@@ -37,6 +37,7 @@ import Svg, { Path, Circle, Line, Polygon, Text as SvgText, G } from 'react-nati
 import client, { getImageUri } from '../api/client';
 import { getDynamicTripStatus, getDestinationImage } from './DashboardScreen';
 import { useNavigation } from '@react-navigation/native';
+import { searchPlaces } from '../utils/locationService';
 
 // Screen width is now resolved dynamically inside each component via useWindowDimensions()
 
@@ -1141,27 +1142,18 @@ function MapTab({ trips, navigation }) {
         if (!trip.destination) continue;
         try {
           const cleanDest = trip.destination.split(',')[0].trim();
-          const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(cleanDest)}&limit=1`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.features && data.features.length > 0) {
-              const geometry = data.features[0].geometry;
-              if (geometry && Array.isArray(geometry.coordinates) && geometry.coordinates.length >= 2) {
-                const lon = geometry.coordinates[0];
-                const lat = geometry.coordinates[1];
-                if (typeof lon === 'number' && typeof lat === 'number' && !isNaN(lon) && !isNaN(lat)) {
-                  newCoords[trip._id] = {
-                    latitude: lat,
-                    longitude: lon
-                  };
-                  changed = true;
-                }
-              }
-            }
+          // 3-tier fallback: Google → Photon → Hardcoded
+          const results = await searchPlaces(cleanDest);
+          if (results && results.length > 0 && results[0].latitude && results[0].longitude) {
+            newCoords[trip._id] = {
+              latitude: results[0].latitude,
+              longitude: results[0].longitude
+            };
+            changed = true;
           }
-          await new Promise(r => setTimeout(r, 150)); // small delay
+          await new Promise(r => setTimeout(r, 100)); // small delay between requests
         } catch (e) {
-          console.log(`[MapTab] Error geocoding fallback for ${trip.destination}:`, e.message);
+          console.log(`[MapTab] Geocode error for ${trip.destination}:`, e.message);
         }
       }
 
