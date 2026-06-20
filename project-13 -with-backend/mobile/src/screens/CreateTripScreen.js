@@ -6,6 +6,7 @@ import { Input } from '../components/Input';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ChevronLeft, ChevronRight, Calendar, Info, MapPin, Tag, Award, Search, Globe, Check } from 'lucide-react-native';
 import client from '../api/client';
+import { ALL_COUNTRIES } from '../data/countries';
 
 const THEME = {
   surface: '#0d0d0d',
@@ -44,7 +45,8 @@ export default function CreateTripScreen({ navigation }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   // Country & Destination Suggestions States
-  const [countries, setCountries] = useState([]);
+  // Countries loaded instantly from local hardcoded list — no API, no errors
+  const [countries] = useState(ALL_COUNTRIES);
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [showCountryModal, setShowCountryModal] = useState(false);
   const [countrySearch, setCountrySearch] = useState('');
@@ -53,31 +55,7 @@ export default function CreateTripScreen({ navigation }) {
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [typingTimeout, setTypingTimeout] = useState(null);
 
-  // Fetch all countries on component mount
-  React.useEffect(() => {
-    let active = true;
-    const fetchCountries = async () => {
-      try {
-        const res = await fetch('https://restcountries.com/v3.1/all?fields=name,cca2');
-        if (res.ok && active) {
-          const data = await res.json();
-          const sorted = data
-            .map(c => ({
-              name: c.name.common,
-              cca2: c.cca2
-            }))
-            .sort((a, b) => a.name.localeCompare(b.name));
-          setCountries(sorted);
-        }
-      } catch (err) {
-        console.error('[CreateTripScreen] Error fetching countries:', err);
-      }
-    };
-    fetchCountries();
-    return () => {
-      active = false;
-    };
-  }, []);
+
 
   const handleDestinationChange = (text) => {
     setFormData(prev => ({ ...prev, destination: text, latitude: null, longitude: null }));
