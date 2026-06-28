@@ -18,10 +18,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.tripsync.app"
+      "bundleIdentifier": "com.hima.tripsync"
     },
     "android": {
-      "package": "com.tripsync.app",
+      "package": "com.hima.tripsync",
       "versionCode": 1,
       "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
