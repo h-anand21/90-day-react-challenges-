@@ -1,7 +1,6 @@
 import React from 'react';
-import { Navbar } from './components/Navbar';
-import { Hero } from './components/Hero';
-import { InteractiveAppPreview } from './components/InteractiveAppPreview';
+import { LexoraNavbar } from './components/LexoraNavbar';
+import { LexoraHero } from './components/LexoraHero';
 import { Features } from './components/Features';
 import { HowItWorks } from './components/HowItWorks';
 import { Pricing } from './components/Pricing';
@@ -10,11 +9,10 @@ import { Footer } from './components/Footer';
 
 function App() {
   return (
-    <div className="min-h-screen bg-[#08090c] text-slate-100 font-sans selection:bg-orange-500 selection:text-white">
-      <Navbar />
+    <div className="min-h-screen bg-[#090b10] text-slate-100 font-sans selection:bg-orange-500 selection:text-white">
+      <LexoraNavbar />
       <main>
-        <Hero />
-        <InteractiveAppPreview />
+        <LexoraHero />
         <Features />
         <HowItWorks />
         <Pricing />
