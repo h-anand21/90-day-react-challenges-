@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import {
   Mic,
+  MicOff,
   Play,
   Pause,
   Sparkles,
@@ -16,6 +17,10 @@ import {
   ShieldCheck,
   RotateCcw,
   CheckCircle,
+  FileText,
+  Download,
+  Upload,
+  Layers,
 } from 'lucide-react';
 
 export const LexoraHero: React.FC = () => {
@@ -105,21 +110,21 @@ export const LexoraHero: React.FC = () => {
   const [typedTranslation, setTypedTranslation] = useState('');
   const [gaugeProgress, setGaugeProgress] = useState(0);
 
-  // INTERACTIVE CENTER CARD BACKEND METRIC STATES
+  // INTERACTIVE AUDIO STUDIO CONSOLE STATES
   const [selectedAiModel, setSelectedAiModel] = useState('Whisper v3 Neural');
-  const [selectedAccessMode, setSelectedAccessMode] = useState('Deaf & Hard-of-Hearing (SDH)');
+  const [selectedAudioInput, setSelectedAudioInput] = useState('System Mic (Real-Time)');
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
-  const [accessDropdownOpen, setAccessDropdownOpen] = useState(false);
-  const [transcribedMinutes, setTranscribedMinutes] = useState(6896);
+  const [inputDropdownOpen, setInputDropdownOpen] = useState(false);
+  const [transcribedMins, setTranscribedMins] = useState(6896);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const aiModels = ['Whisper v3 Neural', 'Deepgram Nova-2', 'On-Device Local ONNX'];
-  const accessModes = ['Deaf & Hard-of-Hearing (SDH)', 'Lecture Live Captions', 'Meeting Summarizer'];
+  const aiModels = ['Whisper v3 Neural (99.4%)', 'Deepgram Nova-2 (Streaming)', 'On-Device Local ONNX'];
+  const audioInputs = ['System Mic (Real-Time)', 'Zoom / Teams Loopback', 'Upload MP3 / WAV File'];
 
   const triggerSaveNotification = () => {
     setGaugeProgress(99);
-    setTranscribedMinutes((prev) => prev + 12);
-    setToastMessage(`✨ Settings Saved: Applied ${selectedAiModel} with ${selectedAccessMode}`);
+    setTranscribedMins((prev) => prev + 15);
+    setToastMessage(`✨ Audio Console Saved: ${selectedAiModel} with ${selectedAudioInput}`);
     setTimeout(() => setToastMessage(null), 3500);
   };
 
@@ -140,7 +145,7 @@ export const LexoraHero: React.FC = () => {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setGaugeProgress(94);
+      setGaugeProgress(99);
     }, 400);
     return () => clearTimeout(timeout);
   }, []);
@@ -401,7 +406,7 @@ export const LexoraHero: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* FLOATING WIDGET 2: Top-Right "Live Caption" WITH FULLY INTERACTIVE LANGUAGE DROPDOWN */}
+          {/* FLOATING WIDGET 2: Top-Right "Live Caption" */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0, y: [0, -14, 0] }}
@@ -433,7 +438,7 @@ export const LexoraHero: React.FC = () => {
                     className="absolute right-0 mt-1.5 w-40 rounded-xl bg-[#181c28] border border-orange-500/40 p-1.5 shadow-2xl z-50 space-y-1"
                   >
                     <div className="text-[10px] uppercase font-bold text-orange-400 px-2 py-1 border-b border-white/10">
-                      Select Speech Language:
+                      Select Language:
                     </div>
                     {languageOptions.map((lang) => (
                       <button
@@ -441,7 +446,7 @@ export const LexoraHero: React.FC = () => {
                         onClick={() => {
                           setSelectedLangObj(lang);
                           setIsLangDropdownOpen(false);
-                          setToastMessage(`🌐 Speech Language Switched: ${lang.name} ${lang.flag}`);
+                          setToastMessage(`🌐 Caption Switched: ${lang.name} ${lang.flag}`);
                           setTimeout(() => setToastMessage(null), 3000);
                         }}
                         className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
@@ -547,7 +552,7 @@ export const LexoraHero: React.FC = () => {
           </motion.div>
 
           {/* ---------------------------------------------------- */}
-          {/* CENTER INTERACTIVE BACKEND-RELATABLE DASHBOARD CARD */}
+          {/* 100% RELATABLE LIVE AUDIO STUDIO RECORDING CONSOLE */}
           {/* ---------------------------------------------------- */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -555,39 +560,44 @@ export const LexoraHero: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="mx-auto pt-16 max-w-2xl"
           >
-            <div className="rounded-3xl bg-white/95 text-slate-900 p-6 shadow-2xl border border-white/50 backdrop-blur-2xl transition-all hover:shadow-orange-500/20 hover:border-white">
+            <div className="rounded-3xl bg-white/95 text-slate-900 p-6 shadow-2xl border border-white/50 backdrop-blur-2xl transition-all hover:shadow-orange-500/25 hover:border-white">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
                 
-                {/* Metric 1: Transcribed Minutes & Accuracy Target */}
+                {/* Panel 1: Live Audio Session & Speech Precision Gauge */}
                 <motion.div
                   whileHover={{ y: -3 }}
                   onClick={() => {
-                    setTranscribedMinutes((prev) => prev + 15);
-                    setToastMessage('⚡ Live Audio Stream Session Updated: +15 Mins Transcribed');
+                    setTranscribedMins((prev) => prev + 15);
+                    setToastMessage('⚡ Live Audio Stream Logged: +15 Mins Captions');
                     setTimeout(() => setToastMessage(null), 3000);
                   }}
                   className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all cursor-pointer group"
                 >
                   <div>
                     <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-                      <span className="font-bold text-slate-800">Transcribed Mins</span>
+                      <span className="font-extrabold text-slate-900 flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping" />
+                        Speech-to-Text
+                      </span>
                       <span className="text-[10px] text-orange-600 font-bold">This Month</span>
                     </div>
                     <div className="flex items-baseline gap-2 mt-2">
                       <span className="text-2xl font-black text-slate-900 group-hover:text-orange-600 transition-colors">
-                        {transcribedMinutes.toLocaleString()}
+                        {transcribedMins.toLocaleString()} <span className="text-xs font-normal text-slate-500">mins</span>
                       </span>
                       <span className="text-[11px] font-bold text-emerald-600">↑ +14.2%</span>
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1">Live Audio Captions Logged</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Live Audio Captions Streamed</p>
                   </div>
 
-                  {/* Circular Arc Gauge Meter for Accuracy */}
+                  {/* Speech Precision Gauge Meter */}
                   <div className="mt-4 pt-3 border-t border-slate-200 text-center">
-                    <span className="text-[10px] font-semibold text-slate-500">Speech Precision Target</span>
+                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">
+                      Speech Precision Rate
+                    </span>
                     <div className="relative w-24 h-12 mx-auto mt-2 overflow-hidden">
                       <div
-                        className="w-24 h-24 rounded-full border-8 border-orange-500 border-b-transparent border-l-transparent transition-transform duration-1000"
+                        className="w-24 h-24 rounded-full border-8 border-orange-500 border-b-transparent border-l-transparent transition-transform duration-1000 shadow-sm"
                         style={{ transform: `rotate(${45 + (gaugeProgress / 100) * 180}deg)` }}
                       />
                       <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-sm font-extrabold text-slate-900">
@@ -597,20 +607,21 @@ export const LexoraHero: React.FC = () => {
                   </div>
                 </motion.div>
 
-                {/* Metric 2: AI Neural Model & Mode Selectors */}
+                {/* Panel 2: Real-Time Audio AI Settings & Model Selector */}
                 <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between text-xs hover:bg-white hover:shadow-md transition-all">
                   <div className="space-y-3 relative">
-                    {/* Dropdown 1: Select AI Model */}
+                    
+                    {/* Model Selector */}
                     <div className="relative">
                       <label className="text-[10px] font-bold text-slate-500 uppercase flex items-center justify-between">
-                        <span>Select AI Speech Model</span>
-                        <Zap className="w-3 h-3 text-orange-500" />
+                        <span>Speech AI Engine</span>
+                        <Zap className="w-3.5 h-3.5 text-orange-500" />
                       </label>
                       <div
                         onClick={() => setModelDropdownOpen(!modelDropdownOpen)}
                         className="mt-1 px-3 py-1.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-800 flex justify-between items-center cursor-pointer hover:border-orange-500 transition-colors shadow-sm"
                       >
-                        <span className="truncate">{selectedAiModel}</span>
+                        <span className="truncate text-[11px]">{selectedAiModel}</span>
                         <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                       </div>
 
@@ -622,10 +633,10 @@ export const LexoraHero: React.FC = () => {
                               onClick={() => {
                                 setSelectedAiModel(m);
                                 setModelDropdownOpen(false);
-                                setToastMessage(`🧠 AI Model Switched to: ${m}`);
+                                setToastMessage(`🧠 AI Speech Engine Set: ${m}`);
                                 setTimeout(() => setToastMessage(null), 3000);
                               }}
-                              className="w-full text-left px-2.5 py-1 rounded text-[11px] font-semibold text-slate-700 hover:bg-orange-50 hover:text-orange-600 transition-colors flex items-center justify-between"
+                              className="w-full text-left px-2 py-1 rounded text-[10px] font-semibold text-slate-700 hover:bg-orange-50 hover:text-orange-600 transition-colors flex items-center justify-between"
                             >
                               <span>{m}</span>
                               {selectedAiModel === m && <Check className="w-3 h-3 text-orange-600" />}
@@ -635,35 +646,35 @@ export const LexoraHero: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Dropdown 2: Select Accessibility Mode */}
+                    {/* Audio Input Selector */}
                     <div className="relative">
                       <label className="text-[10px] font-bold text-slate-500 uppercase flex items-center justify-between">
-                        <span>Accessibility Mode</span>
-                        <Volume2 className="w-3 h-3 text-orange-500" />
+                        <span>Audio Source Input</span>
+                        <Mic className="w-3.5 h-3.5 text-orange-500" />
                       </label>
                       <div
-                        onClick={() => setAccessDropdownOpen(!accessDropdownOpen)}
+                        onClick={() => setInputDropdownOpen(!inputDropdownOpen)}
                         className="mt-1 px-3 py-1.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-800 flex justify-between items-center cursor-pointer hover:border-orange-500 transition-colors shadow-sm"
                       >
-                        <span className="truncate text-[11px]">{selectedAccessMode}</span>
+                        <span className="truncate text-[11px]">{selectedAudioInput}</span>
                         <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                       </div>
 
-                      {accessDropdownOpen && (
+                      {inputDropdownOpen && (
                         <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 p-1 space-y-1">
-                          {accessModes.map((mode) => (
+                          {audioInputs.map((src) => (
                             <button
-                              key={mode}
+                              key={src}
                               onClick={() => {
-                                setSelectedAccessMode(mode);
-                                setAccessDropdownOpen(false);
-                                setToastMessage(`♿ Accessibility Mode Set: ${mode}`);
+                                setSelectedAudioInput(src);
+                                setInputDropdownOpen(false);
+                                setToastMessage(`🎙️ Audio Input Source Changed: ${src}`);
                                 setTimeout(() => setToastMessage(null), 3000);
                               }}
-                              className="w-full text-left px-2.5 py-1 rounded text-[11px] font-semibold text-slate-700 hover:bg-orange-50 hover:text-orange-600 transition-colors flex items-center justify-between"
+                              className="w-full text-left px-2 py-1 rounded text-[10px] font-semibold text-slate-700 hover:bg-orange-50 hover:text-orange-600 transition-colors flex items-center justify-between"
                             >
-                              <span>{mode}</span>
-                              {selectedAccessMode === mode && <Check className="w-3 h-3 text-orange-600" />}
+                              <span>{src}</span>
+                              {selectedAudioInput === src && <Check className="w-3 h-3 text-orange-600" />}
                             </button>
                           ))}
                         </div>
@@ -671,7 +682,7 @@ export const LexoraHero: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Save & Reset Action Buttons */}
+                  {/* Recording Studio Action Buttons */}
                   <div className="flex items-center gap-2 mt-4">
                     <button
                       onClick={triggerSaveNotification}
@@ -682,9 +693,9 @@ export const LexoraHero: React.FC = () => {
                     </button>
                     <button
                       onClick={() => {
-                        setSelectedAiModel('Whisper v3 Neural');
-                        setSelectedAccessMode('Deaf & Hard-of-Hearing (SDH)');
-                        setToastMessage('🔄 Settings Reset to Default AI Pipeline');
+                        setSelectedAiModel('Whisper v3 Neural (99.4%)');
+                        setSelectedAudioInput('System Mic (Real-Time)');
+                        setToastMessage('🔄 Audio Console Reset to Default Settings');
                         setTimeout(() => setToastMessage(null), 3000);
                       }}
                       className="py-1.5 px-2 rounded-lg bg-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-300 active:scale-95 transition-all flex items-center justify-center"
@@ -694,31 +705,33 @@ export const LexoraHero: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Metric 3: AI Notes & Low Latency Score */}
+                {/* Panel 3: AI Notes & Low Latency Streaming Score */}
                 <motion.div
                   whileHover={{ y: -3 }}
                   onClick={() => {
-                    setToastMessage('🚀 Audio Streaming Latency Optimized: < 45ms');
+                    setToastMessage('🚀 Real-Time Audio Latency: < 42ms');
                     setTimeout(() => setToastMessage(null), 3000);
                   }}
                   className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all cursor-pointer group"
                 >
                   <div>
                     <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-                      <span className="font-bold text-slate-800">AI Summaries</span>
+                      <span className="font-extrabold text-slate-900">AI Summaries</span>
                       <span className="text-[10px] text-emerald-600 font-bold">Today</span>
                     </div>
                     <div className="flex items-baseline gap-2 mt-2">
                       <span className="text-2xl font-black text-slate-900 group-hover:text-orange-600 transition-colors">148</span>
                       <span className="text-[11px] font-bold text-emerald-600">↑ +24 Notes</span>
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1">Exported to Supabase Cloud</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Saved in Supabase Vault</p>
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-slate-200 text-center">
-                    <span className="text-[10px] font-semibold text-slate-500">&lt; 50ms Streaming Latency</span>
+                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">
+                      &lt; 50ms Streaming Latency
+                    </span>
                     <div className="relative w-24 h-12 mx-auto mt-1 overflow-hidden">
-                      <div className="w-24 h-24 rounded-full border-8 border-emerald-500 border-b-transparent border-l-transparent rotate-[135deg]" />
+                      <div className="w-24 h-24 rounded-full border-8 border-emerald-500 border-b-transparent border-l-transparent rotate-[135deg] shadow-sm" />
                       <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-xs font-extrabold text-slate-900">
                         98.5%
                       </span>
