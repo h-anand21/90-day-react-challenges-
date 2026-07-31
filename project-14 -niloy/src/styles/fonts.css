@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-inter: 'Inter', sans-serif;
+  --font-instrument: 'Instrument Serif', serif;
+}
+
+body {
+  font-family: var(--font-inter);
+}
+
+.font-serif-italic {
+  font-family: var(--font-instrument);
+  font-style: italic;
+  font-weight: 400;
+}
