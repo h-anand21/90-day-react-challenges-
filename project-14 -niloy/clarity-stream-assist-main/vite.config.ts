@@ -14,6 +14,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": "/src",
+      "cloudflare:workers": "data:text/javascript,export const env = {};",
     },
+  },
+  optimizeDeps: {
+    exclude: ["@lovable.dev/mcp-js"],
   },
 });
