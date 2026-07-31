@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "sdk_version": "0.24.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "accessai-mcp",
+      "version": "0.1.0",
+      "title": "AccessAI"
+    },
+    "tools": [
+      {
+        "name": "echo",
+        "title": "Echo",
+        "description": "Echo the input text back. Useful for verifying MCP connectivity to AccessAI.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Text to echo back."
+            }
+          },
+          "required": [
+            "text"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "summarize_text",
+        "title": "Summarize text",
+        "description": "Produce a concise summary of a transcript or arbitrary text. Delegates to the configured summary provider (Gemini by default).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The text or transcript to summarize."
+            },
+            "style": {
+              "description": "Preferred summary shape. Defaults to bullets.",
+              "type": "string",
+              "enum": [
+                "bullets",
+                "paragraph",
+                "tldr"
+              ]
+            }
+          },
+          "required": [
+            "text"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "translate_text",
+        "title": "Translate text",
+        "description": "Translate arbitrary text into a target language. Delegates to the configured translation provider (Gemini by default).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "minLength": 1,
+              "description": "The source text to translate."
+            },
+            "target_language": {
+              "type": "string",
+              "minLength": 2,
+              "description": "Target language name, e.g. 'Spanish', 'French', 'Japanese'."
+            }
+          },
+          "required": [
+            "text",
+            "target_language"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
