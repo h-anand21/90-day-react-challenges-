@@ -1,21 +1,85 @@
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
   --font-inter: 'Inter', sans-serif;
-  --font-instrument: 'Instrument Serif', serif;
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
 }
 
 body {
-  font-family: var(--font-inter);
-}
-
-.font-serif-italic font-normal {
-  font-family: var(--font-instrument);
-  font-style: italic;
-  font-weight: 400;
+  font-family: var(--font-jakarta), var(--font-inter);
+  background-color: #08090c;
+  color: #f3f4f6;
+  overflow-x: hidden;
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0d12;
+}
+::-webkit-scrollbar-thumb {
+  background: #232733;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ea580c;
+}
+
+/* Custom Glow Effects & Glassmorphism */
+.glow-orange {
+  box-shadow: 0 0 40px -5px rgba(249, 115, 22, 0.35);
+}
+
+.glow-orange-sm {
+  box-shadow: 0 0 20px -2px rgba(249, 115, 22, 0.4);
+}
+
+.glow-orange-lg {
+  box-shadow: 0 0 80px 10px rgba(249, 115, 22, 0.25);
+}
+
+.glass-card {
+  background: rgba(18, 22, 31, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card-hover:hover {
+  border-color: rgba(249, 115, 22, 0.4);
+  box-shadow: 0 10px 30px -10px rgba(249, 115, 22, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Keyframe Animations */
+@keyframes wave-bar {
+  0%, 100% { height: 6px; }
+  50% { height: 36px; }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0.3; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.animate-wave-1 { animation: wave-bar 1.2s infinite ease-in-out 0.1s; }
+.animate-wave-2 { animation: wave-bar 1.4s infinite ease-in-out 0.3s; }
+.animate-wave-3 { animation: wave-bar 0.9s infinite ease-in-out 0.2s; }
+.animate-wave-4 { animation: wave-bar 1.6s infinite ease-in-out 0.4s; }
+.animate-wave-5 { animation: wave-bar 1.1s infinite ease-in-out 0.15s; }
+
+.animate-mic-pulse {
+  animation: pulse-ring 3s infinite ease-in-out;
 }
