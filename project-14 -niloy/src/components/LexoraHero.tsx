@@ -12,14 +12,78 @@ import {
   Volume2,
   CheckCircle2,
   Zap,
+  Sliders,
+  ShieldCheck,
+  RotateCcw,
+  CheckCircle,
 } from 'lucide-react';
 
 export const LexoraHero: React.FC = () => {
   const [isRecording, setIsRecording] = useState(true);
-  const [selectedLang, setSelectedLang] = useState('English');
-  const [selectedTransLang, setSelectedTransLang] = useState('Spanish');
   const [timerCount, setTimerCount] = useState(165); // 02:45
   
+  // Interactive Language Selector State
+  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
+  const [selectedLangObj, setSelectedLangObj] = useState({
+    code: 'en',
+    name: 'English',
+    flag: '🇺🇸',
+    caption: 'Good morning everyone, today we will discuss the Q3 performance metrics and key accessibility goals...',
+    transName: 'Spanish',
+    translation: 'Buenos días a todos, hoy discutiremos el informe trimestral y las métricas clave de este período.',
+  });
+
+  const languageOptions = [
+    {
+      code: 'en',
+      name: 'English',
+      flag: '🇺🇸',
+      caption: 'Good morning everyone, today we will discuss the Q3 performance metrics and key accessibility goals...',
+      transName: 'Spanish',
+      translation: 'Buenos días a todos, hoy discutiremos el informe trimestral y las métricas clave de este período.',
+    },
+    {
+      code: 'es',
+      name: 'Spanish',
+      flag: '🇪🇸',
+      caption: 'Buenos días a todos, hoy discutiremos las métricas de rendimiento del tercer trimestre...',
+      transName: 'English',
+      translation: 'Good morning everyone, today we will discuss the Q3 performance metrics...',
+    },
+    {
+      code: 'fr',
+      name: 'French',
+      flag: '🇫🇷',
+      caption: "Bonjour à tous, aujourd'hui nous allons discuter des métriques de performance du troisième trimestre...",
+      transName: 'English',
+      translation: 'Good morning everyone, today we will discuss Q3 metrics...',
+    },
+    {
+      code: 'hi',
+      name: 'Hindi',
+      flag: '🇮🇳',
+      caption: 'नमस्कार आप सभी का स्वागत है, आज हम तीसरी तिमाही के प्रदर्शन मीट्रिक पर चर्चा करेंगे...',
+      transName: 'English',
+      translation: 'Welcome everyone, today we will discuss Q3 metrics...',
+    },
+    {
+      code: 'de',
+      name: 'German',
+      flag: '🇩🇪',
+      caption: 'Guten Morgen zusammen, heute werden wir die Leistungsmetriken für das dritte Quartal besprechen...',
+      transName: 'Spanish',
+      translation: 'Buenos días a todos, hoy discutiremos las métricas del tercer trimestre...',
+    },
+    {
+      code: 'ja',
+      name: 'Japanese',
+      flag: '🇯🇵',
+      caption: '皆さんおはようございます、本日は第3四半期の業績指標とアクセシビリティについて議論します...',
+      transName: 'English',
+      translation: 'Good morning everyone, today we will discuss Q3 metrics...',
+    },
+  ];
+
   // Dynamic Headline Rotating Text Words
   const [rotatingWordIdx, setRotatingWordIdx] = useState(0);
   const rotatingWords = [
@@ -37,12 +101,27 @@ export const LexoraHero: React.FC = () => {
   }, []);
 
   // Character typing simulation for widgets
-  const fullCaption = "Good morning everyone, today we will discuss the Q3 performance metrics and key accessibility goals...";
-  const fullTranslation = "Buenos días a todos, hoy discutiremos el informe trimestral y las métricas clave de este período.";
-  
   const [typedCaption, setTypedCaption] = useState('');
   const [typedTranslation, setTypedTranslation] = useState('');
   const [gaugeProgress, setGaugeProgress] = useState(0);
+
+  // INTERACTIVE CENTER CARD BACKEND METRIC STATES
+  const [selectedAiModel, setSelectedAiModel] = useState('Whisper v3 Neural');
+  const [selectedAccessMode, setSelectedAccessMode] = useState('Deaf & Hard-of-Hearing (SDH)');
+  const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
+  const [accessDropdownOpen, setAccessDropdownOpen] = useState(false);
+  const [transcribedMinutes, setTranscribedMinutes] = useState(6896);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const aiModels = ['Whisper v3 Neural', 'Deepgram Nova-2', 'On-Device Local ONNX'];
+  const accessModes = ['Deaf & Hard-of-Hearing (SDH)', 'Lecture Live Captions', 'Meeting Summarizer'];
+
+  const triggerSaveNotification = () => {
+    setGaugeProgress(99);
+    setTranscribedMinutes((prev) => prev + 12);
+    setToastMessage(`✨ Settings Saved: Applied ${selectedAiModel} with ${selectedAccessMode}`);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
   // 3D Parallax Mouse Motion Values
   const mouseX = useMotionValue(0);
@@ -61,24 +140,30 @@ export const LexoraHero: React.FC = () => {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setGaugeProgress(92);
+      setGaugeProgress(94);
     }, 400);
     return () => clearTimeout(timeout);
   }, []);
 
-  // Character typing effect
+  // Character typing effect based on active selected language
   useEffect(() => {
     if (!isRecording) return;
     let charIdx = 0;
+    const fullCap = selectedLangObj.caption;
+    const fullTrans = selectedLangObj.translation;
+
+    setTypedCaption('');
+    setTypedTranslation('');
+
     const interval = setInterval(() => {
-      charIdx = (charIdx + 1) % (fullCaption.length + 1);
-      const transIdx = Math.floor((charIdx / fullCaption.length) * fullTranslation.length);
-      setTypedCaption(fullCaption.slice(0, Math.max(12, charIdx)));
-      setTypedTranslation(fullTranslation.slice(0, Math.max(15, transIdx)));
-    }, 75);
+      charIdx = (charIdx + 1) % (fullCap.length + 1);
+      const transIdx = Math.floor((charIdx / fullCap.length) * fullTrans.length);
+      setTypedCaption(fullCap.slice(0, Math.max(8, charIdx)));
+      setTypedTranslation(fullTrans.slice(0, Math.max(10, transIdx)));
+    }, 70);
 
     return () => clearInterval(interval);
-  }, [isRecording]);
+  }, [isRecording, selectedLangObj]);
 
   // Live timer
   useEffect(() => {
@@ -88,7 +173,6 @@ export const LexoraHero: React.FC = () => {
     }, 1000);
     return () => clearInterval(timer);
   }, [isRecording]);
-
 
   const formatTimer = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -126,6 +210,21 @@ export const LexoraHero: React.FC = () => {
       onMouseMove={handleMouseMove}
       className="relative pt-32 pb-20 md:pt-40 md:pb-28 min-h-screen flex flex-col justify-between overflow-hidden perspective-1000"
     >
+      {/* Toast Notification for User Click Actions */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-bold shadow-2xl border border-white/30 flex items-center gap-2"
+          >
+            <CheckCircle className="w-4 h-4 text-white animate-bounce" />
+            <span>{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Generated Cinematic Sunset Mountain Background Asset */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat -z-20 scale-105 transition-transform duration-1000"
@@ -222,7 +321,7 @@ export const LexoraHero: React.FC = () => {
           </h1>
         </motion.div>
 
-        {/* Animated Subtitle with Word-by-Word Reveal */}
+        {/* Animated Subtitle */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -302,27 +401,68 @@ export const LexoraHero: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* FLOATING WIDGET 2: Top-Right "Live Caption" */}
+          {/* FLOATING WIDGET 2: Top-Right "Live Caption" WITH FULLY INTERACTIVE LANGUAGE DROPDOWN */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0, y: [0, -14, 0] }}
             transition={{ opacity: { duration: 0.8, delay: 0.8 }, y: { duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 } }}
-            whileHover={{ scale: 1.05, rotate: 1 }}
-            className="absolute top-4 right-0 md:right-4 z-20 w-72 rounded-2xl bg-[#141720]/85 border border-white/20 p-4 backdrop-blur-xl shadow-2xl text-left hidden sm:block hover:border-orange-500/50 transition-all cursor-pointer"
+            whileHover={{ scale: 1.02 }}
+            className="absolute top-4 right-0 md:right-4 z-40 w-72 rounded-2xl bg-[#141720]/90 border border-white/20 p-4 backdrop-blur-xl shadow-2xl text-left hidden sm:block hover:border-orange-500/50 transition-all"
           >
-            <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center justify-between mb-2 relative">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span className="text-xs font-bold text-white">Live Caption</span>
               </div>
-              <div className="flex items-center gap-1 text-[11px] text-slate-300 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md hover:bg-white/10">
-                <Globe className="w-3 h-3 text-orange-400" />
-                <span>{selectedLang}</span>
-                <ChevronDown className="w-3 h-3 text-slate-400" />
+
+              <div className="relative">
+                <button
+                  onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+                  className="flex items-center gap-1.5 text-[11px] font-bold text-slate-200 bg-white/10 hover:bg-orange-500/20 hover:text-orange-300 border border-white/15 hover:border-orange-500/40 px-2.5 py-1 rounded-lg transition-all"
+                >
+                  <span>{selectedLangObj.flag}</span>
+                  <span>{selectedLangObj.name}</span>
+                  <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {isLangDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                    className="absolute right-0 mt-1.5 w-40 rounded-xl bg-[#181c28] border border-orange-500/40 p-1.5 shadow-2xl z-50 space-y-1"
+                  >
+                    <div className="text-[10px] uppercase font-bold text-orange-400 px-2 py-1 border-b border-white/10">
+                      Select Speech Language:
+                    </div>
+                    {languageOptions.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          setSelectedLangObj(lang);
+                          setIsLangDropdownOpen(false);
+                          setToastMessage(`🌐 Speech Language Switched: ${lang.name} ${lang.flag}`);
+                          setTimeout(() => setToastMessage(null), 3000);
+                        }}
+                        className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          selectedLangObj.code === lang.code
+                            ? 'bg-orange-500 text-white font-bold'
+                            : 'text-slate-200 hover:bg-white/10 hover:text-orange-300'
+                        }`}
+                      >
+                        <span className="flex items-center gap-1.5">
+                          <span>{lang.flag}</span>
+                          <span>{lang.name}</span>
+                        </span>
+                        {selectedLangObj.code === lang.code && <Check className="w-3 h-3 text-white" />}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
               </div>
             </div>
 
-            <div className="text-xs text-slate-200 leading-relaxed font-sans mt-2 italic bg-black/50 p-2.5 rounded-xl border border-white/5 min-h-[54px]">
+            <div className="text-xs text-slate-200 leading-relaxed font-sans mt-2 italic bg-black/50 p-2.5 rounded-xl border border-white/10 min-h-[54px]">
               "{typedCaption}"<span className="inline-block w-1.5 h-3.5 bg-orange-500 ml-0.5 animate-pulse" />
             </div>
           </motion.div>
@@ -371,7 +511,13 @@ export const LexoraHero: React.FC = () => {
               ))}
             </div>
 
-            <button className="w-full py-1.5 rounded-lg bg-orange-500/20 border border-orange-500/40 text-orange-300 font-semibold text-xs hover:bg-orange-500 hover:text-white active:scale-95 transition-all shadow-md">
+            <button
+              onClick={() => {
+                setToastMessage('📝 AI Notes & Action Items Generated!');
+                setTimeout(() => setToastMessage(null), 3000);
+              }}
+              className="w-full py-1.5 rounded-lg bg-orange-500/20 border border-orange-500/40 text-orange-300 font-semibold text-xs hover:bg-orange-500 hover:text-white active:scale-95 transition-all shadow-md"
+            >
               Generate Notes
             </button>
           </motion.div>
@@ -389,8 +535,8 @@ export const LexoraHero: React.FC = () => {
                 <Globe className="w-4 h-4 text-orange-400" />
                 <span className="text-xs font-bold text-white">Translation</span>
               </div>
-              <div className="text-[11px] text-slate-300 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md flex items-center gap-1 hover:bg-white/10">
-                <span>{selectedTransLang}</span>
+              <div className="text-[11px] text-slate-300 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md flex items-center gap-1">
+                <span>{selectedLangObj.transName}</span>
                 <ChevronDown className="w-3 h-3 text-slate-400" />
               </div>
             </div>
@@ -400,7 +546,9 @@ export const LexoraHero: React.FC = () => {
             </p>
           </motion.div>
 
-          {/* CENTER INTERACTIVE DASHBOARD CARD */}
+          {/* ---------------------------------------------------- */}
+          {/* CENTER INTERACTIVE BACKEND-RELATABLE DASHBOARD CARD */}
+          {/* ---------------------------------------------------- */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -410,25 +558,33 @@ export const LexoraHero: React.FC = () => {
             <div className="rounded-3xl bg-white/95 text-slate-900 p-6 shadow-2xl border border-white/50 backdrop-blur-2xl transition-all hover:shadow-orange-500/20 hover:border-white">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
                 
-                {/* Metric 1 */}
+                {/* Metric 1: Transcribed Minutes & Accuracy Target */}
                 <motion.div
                   whileHover={{ y: -3 }}
-                  className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all"
+                  onClick={() => {
+                    setTranscribedMinutes((prev) => prev + 15);
+                    setToastMessage('⚡ Live Audio Stream Session Updated: +15 Mins Transcribed');
+                    setTimeout(() => setToastMessage(null), 3000);
+                  }}
+                  className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all cursor-pointer group"
                 >
                   <div>
                     <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-                      <span>Clicks</span>
-                      <span>This Month</span>
+                      <span className="font-bold text-slate-800">Transcribed Mins</span>
+                      <span className="text-[10px] text-orange-600 font-bold">This Month</span>
                     </div>
                     <div className="flex items-baseline gap-2 mt-2">
-                      <span className="text-2xl font-black text-slate-900">6,896</span>
-                      <span className="text-[11px] font-bold text-red-500">↓ -3.35%</span>
+                      <span className="text-2xl font-black text-slate-900 group-hover:text-orange-600 transition-colors">
+                        {transcribedMinutes.toLocaleString()}
+                      </span>
+                      <span className="text-[11px] font-bold text-emerald-600">↑ +14.2%</span>
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1">Compared to yesterday</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Live Audio Captions Logged</p>
                   </div>
 
+                  {/* Circular Arc Gauge Meter for Accuracy */}
                   <div className="mt-4 pt-3 border-t border-slate-200 text-center">
-                    <span className="text-[10px] font-semibold text-slate-500">Month Target achieved</span>
+                    <span className="text-[10px] font-semibold text-slate-500">Speech Precision Target</span>
                     <div className="relative w-24 h-12 mx-auto mt-2 overflow-hidden">
                       <div
                         className="w-24 h-24 rounded-full border-8 border-orange-500 border-b-transparent border-l-transparent transition-transform duration-1000"
@@ -441,67 +597,139 @@ export const LexoraHero: React.FC = () => {
                   </div>
                 </motion.div>
 
-                {/* Metric 2 */}
-                <motion.div
-                  whileHover={{ y: -3 }}
-                  className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between text-xs hover:bg-white hover:shadow-md transition-all"
-                >
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Show figures for</label>
-                      <div className="mt-1 px-3 py-1.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-800 flex justify-between items-center cursor-pointer hover:border-orange-400 transition-colors">
-                        <span>This month</span>
+                {/* Metric 2: AI Neural Model & Mode Selectors */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between text-xs hover:bg-white hover:shadow-md transition-all">
+                  <div className="space-y-3 relative">
+                    {/* Dropdown 1: Select AI Model */}
+                    <div className="relative">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase flex items-center justify-between">
+                        <span>Select AI Speech Model</span>
+                        <Zap className="w-3 h-3 text-orange-500" />
+                      </label>
+                      <div
+                        onClick={() => setModelDropdownOpen(!modelDropdownOpen)}
+                        className="mt-1 px-3 py-1.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-800 flex justify-between items-center cursor-pointer hover:border-orange-500 transition-colors shadow-sm"
+                      >
+                        <span className="truncate">{selectedAiModel}</span>
                         <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                       </div>
+
+                      {modelDropdownOpen && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 p-1 space-y-1">
+                          {aiModels.map((m) => (
+                            <button
+                              key={m}
+                              onClick={() => {
+                                setSelectedAiModel(m);
+                                setModelDropdownOpen(false);
+                                setToastMessage(`🧠 AI Model Switched to: ${m}`);
+                                setTimeout(() => setToastMessage(null), 3000);
+                              }}
+                              className="w-full text-left px-2.5 py-1 rounded text-[11px] font-semibold text-slate-700 hover:bg-orange-50 hover:text-orange-600 transition-colors flex items-center justify-between"
+                            >
+                              <span>{m}</span>
+                              {selectedAiModel === m && <Check className="w-3 h-3 text-orange-600" />}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
-                    <div>
-                      <label className="text-[10px] font-bold text-slate-500 uppercase">Compare period by</label>
-                      <div className="mt-1 px-3 py-1.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-800 flex justify-between items-center cursor-pointer hover:border-orange-400 transition-colors">
-                        <span>Month-to-date (MTD)</span>
+                    {/* Dropdown 2: Select Accessibility Mode */}
+                    <div className="relative">
+                      <label className="text-[10px] font-bold text-slate-500 uppercase flex items-center justify-between">
+                        <span>Accessibility Mode</span>
+                        <Volume2 className="w-3 h-3 text-orange-500" />
+                      </label>
+                      <div
+                        onClick={() => setAccessDropdownOpen(!accessDropdownOpen)}
+                        className="mt-1 px-3 py-1.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-800 flex justify-between items-center cursor-pointer hover:border-orange-500 transition-colors shadow-sm"
+                      >
+                        <span className="truncate text-[11px]">{selectedAccessMode}</span>
                         <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                       </div>
+
+                      {accessDropdownOpen && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 p-1 space-y-1">
+                          {accessModes.map((mode) => (
+                            <button
+                              key={mode}
+                              onClick={() => {
+                                setSelectedAccessMode(mode);
+                                setAccessDropdownOpen(false);
+                                setToastMessage(`♿ Accessibility Mode Set: ${mode}`);
+                                setTimeout(() => setToastMessage(null), 3000);
+                              }}
+                              className="w-full text-left px-2.5 py-1 rounded text-[11px] font-semibold text-slate-700 hover:bg-orange-50 hover:text-orange-600 transition-colors flex items-center justify-between"
+                            >
+                              <span>{mode}</span>
+                              {selectedAccessMode === mode && <Check className="w-3 h-3 text-orange-600" />}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
+                  {/* Save & Reset Action Buttons */}
                   <div className="flex items-center gap-2 mt-4">
-                    <button className="flex-1 py-1.5 rounded-lg bg-orange-500 text-white font-bold text-xs hover:bg-orange-600 active:scale-95 transition-all shadow-md">
-                      Save
+                    <button
+                      onClick={triggerSaveNotification}
+                      className="flex-1 py-1.5 rounded-lg bg-orange-500 text-white font-bold text-xs hover:bg-orange-600 active:scale-95 transition-all shadow-md shadow-orange-500/30 flex items-center justify-center gap-1"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Save Config</span>
                     </button>
-                    <button className="flex-1 py-1.5 rounded-lg bg-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-300 active:scale-95 transition-all">
-                      Cancel
+                    <button
+                      onClick={() => {
+                        setSelectedAiModel('Whisper v3 Neural');
+                        setSelectedAccessMode('Deaf & Hard-of-Hearing (SDH)');
+                        setToastMessage('🔄 Settings Reset to Default AI Pipeline');
+                        setTimeout(() => setToastMessage(null), 3000);
+                      }}
+                      className="py-1.5 px-2 rounded-lg bg-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-300 active:scale-95 transition-all flex items-center justify-center"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                </motion.div>
+                </div>
 
-                {/* Metric 3 */}
+                {/* Metric 3: AI Notes & Low Latency Score */}
                 <motion.div
                   whileHover={{ y: -3 }}
-                  className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all"
+                  onClick={() => {
+                    setToastMessage('🚀 Audio Streaming Latency Optimized: < 45ms');
+                    setTimeout(() => setToastMessage(null), 3000);
+                  }}
+                  className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all cursor-pointer group"
                 >
                   <div>
                     <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-                      <span>Video Starts</span>
-                      <span>Today</span>
+                      <span className="font-bold text-slate-800">AI Summaries</span>
+                      <span className="text-[10px] text-emerald-600 font-bold">Today</span>
                     </div>
                     <div className="flex items-baseline gap-2 mt-2">
-                      <span className="text-2xl font-black text-slate-900">0</span>
-                      <span className="text-[11px] font-bold text-emerald-500">↑ 0</span>
+                      <span className="text-2xl font-black text-slate-900 group-hover:text-orange-600 transition-colors">148</span>
+                      <span className="text-[11px] font-bold text-emerald-600">↑ +24 Notes</span>
                     </div>
+                    <p className="text-[10px] text-slate-400 mt-1">Exported to Supabase Cloud</p>
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-slate-200 text-center">
-                    <div className="relative w-24 h-12 mx-auto overflow-hidden">
-                      <div className="w-24 h-24 rounded-full border-8 border-slate-700 border-b-transparent border-l-transparent rotate-45" />
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-sm font-extrabold text-slate-900">68%</span>
+                    <span className="text-[10px] font-semibold text-slate-500">&lt; 50ms Streaming Latency</span>
+                    <div className="relative w-24 h-12 mx-auto mt-1 overflow-hidden">
+                      <div className="w-24 h-24 rounded-full border-8 border-emerald-500 border-b-transparent border-l-transparent rotate-[135deg]" />
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-xs font-extrabold text-slate-900">
+                        98.5%
+                      </span>
                     </div>
 
                     <div className="flex items-center gap-2 mt-4 text-[10px]">
-                      <button className="flex-1 py-1 rounded-md bg-white border border-slate-300 font-semibold text-slate-700 hover:border-orange-400 transition-colors">
-                        Video Clicks
+                      <button className="flex-1 py-1 rounded-md bg-white border border-slate-300 font-semibold text-slate-700 hover:border-orange-400 hover:text-orange-600 transition-colors">
+                        Speech Logs
                       </button>
-                      <button className="flex-1 py-1 rounded-md bg-white border border-slate-300 font-semibold text-slate-700 hover:border-orange-400 transition-colors">
-                        Video Starts
+                      <button className="flex-1 py-1 rounded-md bg-white border border-slate-300 font-semibold text-slate-700 hover:border-orange-400 hover:text-orange-600 transition-colors">
+                        Subtitles
                       </button>
                     </div>
                   </div>
