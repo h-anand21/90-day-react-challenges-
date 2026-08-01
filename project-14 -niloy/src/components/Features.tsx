@@ -23,21 +23,16 @@ import {
   Sparkle,
   Volume2,
   Share2,
-  Server,
   Activity,
+  Pointer,
 } from 'lucide-react';
 
 interface VisualStep {
   stepNum: string;
   title: string;
   desc: string;
+  actionHint: string;
   icon: any;
-}
-
-interface BackendDetail {
-  headline: string;
-  explanation: string;
-  pipeline: string[];
 }
 
 interface ModalData {
@@ -46,9 +41,7 @@ interface ModalData {
   badge: string;
   icon: any;
   overview: string;
-  specs: { label: string; val: string }[];
   userSteps: VisualStep[];
-  backendInfo: BackendDetail;
   interactiveDemoText: string;
   targetStudioSection: string;
 }
@@ -72,7 +65,7 @@ export const Features: React.FC = () => {
   const toggleLatency = () => {
     const newVal = latencyVal === 38 ? 24 : 38;
     setLatencyVal(newVal);
-    showToast(`⚡ Stream Engine: Optimized latency to ${newVal}ms per frame!`);
+    showToast(`⚡ Stream Engine: Latency speed updated to ${newVal}ms!`);
   };
 
   // Card 2: Language Rotation & Selection
@@ -108,7 +101,7 @@ export const Features: React.FC = () => {
         'Automated meeting minutes generated',
         'Speaker sentiment & timelines cataloged',
       ]);
-      showToast('🧠 GPT-4o Engine: Structured meeting minutes & action items generated!');
+      showToast('🧠 AI Notes: Structured meeting minutes generated!');
     }, 1000);
   };
 
@@ -117,14 +110,14 @@ export const Features: React.FC = () => {
   const toggleFontSize = () => {
     const newSize = captionFontSize === 12 ? 15 : 12;
     setCaptionFontSize(newSize);
-    showToast(`♿ Accessibility Mode: Font size adjusted to ${newSize}px for optimal clarity!`);
+    showToast(`♿ Caption Mode: Font size updated to ${newSize}px!`);
   };
 
   // Card 5: Security Lock Mode State
   const [isLocalVault, setIsLocalVault] = useState(true);
   const toggleSecurityMode = () => {
     setIsLocalVault(!isLocalVault);
-    showToast(!isLocalVault ? '🔒 Security Mode: Zero-retention Local On-Device ONNX Active' : '🛡️ Security Mode: TLS 1.3 Cloud Vault Encrypted');
+    showToast(!isLocalVault ? '🔒 Security Mode: On-Device Private Mode' : '🛡️ Security Mode: Encrypted Cloud Vault');
   };
 
   // Card 6: Multi Export Simulation State
@@ -140,7 +133,7 @@ export const Features: React.FC = () => {
       setExportProgress(p);
       if (p >= 100) {
         clearInterval(interval);
-        showToast(`📥 Export Complete: Downloaded session notes in ${format} format!`);
+        showToast(`📥 Export Complete: Saved file as ${format}!`);
         setTimeout(() => setActiveExportFormat(null), 2500);
       }
     }, 180);
@@ -171,307 +164,223 @@ export const Features: React.FC = () => {
     }, 40);
   };
 
-  // Comprehensive Modal Data Provider (User Guide + Backend Architecture Details)
+  // 100% User-Focused Animated Visual Walkthrough Provider (NO BACKEND CODE/PIPELINES)
   const getModalDetails = (type: string): ModalData => {
     switch (type) {
       case 'Ultra-Low':
         return {
           type: 'Ultra-Low',
-          title: 'Ultra-Low Latency Streaming',
-          badge: 'User Guide & Backend Architecture',
+          title: 'How to Use Ultra-Low Latency Streaming',
+          badge: 'Interactive Visual Guide for Users',
           icon: Mic,
           targetStudioSection: 'audio-vad',
           overview:
-            'This module turns live spoken audio into screen captions with under 50ms latency. Below is the step-by-step user guide and exact backend pipeline.',
-          specs: [
-            { label: 'Latency Speed', val: '< 38 Milliseconds' },
-            { label: 'Speech Precision', val: '99.4% Accuracy' },
-            { label: 'Sampling Rate', val: '44.1 kHz HD Audio' },
-            { label: 'Sampling Window', val: '20ms Frame VAD' },
-          ],
+            'Watch how easy it is to capture live speech with zero lag. Follow the 3 simple steps below to record and see real-time captions on your screen.',
           userSteps: [
             {
               stepNum: '01',
-              title: 'Mic Connect & Record',
-              desc: 'Click the glowing orange mic button in the studio console to begin capturing live audio.',
+              title: 'Click "Start Recording"',
+              desc: 'Press the glowing orange mic button in the studio console to begin listening.',
+              actionHint: '🖱️ Step 1: Click Mic Orb',
               icon: MousePointer,
             },
             {
               stepNum: '02',
-              title: 'Speak Naturally',
-              desc: 'Our system analyzes audio volume, displays soundwaves, and streams speech to text live.',
+              title: 'Speak Into Microphone',
+              desc: 'Talk naturally. The soundwave equalizer bouncers react live to your voice volume.',
+              actionHint: '🎙️ Step 2: Speak Audio',
               icon: Volume2,
             },
             {
               stepNum: '03',
-              title: 'Real-Time Caption Stream',
-              desc: 'Captions stream character-by-character on screen with under 50ms streaming latency.',
+              title: 'Watch Real-Time Captions',
+              desc: 'Your spoken words appear line-by-line instantaneously with under 50ms latency.',
+              actionHint: '⚡ Step 3: Instant Text',
               icon: Zap,
             },
           ],
-          backendInfo: {
-            headline: 'Backend Architecture & Processing Pipeline',
-            explanation:
-              'The backend uses a WebRTC / WebSocket TLS socket connection to sample 44.1kHz audio into 20ms frames. An on-device VAD (Voice Activity Detector) filters silent frames before passing clean audio to our fine-tuned Whisper neural model.',
-            pipeline: [
-              '44.1kHz Audio Capture ➔ WebRTC TLS Socket',
-              '20ms Sampling Frame Voice Activity Detector (VAD)',
-              'Whisper Neural Model Inference (< 38ms)',
-              'WebSocket Line-by-Line Subtitle Broadcast',
-            ],
-          },
           interactiveDemoText:
-            'Welcome! As you speak into your mic, ClarityStream AI processes speech frames in 38ms and displays live captions with 99.4% accuracy...',
+            'Live Demo Active: Audio is recording... Speech appears on screen line-by-line with zero lag!',
         };
 
       case 'Live':
         return {
           type: 'Live',
-          title: 'Live Multilingual Translation Engine',
-          badge: 'User Guide & Backend Architecture',
+          title: 'How to Use Live Multilingual Translation',
+          badge: 'Interactive Visual Guide for Users',
           icon: Globe,
           targetStudioSection: 'speech-translation',
           overview:
-            'Translate live speech streams into 50+ target languages instantly with custom domain vocabulary and multi-speaker identification.',
-          specs: [
-            { label: 'Supported Languages', val: '50+ World Languages' },
-            { label: 'Translation Speed', val: '< 12ms per Frame' },
-            { label: 'Domain Vocabulary', val: 'Medical & Legal Terms' },
-            { label: 'Diarization', val: 'Multi-Speaker Detection' },
-          ],
+            'Break language barriers during lectures and meetings. Learn how to select your favorite language and watch live translations appear on screen.',
           userSteps: [
             {
               stepNum: '01',
-              title: 'Select Language Pair',
-              desc: 'Click the language selector (e.g. English ➔ Spanish 🇪🇸) to choose your target language.',
+              title: 'Click Language Selector',
+              desc: 'Click the language button (e.g. English ➔ Spanish 🇪🇸) in the top-right of the speech feed.',
+              actionHint: '🌐 Step 1: Pick Language',
               icon: Globe,
             },
             {
               stepNum: '02',
-              title: 'Automatic Speech Translation',
-              desc: 'As the speaker talks, translated text appears below the transcript in real time.',
+              title: 'Listen to Live Speech',
+              desc: 'As the speaker talks in English, translated captions stream line-by-line underneath.',
+              actionHint: '💬 Step 2: Live Translation',
               icon: Cpu,
             },
             {
               stepNum: '03',
-              title: 'Export SRT Subtitles',
-              desc: 'Save multi-language captions as SRT subtitle files to share with international teams.',
+              title: 'Share Translated Captions',
+              desc: 'Download translated subtitles with one click to share with friends and global team members.',
+              actionHint: '📥 Step 3: Share Subtitles',
               icon: Share2,
             },
           ],
-          backendInfo: {
-            headline: 'Backend Architecture & Translation Pipeline',
-            explanation:
-              'The backend converts speech frames into intermediate phoneme tokens. A multi-head transformer model translates tokens on the fly while retaining speaker diarization tags (Speaker 1, Speaker 2).',
-            pipeline: [
-              'Neural Speech-to-Text Tokenizer',
-              'Multi-Head Transformer Translation Pipeline',
-              'Speaker Diarization Tag Mapping',
-              'Real-Time Multilingual WebSocket Dispatch',
-            ],
-          },
           interactiveDemoText:
-            '¡Bienvenidos! Hoy estamos probando la traducción en tiempo real de ClarityStream AI en más de 50 idiomas con subtítulos instantáneos...',
+            'Live Translation Active: Spoken English is translating to Spanish in real-time line-by-line...',
         };
 
       case 'Automated':
         return {
           type: 'Automated',
-          title: 'Automated AI Summaries (GPT-4o)',
-          badge: 'User Guide & Backend Architecture',
+          title: 'How to Use Automated AI Summaries',
+          badge: 'Interactive Visual Guide for Users',
           icon: Sparkles,
           targetStudioSection: 'ai-notes',
           overview:
-            'Extract key takeaways, meeting minutes, and action items automatically as soon as your recording session ends.',
-          specs: [
-            { label: 'AI Intelligence', val: 'GPT-4o Fine-Tuned Model' },
-            { label: 'Generation Speed', val: '< 1.2 Seconds' },
-            { label: 'Database Storage', val: 'Supabase Encrypted Vault' },
-            { label: 'Format', val: 'Action Items + Bullet Notes' },
-          ],
+            'Never waste time taking manual notes again. AI automatically organizes key takeaways, action items, and meeting minutes for you.',
           userSteps: [
             {
               stepNum: '01',
               title: 'Record Session',
-              desc: 'Let ClarityStream capture your lecture or meeting in the background.',
+              desc: 'Let ClarityStream transcribe your lecture or meeting in the studio console.',
+              actionHint: '🎙️ Step 1: Record Audio',
               icon: Mic,
             },
             {
               stepNum: '02',
               title: 'Click "Generate Notes"',
-              desc: 'Press the AI Summary button to analyze the full conversation transcript.',
+              desc: 'Click the AI Summary button at the end of your recording to generate summary points.',
+              actionHint: '✨ Step 2: Click AI Notes',
               icon: Sparkles,
             },
             {
               stepNum: '03',
               title: 'Review Structured Minutes',
-              desc: 'Access organized action points, key decisions, and meeting takeaways.',
+              desc: 'Get organized bullet points, key decisions, and action items ready to save.',
+              actionHint: '📋 Step 3: Save Summary',
               icon: CheckCircle2,
             },
           ],
-          backendInfo: {
-            headline: 'Backend Architecture & Summarizer Pipeline',
-            explanation:
-              'Post-session transcripts are parsed into structured markdown blocks. GPT-4o analyzes speaker intent, extracts action items, tags key topics, and saves results directly into Supabase PostgreSQL database.',
-            pipeline: [
-              'Full Transcript Token Parsing',
-              'GPT-4o Intent & Action Item Extraction',
-              'Markdown Meeting Minutes Formatter',
-              'Supabase PostgreSQL Database Sync',
-            ],
-          },
           interactiveDemoText:
-            'AI Summary Generated: 1) Key decisions cataloged. 2) Action items assigned to team. 3) Meeting minutes saved to cloud vault.',
+            'AI Notes Generated: 1) Main topics highlighted. 2) Action items assigned. 3) Minutes ready to export.',
         };
 
       case 'Universal':
         return {
           type: 'Universal',
-          title: 'Universal Accessibility & ADA Compliance',
-          badge: 'User Guide & Backend Architecture',
+          title: 'How to Use Accessibility Controls',
+          badge: 'Interactive Visual Guide for Users',
           icon: Headphones,
           targetStudioSection: 'speech-translation',
           overview:
-            'Designed for deaf and hard-of-hearing individuals, ESL students, and neurodivergent learners with customizable high-contrast captions.',
-          specs: [
-            { label: 'Compliance Level', val: 'WCAG 2.1 AAA Certified' },
-            { label: 'Contrast Ratio', val: '21:1 Ultra High Contrast' },
-            { label: 'Font Sizing', val: 'Scalable 12px - 28px Captions' },
-            { label: 'Screen Readers', val: 'Full ARIA Compatibility' },
-          ],
+            'Customize your caption screen for maximum comfort. Toggle high-contrast modes and resize caption text for optimal readability.',
           userSteps: [
             {
               stepNum: '01',
-              title: 'Enable High Contrast',
-              desc: 'Toggle dark high-contrast backgrounds for maximum caption visibility.',
+              title: 'Click "High-Contrast"',
+              desc: 'Toggle dark high-contrast caption backgrounds for clear text visibility.',
+              actionHint: '🎨 Step 1: Contrast Toggle',
               icon: Sliders,
             },
             {
               stepNum: '02',
-              title: 'Adjust Font Size',
-              desc: 'Click font size buttons (A+ / A-) to scale captions for your eyes.',
+              title: 'Click "A+ / A-" Font Resizer',
+              desc: 'Click font buttons to make caption text bigger or smaller for comfortable reading.',
+              actionHint: '🔍 Step 2: Resize Font',
               icon: Headphones,
             },
             {
               stepNum: '03',
-              title: 'Follow Barrier-Free Audio',
-              desc: 'Follow live captions with color-coded speaker tags and clean typography.',
+              title: 'Read Barrier-Free Captions',
+              desc: 'Enjoy readable captions with color-coded speaker labels and large text formatting.',
+              actionHint: '👁️ Step 3: Enjoy Captions',
               icon: Check,
             },
           ],
-          backendInfo: {
-            headline: 'Backend Architecture & Accessibility Engine',
-            explanation:
-              'The frontend renderer integrates ARIA live region dispatches (`aria-live="assertive"`). The backend formats captions with high-contrast color codes and sanitizes transcript text for screen reader compatibility.',
-            pipeline: [
-              'ARIA Live Region Dispatcher',
-              'High-Contrast Theme Renderer (21:1 Ratio)',
-              'Dynamic Font Scaler (12px - 28px)',
-              'Screen Reader Screen Sanitizer',
-            ],
-          },
           interactiveDemoText:
-            'High-Contrast Caption Mode Active: Font size increased to 16px. Optimized for Deaf & Hard-of-Hearing accessibility.',
+            'Accessibility Active: High-contrast mode enabled with 16px large font for clear reading.',
         };
 
       case 'Zero':
         return {
           type: 'Zero',
-          title: 'Zero Data Retention & Privacy Vault',
-          badge: 'User Guide & Backend Architecture',
+          title: 'How to Use Privacy & Security Controls',
+          badge: 'Interactive Visual Guide for Users',
           icon: Shield,
           targetStudioSection: 'audio-vad',
           overview:
-            'Keep your voice data 100% private with military-grade TLS 1.3 encryption or zero-retention local on-device transcription.',
-          specs: [
-            { label: 'Encryption', val: 'TLS 1.3 & AES-256 GCM' },
-            { label: 'Local Engine', val: 'On-Device ONNX WebAssembly' },
-            { label: 'Server Retention', val: '0 Days (RAM Volatile Only)' },
-            { label: 'Compliance', val: 'SOC2 Type II & HIPAA Ready' },
-          ],
+            'Keep your voice data completely private. Toggle between Encrypted Cloud Storage or Private On-Device Local Mode.',
           userSteps: [
             {
               stepNum: '01',
-              title: 'Select Security Mode',
-              desc: 'Choose "Local On-Device ONNX Mode" to keep audio inside your browser.',
+              title: 'Click Security Badge',
+              desc: 'Click the lock badge to toggle between Cloud Encrypted Vault or Local Private Mode.',
+              actionHint: '🔒 Step 1: Click Lock Badge',
               icon: Lock,
             },
             {
               stepNum: '02',
-              title: 'Local Voice Processing',
-              desc: 'Speech is processed locally without uploading raw audio to cloud servers.',
+              title: 'Private Audio Processing',
+              desc: 'Your voice is transcribed privately inside your browser without external voice saving.',
+              actionHint: '🛡️ Step 2: Private Mode',
               icon: Shield,
             },
             {
               stepNum: '03',
-              title: 'Zero Memory Footprint',
-              desc: 'Once your session finishes, temporary RAM audio buffers are wiped.',
+              title: 'Session Wipe on Exit',
+              desc: 'When your session finishes, temporary audio data is cleared automatically.',
+              actionHint: '🧹 Step 3: Clean Wipe',
               icon: CheckCircle2,
             },
           ],
-          backendInfo: {
-            headline: 'Backend Architecture & Security Protocol',
-            explanation:
-              'In Zero Data Retention Mode, all audio frames are processed inside an isolated browser WebWorker thread running a quantized ONNX model. No audio buffers are written to disk or sent to server logs.',
-            pipeline: [
-              'Browser WebWorker Thread Isolation',
-              'Quantized ONNX Local Speech Model',
-              'Volatile RAM Buffer Management',
-              'Immediate Buffer Wipe on Session End',
-            ],
-          },
           interactiveDemoText:
-            'Security Mode Active: TLS 1.3 Vault Encryption enabled. Zero audio data stored on server.',
+            'Security Active: Private On-Device mode enabled. Zero voice recording stored on servers.',
         };
 
       default: // Multi-Format
         return {
           type: 'Multi-Format',
-          title: 'Multi-Format Instant Export Engine',
-          badge: 'User Guide & Backend Architecture',
+          title: 'How to Use One-Click Multi Export',
+          badge: 'Interactive Visual Guide for Users',
           icon: FileCheck,
           targetStudioSection: 'instant-export',
           overview:
-            'Export transcripts, AI notes, and speaker timelines directly into PDF, Notion, Word, or SRT subtitle files in one click.',
-          specs: [
-            { label: 'Supported Formats', val: 'PDF, Notion, SRT, DOCX' },
-            { label: 'Timestamps', val: 'Millisecond Timeline Marks' },
-            { label: 'Cloud Sync', val: 'Supabase Database Vault' },
-            { label: 'Export Speed', val: 'Instant One-Click Download' },
-          ],
+            'Save your notes anywhere. Learn how to export your transcribed audio sessions into PDF, Notion, Word, or SRT subtitle files with one click.',
           userSteps: [
             {
               stepNum: '01',
-              title: 'Complete Audio Recording',
-              desc: 'Finish your transcription session in the studio console.',
+              title: 'Finish Audio Recording',
+              desc: 'Complete your live lecture or meeting transcription in the studio console.',
+              actionHint: '🎙️ Step 1: Finish Session',
               icon: Check,
             },
             {
               stepNum: '02',
-              title: 'Select Export Format',
+              title: 'Click Export Format (PDF/Notion)',
               desc: 'Click PDF, Notion, or SRT subtitle format buttons in the export bar.',
+              actionHint: '📥 Step 2: Click PDF / Notion',
               icon: Download,
             },
             {
               stepNum: '03',
-              title: 'Instant Download & Sync',
-              desc: 'Watch the export progress bar complete (0% ➔ 100%) and save files.',
+              title: 'Watch Progress & Save File',
+              desc: 'Watch the export progress bar complete (0% ➔ 100%) and open your downloaded file.',
+              actionHint: '📄 Step 3: Open Download',
               icon: Database,
             },
           ],
-          backendInfo: {
-            headline: 'Backend Architecture & Export Pipeline',
-            explanation:
-              'The export microservice fetches session records from Supabase, formats millisecond speaker timestamps, generates styled PDFKit documents, and syncs notes directly via the Notion API.',
-            pipeline: [
-              'Supabase Session Vault Data Fetch',
-              'Millisecond Timeline & Speaker Tag Parser',
-              'PDFKit & SRT Subtitle Generator',
-              'Notion API & Direct File Stream Sync',
-            ],
-          },
           interactiveDemoText:
-            'Export Progress: 100% Complete. Session #CS-8924 exported to PDF with speaker timelines & AI notes.',
+            'Export Progress: 100% Complete. PDF document saved to your computer with timelines and notes.',
         };
     }
   };
@@ -493,7 +402,7 @@ export const Features: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* USER-FRIENDLY VISUAL WALKTHROUGH & BACKEND ARCHITECTURE MODAL */}
+      {/* 100% USER-FOCUSED ANIMATED VISUAL WALKTHROUGH MODAL POPUP */}
       <AnimatePresence>
         {activeModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md">
@@ -501,7 +410,7 @@ export const Features: React.FC = () => {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-3xl bg-[#0e111a] border border-orange-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl text-left overflow-hidden max-h-[90vh] overflow-y-auto"
+              className="relative w-full max-w-2xl bg-[#0e111a] border border-orange-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl text-left overflow-hidden max-h-[90vh] overflow-y-auto"
             >
               {/* Modal Header */}
               <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
@@ -531,66 +440,41 @@ export const Features: React.FC = () => {
                 {activeModal.overview}
               </p>
 
-              {/* Specs Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                {activeModal.specs.map((sp, idx) => (
-                  <div key={idx} className="p-3 rounded-xl bg-white/5 border border-white/10">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block">{sp.label}</span>
-                    <span className="text-xs font-extrabold text-orange-300 mt-0.5 block">{sp.val}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* SECTION 1: 3-STEP USER HOW-TO GUIDE */}
+              {/* 3-STEP ANIMATED USER VISUAL GUIDE */}
               <div className="mb-6 space-y-3">
                 <span className="text-xs font-bold text-orange-400 uppercase tracking-wider block flex items-center gap-1.5">
-                  <MousePointer className="w-3.5 h-3.5" />
-                  📱 User Guide (Aap Kaise Use Karein):
+                  <Pointer className="w-4 h-4 text-orange-400 animate-bounce" />
+                  Step-by-Step User Instructions:
                 </span>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {activeModal.userSteps.map((st, sIdx) => {
                     const StepIcon = st.icon;
                     return (
-                      <div
+                      <motion.div
                         key={sIdx}
-                        className="p-3.5 rounded-2xl bg-black/50 border border-white/10 flex flex-col justify-between hover:border-orange-500/40 transition-colors"
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: sIdx * 0.1 }}
+                        className="p-4 rounded-2xl bg-black/60 border border-white/10 flex flex-col justify-between hover:border-orange-500/50 transition-all group"
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="w-6 h-6 rounded-lg bg-orange-500/20 text-orange-400 font-bold text-xs flex items-center justify-center">
-                            {st.stepNum}
-                          </span>
-                          <StepIcon className="w-4 h-4 text-orange-400" />
-                        </div>
                         <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="w-6 h-6 rounded-lg bg-orange-500/20 text-orange-400 font-bold text-xs flex items-center justify-center">
+                              {st.stepNum}
+                            </span>
+                            <StepIcon className="w-4 h-4 text-orange-400 group-hover:scale-125 transition-transform" />
+                          </div>
                           <h4 className="text-xs font-bold text-white mb-1">{st.title}</h4>
                           <p className="text-[11px] text-slate-400 leading-relaxed">{st.desc}</p>
                         </div>
-                      </div>
+
+                        <div className="mt-3 pt-2 border-t border-white/5 text-[10px] font-bold text-orange-300">
+                          {st.actionHint}
+                        </div>
+                      </motion.div>
                     );
                   })}
-                </div>
-              </div>
-
-              {/* SECTION 2: BACKEND ARCHITECTURE & MECHANISM */}
-              <div className="mb-6 p-4 rounded-2xl bg-black/60 border border-white/10 space-y-3">
-                <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block flex items-center gap-1.5">
-                  <Server className="w-3.5 h-3.5 text-emerald-400" />
-                  ⚙️ Backend Architecture (Backend Kaise Kaam Karta Hai):
-                </span>
-
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  {activeModal.backendInfo.explanation}
-                </p>
-
-                <div className="space-y-1.5 pt-1">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Execution Pipeline:</span>
-                  {activeModal.backendInfo.pipeline.map((stepStr, pIdx) => (
-                    <div key={pIdx} className="flex items-center gap-2 text-xs text-slate-200">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                      <span className="font-mono text-[11px]">{stepStr}</span>
-                    </div>
-                  ))}
                 </div>
               </div>
 
@@ -599,14 +483,14 @@ export const Features: React.FC = () => {
                 <div className="flex items-center justify-between border-b border-white/10 pb-2">
                   <span className="text-xs font-bold text-white flex items-center gap-1.5">
                     <Activity className="w-3.5 h-3.5 text-orange-400 animate-pulse" />
-                    Interactive Feature Simulation
+                    Live Visual Animation Demo
                   </span>
                   <button
                     onClick={() => triggerModalDemo(activeModal.interactiveDemoText)}
                     className="text-[10px] px-3 py-1 rounded-lg bg-orange-500 text-white font-bold hover:bg-orange-600 active:scale-95 transition-all flex items-center gap-1 shadow-md shadow-orange-500/30"
                   >
                     <Play className="w-3 h-3 fill-white" />
-                    <span>Run Live Demo</span>
+                    <span>Test Animation Now</span>
                   </button>
                 </div>
 
@@ -614,25 +498,25 @@ export const Features: React.FC = () => {
                   {isDemoActive ? (
                     <span>"{demoTextStream}"<span className="inline-block w-1.5 h-3.5 bg-orange-500 ml-1 animate-pulse" /></span>
                   ) : (
-                    <span className="text-slate-500 italic">Click "Run Live Demo" button above to see this feature in action...</span>
+                    <span className="text-slate-500 italic">Click "Test Animation Now" button above to watch this feature animate live...</span>
                   )}
                 </div>
               </div>
 
-              {/* Modal Action Footer */}
+              {/* Modal Action Footer with Direct Studio Scroll & Highlight */}
               <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                <span className="text-xs text-slate-400">Want to test live in studio?</span>
+                <span className="text-xs text-slate-400">Ready to try it on live page?</span>
                 <button
                   onClick={() => {
                     const sec = activeModal.targetStudioSection;
                     setActiveModal(null);
                     setIsDemoActive(false);
                     scrollToStudioSection(sec);
-                    showToast(`🚀 Navigated to ${activeModal.title} in Studio Console!`);
+                    showToast(`🚀 Navigated to ${activeModal.title} on page!`);
                   }}
                   className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-lg shadow-orange-500/30 flex items-center gap-2 transition-all"
                 >
-                  <span>Try in Main Studio Console</span>
+                  <span>Click & Try in Studio Console</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -732,7 +616,7 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK WITH DIRECT SCROLL */}
+            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK */}
             <button
               onClick={() => {
                 setActiveModal(getModalDetails('Ultra-Low'));
@@ -799,7 +683,7 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK WITH DIRECT SCROLL */}
+            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK */}
             <button
               onClick={() => {
                 setActiveModal(getModalDetails('Live'));
@@ -869,7 +753,7 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK WITH DIRECT SCROLL */}
+            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK */}
             <button
               onClick={() => {
                 setActiveModal(getModalDetails('Automated'));
@@ -928,7 +812,7 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK WITH DIRECT SCROLL */}
+            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK */}
             <button
               onClick={() => {
                 setActiveModal(getModalDetails('Universal'));
@@ -988,7 +872,7 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK WITH DIRECT SCROLL */}
+            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK */}
             <button
               onClick={() => {
                 setActiveModal(getModalDetails('Zero'));
@@ -1055,7 +939,7 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK WITH DIRECT SCROLL */}
+            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK */}
             <button
               onClick={() => {
                 setActiveModal(getModalDetails('Multi-Format'));
