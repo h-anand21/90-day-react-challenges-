@@ -25,6 +25,8 @@ import {
   Share2,
   Activity,
   Pointer,
+  Pause,
+  RotateCcw,
 } from 'lucide-react';
 
 interface VisualStep {
@@ -33,6 +35,7 @@ interface VisualStep {
   desc: string;
   actionHint: string;
   icon: any;
+  demoVisual: React.ReactNode;
 }
 
 interface ModalData {
@@ -51,9 +54,11 @@ export const Features: React.FC = () => {
   const [featureToast, setFeatureToast] = useState<string | null>(null);
   // Active Detail Modal State
   const [activeModal, setActiveModal] = useState<ModalData | null>(null);
-  // Modal Interactive Demo State
-  const [isDemoActive, setIsDemoActive] = useState(false);
-  const [demoTextStream, setDemoTextStream] = useState('');
+  
+  // Modal Interactive Step Tour States
+  const [activeStepIdx, setActiveStepIdx] = useState(0);
+  const [isTourPlaying, setIsTourPlaying] = useState(true);
+  const [stepDemoText, setStepDemoText] = useState('');
 
   const showToast = (msg: string) => {
     setFeatureToast(msg);
@@ -139,6 +144,30 @@ export const Features: React.FC = () => {
     }, 180);
   };
 
+  // Auto-advance step tour when modal is open
+  useEffect(() => {
+    if (!activeModal || !isTourPlaying) return;
+    const tourInterval = setInterval(() => {
+      setActiveStepIdx((prev) => (prev + 1) % 3);
+    }, 3500);
+    return () => clearInterval(tourInterval);
+  }, [activeModal, isTourPlaying]);
+
+  // Live typing text stream for Step 3
+  useEffect(() => {
+    if (!activeModal) return;
+    let charIdx = 0;
+    const fullText = activeModal.interactiveDemoText;
+    setStepDemoText('');
+
+    const typingInterval = setInterval(() => {
+      charIdx = (charIdx + 1) % (fullText.length + 1);
+      setStepDemoText(fullText.slice(0, Math.max(10, charIdx)));
+    }, 50);
+
+    return () => clearInterval(typingInterval);
+  }, [activeModal, activeStepIdx]);
+
   // Smooth Scroll & Highlight Studio Console Feature
   const scrollToStudioSection = (sectionId: string) => {
     const el = document.getElementById('studio-console');
@@ -150,39 +179,36 @@ export const Features: React.FC = () => {
     }
   };
 
-  // Trigger Modal Interactive Demo
-  const triggerModalDemo = (demoText: string) => {
-    setIsDemoActive(true);
-    setDemoTextStream('');
-    let idx = 0;
-    const timer = setInterval(() => {
-      idx += 2;
-      setDemoTextStream(demoText.slice(0, idx));
-      if (idx >= demoText.length) {
-        clearInterval(timer);
-      }
-    }, 40);
-  };
-
-  // 100% User-Focused Animated Visual Walkthrough Provider (NO BACKEND CODE/PIPELINES)
+  // 100% User-Focused Step-by-Step Animated Provider
   const getModalDetails = (type: string): ModalData => {
     switch (type) {
       case 'Ultra-Low':
         return {
           type: 'Ultra-Low',
           title: 'How to Use Ultra-Low Latency Streaming',
-          badge: 'Interactive Visual Guide for Users',
+          badge: 'Auto-Animated Step-by-Step Guide',
           icon: Mic,
           targetStudioSection: 'audio-vad',
           overview:
-            'Watch how easy it is to capture live speech with zero lag. Follow the 3 simple steps below to record and see real-time captions on your screen.',
+            'Watch how easy it is to capture live speech with zero lag. Follow the 3 animated steps below to see real-time captions on your screen.',
           userSteps: [
             {
               stepNum: '01',
               title: 'Click "Start Recording"',
-              desc: 'Press the glowing orange mic button in the studio console to begin listening.',
+              desc: 'Press the glowing orange mic button in the studio console to start listening.',
               actionHint: '🖱️ Step 1: Click Mic Orb',
               icon: MousePointer,
+              demoVisual: (
+                <div className="p-3 rounded-xl bg-black/60 border border-orange-500/40 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center text-white animate-pulse">
+                      <Mic className="w-4 h-4" />
+                    </div>
+                    <span className="text-[11px] font-bold text-white">Mic Active</span>
+                  </div>
+                  <Pointer className="w-4 h-4 text-orange-400 animate-bounce" />
+                </div>
+              ),
             },
             {
               stepNum: '02',
@@ -190,6 +216,17 @@ export const Features: React.FC = () => {
               desc: 'Talk naturally. The soundwave equalizer bouncers react live to your voice volume.',
               actionHint: '🎙️ Step 2: Speak Audio',
               icon: Volume2,
+              demoVisual: (
+                <div className="p-3 rounded-xl bg-black/60 border border-orange-500/40 flex items-end justify-center gap-1 h-10">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-1 rounded-full bg-gradient-to-t from-orange-500 to-amber-300 animate-wave-1"
+                      style={{ height: `${(i % 4) * 6 + 10}px` }}
+                    />
+                  ))}
+                </div>
+              ),
             },
             {
               stepNum: '03',
@@ -197,28 +234,40 @@ export const Features: React.FC = () => {
               desc: 'Your spoken words appear line-by-line instantaneously with under 50ms latency.',
               actionHint: '⚡ Step 3: Instant Text',
               icon: Zap,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-orange-500/40 text-[10px] text-emerald-400 font-mono flex items-center justify-between">
+                  <span>⚡ Stream &lt; 38ms</span>
+                  <span className="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-bold">99.4% Precision</span>
+                </div>
+              ),
             },
           ],
           interactiveDemoText:
-            'Live Demo Active: Audio is recording... Speech appears on screen line-by-line with zero lag!',
+            'Live Speech Stream Active: Speech frames processed in 38ms with 99.4% speech accuracy...',
         };
 
       case 'Live':
         return {
           type: 'Live',
           title: 'How to Use Live Multilingual Translation',
-          badge: 'Interactive Visual Guide for Users',
+          badge: 'Auto-Animated Step-by-Step Guide',
           icon: Globe,
           targetStudioSection: 'speech-translation',
           overview:
-            'Break language barriers during lectures and meetings. Learn how to select your favorite language and watch live translations appear on screen.',
+            'Break language barriers during lectures and meetings. Select your target language and watch live translations stream on screen.',
           userSteps: [
             {
               stepNum: '01',
               title: 'Click Language Selector',
-              desc: 'Click the language button (e.g. English ➔ Spanish 🇪🇸) in the top-right of the speech feed.',
+              desc: 'Click the language button in the top-right of the speech feed to pick target language.',
               actionHint: '🌐 Step 1: Pick Language',
               icon: Globe,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-blue-500/40 text-[10px] font-bold text-blue-400 flex items-center justify-between">
+                  <span>English 🇺🇸 ➔ Spanish 🇪🇸</span>
+                  <Check className="w-3.5 h-3.5 text-blue-400" />
+                </div>
+              ),
             },
             {
               stepNum: '02',
@@ -226,28 +275,39 @@ export const Features: React.FC = () => {
               desc: 'As the speaker talks in English, translated captions stream line-by-line underneath.',
               actionHint: '💬 Step 2: Live Translation',
               icon: Cpu,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-blue-500/40 text-[10px] text-orange-200 italic truncate">
+                  "Subtítulos traducidos en tiempo real..."
+                </div>
+              ),
             },
             {
               stepNum: '03',
               title: 'Share Translated Captions',
-              desc: 'Download translated subtitles with one click to share with friends and global team members.',
+              desc: 'Download translated subtitles with one click to share with international teams.',
               actionHint: '📥 Step 3: Share Subtitles',
               icon: Share2,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-blue-500/40 text-[10px] font-bold text-emerald-400 flex items-center justify-between">
+                  <span>SRT Subtitles Ready</span>
+                  <Download className="w-3.5 h-3.5 text-emerald-400" />
+                </div>
+              ),
             },
           ],
           interactiveDemoText:
-            'Live Translation Active: Spoken English is translating to Spanish in real-time line-by-line...',
+            'Live Translation Stream Active: English speech translating to Spanish in real-time line-by-line...',
         };
 
       case 'Automated':
         return {
           type: 'Automated',
           title: 'How to Use Automated AI Summaries',
-          badge: 'Interactive Visual Guide for Users',
+          badge: 'Auto-Animated Step-by-Step Guide',
           icon: Sparkles,
           targetStudioSection: 'ai-notes',
           overview:
-            'Never waste time taking manual notes again. AI automatically organizes key takeaways, action items, and meeting minutes for you.',
+            'Never spend hours writing manual notes. AI automatically organizes key takeaways, action points, and meeting minutes for you.',
           userSteps: [
             {
               stepNum: '01',
@@ -255,6 +315,12 @@ export const Features: React.FC = () => {
               desc: 'Let ClarityStream transcribe your lecture or meeting in the studio console.',
               actionHint: '🎙️ Step 1: Record Audio',
               icon: Mic,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-purple-500/40 text-[10px] text-purple-300 font-bold flex items-center justify-between">
+                  <span>Audio Session Logging</span>
+                  <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
+                </div>
+              ),
             },
             {
               stepNum: '02',
@@ -262,6 +328,12 @@ export const Features: React.FC = () => {
               desc: 'Click the AI Summary button at the end of your recording to generate summary points.',
               actionHint: '✨ Step 2: Click AI Notes',
               icon: Sparkles,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-purple-500/20 border border-purple-500/40 text-[10px] text-white font-bold flex items-center justify-between">
+                  <span>Extracting Key Points...</span>
+                  <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-spin" />
+                </div>
+              ),
             },
             {
               stepNum: '03',
@@ -269,17 +341,23 @@ export const Features: React.FC = () => {
               desc: 'Get organized bullet points, key decisions, and action items ready to save.',
               actionHint: '📋 Step 3: Save Summary',
               icon: CheckCircle2,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-purple-500/40 text-[10px] text-emerald-400 font-bold flex items-center justify-between">
+                  <span>148 Notes Saved</span>
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                </div>
+              ),
             },
           ],
           interactiveDemoText:
-            'AI Notes Generated: 1) Main topics highlighted. 2) Action items assigned. 3) Minutes ready to export.',
+            'AI Notes Generated: 1) Key decisions cataloged. 2) Action items assigned. 3) Minutes saved to cloud vault.',
         };
 
       case 'Universal':
         return {
           type: 'Universal',
           title: 'How to Use Accessibility Controls',
-          badge: 'Interactive Visual Guide for Users',
+          badge: 'Auto-Animated Step-by-Step Guide',
           icon: Headphones,
           targetStudioSection: 'speech-translation',
           overview:
@@ -291,6 +369,12 @@ export const Features: React.FC = () => {
               desc: 'Toggle dark high-contrast caption backgrounds for clear text visibility.',
               actionHint: '🎨 Step 1: Contrast Toggle',
               icon: Sliders,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black border border-amber-500/40 text-[10px] font-bold text-amber-400 flex items-center justify-between">
+                  <span>High Contrast 21:1</span>
+                  <Check className="w-3.5 h-3.5 text-amber-400" />
+                </div>
+              ),
             },
             {
               stepNum: '02',
@@ -298,6 +382,11 @@ export const Features: React.FC = () => {
               desc: 'Click font buttons to make caption text bigger or smaller for comfortable reading.',
               actionHint: '🔍 Step 2: Resize Font',
               icon: Headphones,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-xs font-bold text-white text-center">
+                  Size: 16px Scaled
+                </div>
+              ),
             },
             {
               stepNum: '03',
@@ -305,6 +394,11 @@ export const Features: React.FC = () => {
               desc: 'Enjoy readable captions with color-coded speaker labels and large text formatting.',
               actionHint: '👁️ Step 3: Enjoy Captions',
               icon: Check,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-amber-500/40 text-[10px] text-amber-200 italic truncate">
+                  "Deaf & Hard-of-Hearing Optimized Stream"
+                </div>
+              ),
             },
           ],
           interactiveDemoText:
@@ -315,7 +409,7 @@ export const Features: React.FC = () => {
         return {
           type: 'Zero',
           title: 'How to Use Privacy & Security Controls',
-          badge: 'Interactive Visual Guide for Users',
+          badge: 'Auto-Animated Step-by-Step Guide',
           icon: Shield,
           targetStudioSection: 'audio-vad',
           overview:
@@ -327,6 +421,12 @@ export const Features: React.FC = () => {
               desc: 'Click the lock badge to toggle between Cloud Encrypted Vault or Local Private Mode.',
               actionHint: '🔒 Step 1: Click Lock Badge',
               icon: Lock,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-emerald-500/40 text-[10px] font-bold text-emerald-400 flex items-center justify-between">
+                  <span>TLS 1.3 Vault Active</span>
+                  <Lock className="w-3.5 h-3.5 text-emerald-400" />
+                </div>
+              ),
             },
             {
               stepNum: '02',
@@ -334,6 +434,12 @@ export const Features: React.FC = () => {
               desc: 'Your voice is transcribed privately inside your browser without external voice saving.',
               actionHint: '🛡️ Step 2: Private Mode',
               icon: Shield,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-emerald-500/40 text-[10px] font-bold text-emerald-300 flex items-center justify-between">
+                  <span>On-Device Local ONNX</span>
+                  <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                </div>
+              ),
             },
             {
               stepNum: '03',
@@ -341,6 +447,12 @@ export const Features: React.FC = () => {
               desc: 'When your session finishes, temporary audio data is cleared automatically.',
               actionHint: '🧹 Step 3: Clean Wipe',
               icon: CheckCircle2,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-emerald-500/40 text-[10px] text-slate-400 font-bold flex items-center justify-between">
+                  <span>0 Days Retention</span>
+                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                </div>
+              ),
             },
           ],
           interactiveDemoText:
@@ -351,11 +463,11 @@ export const Features: React.FC = () => {
         return {
           type: 'Multi-Format',
           title: 'How to Use One-Click Multi Export',
-          badge: 'Interactive Visual Guide for Users',
+          badge: 'Auto-Animated Step-by-Step Guide',
           icon: FileCheck,
           targetStudioSection: 'instant-export',
           overview:
-            'Save your notes anywhere. Learn how to export your transcribed audio sessions into PDF, Notion, Word, or SRT subtitle files with one click.',
+            'Save your notes anywhere. Export your transcribed audio sessions into PDF, Notion, Word, or SRT subtitle files with one click.',
           userSteps: [
             {
               stepNum: '01',
@@ -363,6 +475,12 @@ export const Features: React.FC = () => {
               desc: 'Complete your live lecture or meeting transcription in the studio console.',
               actionHint: '🎙️ Step 1: Finish Session',
               icon: Check,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-teal-500/40 text-[10px] font-bold text-teal-400 flex items-center justify-between">
+                  <span>Session Complete</span>
+                  <Check className="w-3.5 h-3.5 text-teal-400" />
+                </div>
+              ),
             },
             {
               stepNum: '02',
@@ -370,6 +488,12 @@ export const Features: React.FC = () => {
               desc: 'Click PDF, Notion, or SRT subtitle format buttons in the export bar.',
               actionHint: '📥 Step 2: Click PDF / Notion',
               icon: Download,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-teal-500/40 text-[10px] font-bold text-orange-300 flex items-center justify-between">
+                  <span>Exporting PDF...</span>
+                  <Download className="w-3.5 h-3.5 text-orange-400 animate-bounce" />
+                </div>
+              ),
             },
             {
               stepNum: '03',
@@ -377,6 +501,12 @@ export const Features: React.FC = () => {
               desc: 'Watch the export progress bar complete (0% ➔ 100%) and open your downloaded file.',
               actionHint: '📄 Step 3: Open Download',
               icon: Database,
+              demoVisual: (
+                <div className="p-2.5 rounded-xl bg-black/60 border border-teal-500/40 text-[10px] font-bold text-emerald-400 flex items-center justify-between">
+                  <span>100% Downloaded</span>
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                </div>
+              ),
             },
           ],
           interactiveDemoText:
@@ -402,10 +532,10 @@ export const Features: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* 100% USER-FOCUSED ANIMATED VISUAL WALKTHROUGH MODAL POPUP */}
+      {/* 100% USER-FOCUSED ANIMATED STEP-BY-STEP MODAL POPUP */}
       <AnimatePresence>
         {activeModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md">
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -424,15 +554,24 @@ export const Features: React.FC = () => {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => {
-                    setActiveModal(null);
-                    setIsDemoActive(false);
-                  }}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setIsTourPlaying(!isTourPlaying)}
+                    className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-xs font-bold text-slate-200 flex items-center gap-1.5 transition-all"
+                  >
+                    {isTourPlaying ? <Pause className="w-3.5 h-3.5 text-orange-400" /> : <Play className="w-3.5 h-3.5 text-orange-400" />}
+                    <span>{isTourPlaying ? 'Pause Tour' : 'Play Tour'}</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setActiveModal(null);
+                    }}
+                    className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
               {/* Modal Overview */}
@@ -440,37 +579,49 @@ export const Features: React.FC = () => {
                 {activeModal.overview}
               </p>
 
-              {/* 3-STEP ANIMATED USER VISUAL GUIDE */}
+              {/* 3-STEP AUTO-ANIMATING USER VISUAL CARDS */}
               <div className="mb-6 space-y-3">
-                <span className="text-xs font-bold text-orange-400 uppercase tracking-wider block flex items-center gap-1.5">
-                  <Pointer className="w-4 h-4 text-orange-400 animate-bounce" />
-                  Step-by-Step User Instructions:
-                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-orange-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Pointer className="w-4 h-4 text-orange-400 animate-bounce" />
+                    Animated Step-by-Step User Instructions:
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400 bg-white/5 border border-white/10 px-2 py-0.5 rounded-full">
+                    Active Step: 0{activeStepIdx + 1} / 03
+                  </span>
+                </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {activeModal.userSteps.map((st, sIdx) => {
                     const StepIcon = st.icon;
+                    const isActive = activeStepIdx === sIdx;
                     return (
                       <motion.div
                         key={sIdx}
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: sIdx * 0.1 }}
-                        className="p-4 rounded-2xl bg-black/60 border border-white/10 flex flex-col justify-between hover:border-orange-500/50 transition-all group"
+                        onClick={() => {
+                          setActiveStepIdx(sIdx);
+                          setIsTourPlaying(false);
+                        }}
+                        whileHover={{ scale: 1.03 }}
+                        className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer flex flex-col justify-between ${
+                          isActive
+                            ? 'bg-[#181c28] border-orange-500 shadow-xl shadow-orange-500/20 scale-[1.02]'
+                            : 'bg-black/60 border-white/10 opacity-70 hover:opacity-100 hover:border-white/20'
+                        }`}
                       >
                         <div>
                           <div className="flex items-center justify-between mb-2">
-                            <span className="w-6 h-6 rounded-lg bg-orange-500/20 text-orange-400 font-bold text-xs flex items-center justify-center">
+                            <span className={`w-6 h-6 rounded-lg font-bold text-xs flex items-center justify-center ${isActive ? 'bg-orange-500 text-white' : 'bg-white/10 text-slate-400'}`}>
                               {st.stepNum}
                             </span>
-                            <StepIcon className="w-4 h-4 text-orange-400 group-hover:scale-125 transition-transform" />
+                            <StepIcon className={`w-4 h-4 ${isActive ? 'text-orange-400 scale-125' : 'text-slate-500'}`} />
                           </div>
-                          <h4 className="text-xs font-bold text-white mb-1">{st.title}</h4>
+                          <h4 className={`text-xs font-bold mb-1 ${isActive ? 'text-white' : 'text-slate-300'}`}>{st.title}</h4>
                           <p className="text-[11px] text-slate-400 leading-relaxed">{st.desc}</p>
                         </div>
 
-                        <div className="mt-3 pt-2 border-t border-white/5 text-[10px] font-bold text-orange-300">
-                          {st.actionHint}
+                        <div className="mt-4 pt-2 border-t border-white/10">
+                          {st.demoVisual}
                         </div>
                       </motion.div>
                     );
@@ -478,39 +629,30 @@ export const Features: React.FC = () => {
                 </div>
               </div>
 
-              {/* LIVE INTERACTIVE DEMO SIMULATOR INSIDE MODAL */}
-              <div className="p-4 rounded-2xl bg-black border border-orange-500/30 mb-6 space-y-2">
-                <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                  <span className="text-xs font-bold text-white flex items-center gap-1.5">
+              {/* LIVE STEP CAPTION OUTPUT BOX */}
+              <div className="p-4 rounded-2xl bg-black border border-orange-500/30 mb-6 space-y-1.5">
+                <div className="flex items-center justify-between text-xs border-b border-white/10 pb-2">
+                  <span className="font-bold text-white flex items-center gap-1.5">
                     <Activity className="w-3.5 h-3.5 text-orange-400 animate-pulse" />
-                    Live Visual Animation Demo
+                    Live Step 0{activeStepIdx + 1} Visual Execution Output:
                   </span>
-                  <button
-                    onClick={() => triggerModalDemo(activeModal.interactiveDemoText)}
-                    className="text-[10px] px-3 py-1 rounded-lg bg-orange-500 text-white font-bold hover:bg-orange-600 active:scale-95 transition-all flex items-center gap-1 shadow-md shadow-orange-500/30"
-                  >
-                    <Play className="w-3 h-3 fill-white" />
-                    <span>Test Animation Now</span>
-                  </button>
+                  <span className="text-[10px] text-emerald-400 font-mono">
+                    ● Real-Time
+                  </span>
                 </div>
 
-                <div className="text-xs text-slate-200 leading-relaxed font-mono min-h-[44px]">
-                  {isDemoActive ? (
-                    <span>"{demoTextStream}"<span className="inline-block w-1.5 h-3.5 bg-orange-500 ml-1 animate-pulse" /></span>
-                  ) : (
-                    <span className="text-slate-500 italic">Click "Test Animation Now" button above to watch this feature animate live...</span>
-                  )}
+                <div className="text-xs text-slate-200 leading-relaxed font-mono min-h-[44px] pt-1">
+                  "{stepDemoText}"<span className="inline-block w-1.5 h-3.5 bg-orange-500 ml-1 animate-pulse" />
                 </div>
               </div>
 
               {/* Modal Action Footer with Direct Studio Scroll & Highlight */}
               <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                <span className="text-xs text-slate-400">Ready to try it on live page?</span>
+                <span className="text-xs text-slate-400">Ready to try live on page?</span>
                 <button
                   onClick={() => {
                     const sec = activeModal.targetStudioSection;
                     setActiveModal(null);
-                    setIsDemoActive(false);
                     scrollToStudioSection(sec);
                     showToast(`🚀 Navigated to ${activeModal.title} on page!`);
                   }}
@@ -620,6 +762,8 @@ export const Features: React.FC = () => {
             <button
               onClick={() => {
                 setActiveModal(getModalDetails('Ultra-Low'));
+                setActiveStepIdx(0);
+                setIsTourPlaying(true);
               }}
               className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
             >
@@ -687,6 +831,8 @@ export const Features: React.FC = () => {
             <button
               onClick={() => {
                 setActiveModal(getModalDetails('Live'));
+                setActiveStepIdx(0);
+                setIsTourPlaying(true);
               }}
               className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
             >
@@ -757,6 +903,8 @@ export const Features: React.FC = () => {
             <button
               onClick={() => {
                 setActiveModal(getModalDetails('Automated'));
+                setActiveStepIdx(0);
+                setIsTourPlaying(true);
               }}
               className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
             >
@@ -816,6 +964,8 @@ export const Features: React.FC = () => {
             <button
               onClick={() => {
                 setActiveModal(getModalDetails('Universal'));
+                setActiveStepIdx(0);
+                setIsTourPlaying(true);
               }}
               className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
             >
@@ -876,6 +1026,8 @@ export const Features: React.FC = () => {
             <button
               onClick={() => {
                 setActiveModal(getModalDetails('Zero'));
+                setActiveStepIdx(0);
+                setIsTourPlaying(true);
               }}
               className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
             >
@@ -943,6 +1095,8 @@ export const Features: React.FC = () => {
             <button
               onClick={() => {
                 setActiveModal(getModalDetails('Multi-Format'));
+                setActiveStepIdx(0);
+                setIsTourPlaying(true);
               }}
               className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
             >

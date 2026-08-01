@@ -14,21 +14,39 @@ import {
   Check,
   Play,
   Pause,
-  Layers,
   ShieldCheck,
+  FileAudio,
+  Zap,
 } from 'lucide-react';
 
 export const HowItWorks: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  // Live Step 2 Typing Simulation State
+  // Step 1 Interactive Simulation States
+  const [activeInputType, setActiveInputType] = useState<'mic' | 'file'>('mic');
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Step 2 Live Typing Simulation States
   const [step2TypedText, setStep2TypedText] = useState('');
   const [step2TransText, setStep2TransText] = useState('');
   const sampleSpeech = "Today's lecture focuses on neural speech processing, real-time transcription latency, and automatic action item generation.";
   const sampleTrans = "La conferencia de hoy se centra en el procesamiento neural del habla y la generación automática de tareas.";
 
-  // Auto-advance stepper every 6 seconds
+  // Step 3 Export Simulation States
+  const [step3ExportFormat, setStep3ExportFormat] = useState<string | null>(null);
+  const [step3ExportProgress, setStep3ExportProgress] = useState(0);
+
+  // Toast notification
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const showToast = (msg: string) => {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3000);
+  };
+
+  // Auto-advance stepper every 6 seconds if playing
   useEffect(() => {
     if (!isAutoPlaying) return;
     const interval = setInterval(() => {
@@ -49,6 +67,41 @@ export const HowItWorks: React.FC = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Handle Drag & Drop File Simulation
+  const handleFileUploadSim = () => {
+    setActiveInputType('file');
+    setIsUploading(true);
+    setSelectedFileName('lecture_audio_q3_recording.mp3');
+    setUploadProgress(0);
+
+    let p = 0;
+    const interval = setInterval(() => {
+      p += 25;
+      setUploadProgress(p);
+      if (p >= 100) {
+        clearInterval(interval);
+        setIsUploading(false);
+        showToast('📁 Audio File "lecture_audio_q3.mp3" Uploaded & Processed with VAD!');
+      }
+    }, 180);
+  };
+
+  // Handle Export Simulation in Step 3
+  const handleStep3Export = (fmt: string) => {
+    setStep3ExportFormat(fmt);
+    setStep3ExportProgress(0);
+    let p = 0;
+    const interval = setInterval(() => {
+      p += 25;
+      setStep3ExportProgress(p);
+      if (p >= 100) {
+        clearInterval(interval);
+        showToast(`📥 Saved Session Summary as ${fmt} file!`);
+        setTimeout(() => setStep3ExportFormat(null), 2500);
+      }
+    }, 180);
+  };
 
   const steps = [
     {
@@ -78,7 +131,22 @@ export const HowItWorks: React.FC = () => {
   ];
 
   return (
-    <section id="how-it-works" className="py-24 bg-gradient-to-b from-[#080a0e] via-[#0e121a] to-[#080a0e] relative overflow-hidden">
+    <section id="how-it-works" className="py-24 bg-gradient-to-b from-[#080a0e] via-[#0e121a] to-[#080a0e] relative overflow-hidden text-left">
+      {/* Toast Alert */}
+      <AnimatePresence>
+        {toastMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -40, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white text-xs font-bold shadow-2xl border border-white/30 flex items-center gap-2"
+          >
+            <Sparkles className="w-4 h-4 text-white animate-spin" style={{ animationDuration: '4s' }} />
+            <span>{toastMsg}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Background Ambient Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] bg-orange-500/10 rounded-full blur-[180px] pointer-events-none -z-10" />
 
@@ -137,7 +205,6 @@ export const HowItWorks: React.FC = () => {
                     : 'bg-[#0d0f16]/90 border-white/10 hover:border-white/20'
                 }`}
               >
-                {/* Active Indicator Top Pill */}
                 {isActive && (
                   <motion.div
                     layoutId="activePill"
@@ -179,15 +246,15 @@ export const HowItWorks: React.FC = () => {
         </div>
 
         {/* ---------------------------------------------------- */}
-        {/* LIVE ANIMATED WORKFLOW DEMO SCREEN (VISUAL SIMULATOR) */}
+        {/* LIVE INTERACTIVE SIMULATION SCREEN */}
         {/* ---------------------------------------------------- */}
         <div className="relative rounded-3xl bg-[#0b0d14] border border-white/15 p-6 sm:p-10 shadow-2xl overflow-hidden backdrop-blur-2xl">
-          <div className="flex items-center justify-between pb-6 border-b border-white/10 mb-8">
+          <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-white/10 mb-8">
             <div className="flex items-center gap-3">
               <span className="w-3 h-3 rounded-full bg-red-500" />
               <span className="w-3 h-3 rounded-full bg-amber-500" />
               <span className="w-3 h-3 rounded-full bg-emerald-500" />
-              <span className="text-xs font-mono font-semibold text-slate-400 ml-2">
+              <span className="text-xs font-mono font-semibold text-slate-300 ml-2">
                 Pipeline Simulator — Stage 0{activeStep + 1}: {steps[activeStep].title}
               </span>
             </div>
@@ -211,7 +278,7 @@ export const HowItWorks: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.4 }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
               >
                 <div className="lg:col-span-6 space-y-4">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 text-xs font-bold">
@@ -232,30 +299,98 @@ export const HowItWorks: React.FC = () => {
                       <span className="text-orange-400">Microphone, MP3, WAV, MP4, M4A</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-slate-400">
-                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                      <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                       <span>End-to-End TLS 1.3 Encryption & Local VAD Processing</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Right Interactive Dropzone / Mic Graphic */}
+                {/* Right Interactive Dropzone / Mic Control Graphic */}
                 <div className="lg:col-span-6">
-                  <div className="p-8 rounded-2xl bg-gradient-to-b from-[#141722] to-[#0d0f17] border-2 border-dashed border-orange-500/40 hover:border-orange-500 text-center relative group cursor-pointer transition-all">
-                    <div className="w-16 h-16 rounded-full bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-orange-500/30">
-                      <Upload className="w-8 h-8" />
+                  <div className="p-8 rounded-2xl bg-gradient-to-b from-[#141722] to-[#0d0f17] border-2 border-dashed border-orange-500/40 hover:border-orange-500 text-center relative group transition-all shadow-xl">
+                    
+                    {/* Interactive Mode Toggle */}
+                    <div className="flex items-center justify-center gap-3 mb-6">
+                      <button
+                        onClick={() => {
+                          setActiveInputType('mic');
+                          showToast('🎙️ Active Input: System Microphone Streaming');
+                        }}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                          activeInputType === 'mic'
+                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                            : 'bg-white/5 text-slate-400 border border-white/10 hover:text-white'
+                        }`}
+                      >
+                        <Mic className="w-3.5 h-3.5" />
+                        <span>Use System Mic</span>
+                      </button>
+
+                      <button
+                        onClick={handleFileUploadSim}
+                        className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                          activeInputType === 'file'
+                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                            : 'bg-white/5 text-slate-400 border border-white/10 hover:text-white'
+                        }`}
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Upload Audio File</span>
+                      </button>
                     </div>
 
-                    <h4 className="text-base font-bold text-white mb-1">
-                      Drag & Drop Audio / Video File Here
-                    </h4>
-                    <p className="text-xs text-slate-400 mb-4">
-                      or click to select file from your computer
-                    </p>
+                    {/* Mic Stream View */}
+                    {activeInputType === 'mic' ? (
+                      <div className="space-y-4">
+                        <div className="w-16 h-16 rounded-full bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center mx-auto shadow-lg shadow-orange-500/30 animate-pulse">
+                          <Mic className="w-8 h-8" />
+                        </div>
+                        <h4 className="text-base font-bold text-white">System Microphone Active & Listening</h4>
+                        <div className="flex items-end justify-center gap-1 h-8 px-4 py-1 bg-black/60 rounded-xl border border-white/10 max-w-xs mx-auto">
+                          {Array.from({ length: 16 }).map((_, i) => (
+                            <div
+                              key={i}
+                              className="w-1 rounded-full bg-gradient-to-t from-orange-500 to-amber-300 animate-wave-1"
+                              style={{ height: `${(i % 5) * 4 + 8}px` }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      /* File Upload View */
+                      <div className="space-y-4 cursor-pointer" onClick={handleFileUploadSim}>
+                        <div className="w-16 h-16 rounded-full bg-orange-500/20 border border-orange-500/40 text-orange-400 flex items-center justify-center mx-auto shadow-lg shadow-orange-500/30">
+                          <FileAudio className="w-8 h-8" />
+                        </div>
 
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-500 text-white font-bold text-xs shadow-md">
-                      <Mic className="w-4 h-4" />
-                      <span>Use System Microphone</span>
-                    </div>
+                        {isUploading ? (
+                          <div className="space-y-2">
+                            <span className="text-xs font-bold text-orange-400 block">Uploading & Sampling VAD Frames... ({uploadProgress}%)</span>
+                            <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden max-w-xs mx-auto">
+                              <div className="bg-orange-500 h-full transition-all duration-200" style={{ width: `${uploadProgress}%` }} />
+                            </div>
+                          </div>
+                        ) : selectedFileName ? (
+                          <div className="space-y-1">
+                            <span className="text-xs font-bold text-emerald-400 block flex items-center justify-center gap-1">
+                              <Check className="w-4 h-4 text-emerald-400" />
+                              {selectedFileName}
+                            </span>
+                            <span className="text-[10px] text-slate-400 block">Click box to upload another audio file</span>
+                          </div>
+                        ) : (
+                          <div>
+                            <h4 className="text-base font-bold text-white mb-1">
+                              Drag & Drop Audio / Video File Here
+                            </h4>
+                            <p className="text-xs text-slate-400">
+                              or click to select file from your computer (MP3, WAV, MP4)
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                   </div>
                 </div>
               </motion.div>
@@ -269,7 +404,7 @@ export const HowItWorks: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.4 }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
               >
                 <div className="lg:col-span-6 space-y-4">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
@@ -335,7 +470,7 @@ export const HowItWorks: React.FC = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.4 }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center text-left"
+                className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
               >
                 <div className="lg:col-span-6 space-y-4">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-bold">
@@ -351,25 +486,47 @@ export const HowItWorks: React.FC = () => {
                   </p>
 
                   {/* Multi-Format Export Buttons */}
-                  <div className="flex flex-wrap gap-2 pt-2">
-                    <button className="px-3.5 py-2 rounded-xl bg-orange-500 text-white font-bold text-xs shadow-lg shadow-orange-500/30 flex items-center gap-2 hover:scale-105 transition-all">
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Export PDF</span>
-                    </button>
-                    <button className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-semibold text-xs flex items-center gap-2 transition-all">
-                      <FileText className="w-3.5 h-3.5 text-orange-400" />
-                      <span>Sync to Notion</span>
-                    </button>
-                    <button className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-semibold text-xs flex items-center gap-2 transition-all">
-                      <Share2 className="w-3.5 h-3.5 text-orange-400" />
-                      <span>SRT Subtitles</span>
-                    </button>
+                  <div className="space-y-2 pt-2">
+                    {step3ExportFormat ? (
+                      <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-xs space-y-1">
+                        <span className="text-orange-400 font-bold block">Exporting {step3ExportFormat}... ({step3ExportProgress}%)</span>
+                        <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                          <div className="bg-orange-500 h-full transition-all duration-200" style={{ width: `${step3ExportProgress}%` }} />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          onClick={() => handleStep3Export('PDF')}
+                          className="px-3.5 py-2 rounded-xl bg-orange-500 text-white font-bold text-xs shadow-lg shadow-orange-500/30 flex items-center gap-2 hover:scale-105 transition-all"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Export PDF</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleStep3Export('Notion')}
+                          className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-semibold text-xs flex items-center gap-2 transition-all"
+                        >
+                          <FileText className="w-3.5 h-3.5 text-orange-400" />
+                          <span>Sync to Notion</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleStep3Export('SRT')}
+                          className="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white font-semibold text-xs flex items-center gap-2 transition-all"
+                        >
+                          <Share2 className="w-3.5 h-3.5 text-orange-400" />
+                          <span>SRT Subtitles</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Right AI Summary Card Populating */}
                 <div className="lg:col-span-6">
-                  <div className="p-6 rounded-2xl bg-[#141722] border border-orange-500/40 text-left space-y-3 shadow-2xl">
+                  <div className="p-6 rounded-2xl bg-[#141722] border border-orange-500/40 space-y-3 shadow-2xl">
                     <div className="flex items-center justify-between border-b border-white/10 pb-3">
                       <span className="font-bold text-white text-xs flex items-center gap-2">
                         <Sparkles className="w-4 h-4 text-orange-400" />
