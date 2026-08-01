@@ -12,15 +12,30 @@ import {
   Check,
   Lock,
   Download,
-  RotateCcw,
-  Volume2,
+  X,
+  Database,
+  Cpu,
+  Layers,
+  Code,
   Sliders,
-  Sparkle,
+  CheckCircle2,
 } from 'lucide-react';
+
+interface ModalData {
+  title: string;
+  badge: string;
+  icon: any;
+  overview: string;
+  specs: { label: string; val: string }[];
+  deepDive: string;
+  codeSnippet: string;
+}
 
 export const Features: React.FC = () => {
   // Toast Alert Notification State
   const [featureToast, setFeatureToast] = useState<string | null>(null);
+  // Active Detail Modal State
+  const [activeModal, setActiveModal] = useState<ModalData | null>(null);
 
   const showToast = (msg: string) => {
     setFeatureToast(msg);
@@ -41,7 +56,7 @@ export const Features: React.FC = () => {
     { name: 'Spanish', flag: '🇪🇸', text: 'Subtítulos en tiempo real en español' },
     { name: 'French', flag: '🇫🇷', text: 'Sous-titres en temps réel en français' },
     { name: 'Hindi', flag: '🇮🇳', text: 'हिंदी में लाइव ट्रांसक्रिप्शन और अनुवाद' },
-    { name: 'Japanese', flag: '🇯🇵', text: '日本語でのリアルタイムAI字幕' },
+    { name: 'Japanese', flag: '🇯🇵', text: 'リアルタイムAI文字起こし' },
     { name: 'English', flag: '🇺🇸', text: 'Real-time AI captions in English' },
   ];
 
@@ -106,6 +121,119 @@ export const Features: React.FC = () => {
     }, 180);
   };
 
+  // Modal Data Provider for "Learn More about ..." Links
+  const getModalDetails = (type: string): ModalData => {
+    switch (type) {
+      case 'Ultra-Low':
+        return {
+          title: 'Ultra-Low Latency Neural Streaming',
+          badge: '99.4% Precision • < 50ms Latency',
+          icon: Mic,
+          overview:
+            'Our proprietary Voice Activity Detection (VAD) and WebRTC audio chunking engine streams transcriptions in under 50ms.',
+          specs: [
+            { label: 'Streaming Protocol', val: 'WebRTC / WebSocket TLS' },
+            { label: 'Latency Benchmark', val: '38ms Mean Latency' },
+            { label: 'Speech Model', val: 'Whisper v3 Fine-Tuned' },
+            { label: 'VAD Chunk Window', val: '20ms Frame Sampling' },
+          ],
+          deepDive:
+            'Audio is sampled at 44.1kHz, split into 20ms frames, and evaluated by an on-device VAD classifier before streaming to the neural speech model.',
+          codeSnippet: `import { ClarityStream } from '@clarity/sdk';\n\nconst client = new ClarityStream({\n  apiKey: 'cs_live_9984',\n  latencyTargetMs: 38,\n  vadThreshold: 0.85\n});\nclient.on('transcript', (frame) => {\n  console.log('Realtime Caption:', frame.text);\n});`,
+        };
+
+      case 'Live':
+        return {
+          title: 'Live Multilingual Translation Matrix',
+          badge: '50+ Target Languages Supported',
+          icon: Globe,
+          overview:
+            'Translate incoming speech streams simultaneously into up to 50 target languages while maintaining technical vocabulary accuracy.',
+          specs: [
+            { label: 'Supported Languages', val: '50+ World Languages' },
+            { label: 'Translation Latency', val: '12ms Frame Translation' },
+            { label: 'Domain Vocabulary', val: 'Custom Medical / Legal Lexicon' },
+            { label: 'Diarization', val: 'Multi-Speaker Identification' },
+          ],
+          deepDive:
+            'Speech is transcribed into intermediate phonemes and translated on the fly using a multi-head transformer pipeline tuned for live conversations.',
+          codeSnippet: `const translator = client.createTranslator({\n  sourceLang: 'auto',\n  targetLangs: ['es', 'fr', 'hi', 'ja']\n});\ntranslator.on('translation', (data) => {\n  renderSubtitles(data.lang, data.text);\n});`,
+        };
+
+      case 'Automated':
+        return {
+          title: 'GPT-4o Automated Session Summarization',
+          badge: 'GPT-4o Intelligence • One-Click Notes',
+          icon: Sparkles,
+          overview:
+            'Automatically analyze long lectures and meetings to generate bulleted executive summaries, key decisions, and action item trackers.',
+          specs: [
+            { label: 'Summary Engine', val: 'GPT-4o Fine-Tuned Pipeline' },
+            { label: 'Extraction Time', val: '< 1.2s Post Session' },
+            { label: 'Output Structure', val: 'Action Items + Minutes + Key Terms' },
+            { label: 'Cloud Persistence', val: 'Supabase Encrypted Vault' },
+          ],
+          deepDive:
+            'Post-session transcripts are parsed into structured markdown blocks containing speaker timelines, action assignments, and key topic tags.',
+          codeSnippet: `const summary = await client.summarizeSession({\n  sessionId: 'cs-8924',\n  format: 'structured-markdown',\n  extractActionItems: true\n});\nconsole.log(summary.actionItems);`,
+        };
+
+      case 'Universal':
+        return {
+          title: 'Universal Accessibility & ADA Compliance Studio',
+          badge: 'ADA 508 & WCAG 2.1 AAA Compliant',
+          icon: Headphones,
+          overview:
+            'Designed to empower deaf and hard-of-hearing individuals, ESL students, and neurodivergent learners with customizable high-contrast captions.',
+          specs: [
+            { label: 'Compliance Level', val: 'WCAG 2.1 AAA Certified' },
+            { label: 'Contrast Ratio', val: '21:1 Maximum High Contrast' },
+            { label: 'Dynamic Sizing', val: '12px - 28px Scalable Fonts' },
+            { label: 'Assistive Tech', val: 'Screen Reader ARIA Compatible' },
+          ],
+          deepDive:
+            'Captions feature dynamic font sizing, custom background opacity, speaker color coding, and reduced visual noise modes for focus.',
+          codeSnippet: `client.setAccessibilityOptions({\n  highContrast: true,\n  fontSizePx: 16,\n  dyslexiaFont: false,\n  ariaLiveMode: 'assertive'\n});`,
+        };
+
+      case 'Zero':
+        return {
+          title: 'Zero Data Retention & Local Encryption Vault',
+          badge: 'SOC2 Type II & HIPAA Compliant',
+          icon: Shield,
+          overview:
+            'Military-grade TLS 1.3 encryption and on-device local ONNX inference models ensure complete privacy for sensitive voice recordings.',
+          specs: [
+            { label: 'Encryption', val: 'AES-256 GCM & TLS 1.3' },
+            { label: 'On-Device Engine', val: 'Local WebAssembly / ONNX' },
+            { label: 'Server Retention', val: '0 Days (Ephemeral Memory)' },
+            { label: 'Compliance', val: 'SOC2 Type II & HIPAA Ready' },
+          ],
+          deepDive:
+            'In Zero-Retention Mode, all audio frames are processed locally inside your browser WebWorker thread and immediately destroyed.',
+          codeSnippet: `client.enableZeroRetentionMode({\n  storage: 'volatile-ram-only',\n  encryptPayloads: true,\n  localInference: true\n});`,
+        };
+
+      default: // Multi-Format
+        return {
+          title: 'Multi-Format Instant Export Engine',
+          badge: 'PDF • Notion • SRT Subtitles • DOCX',
+          icon: FileCheck,
+          overview:
+            'Export your transcribed audio sessions and meeting minutes seamlessly into industry-standard document formats with one click.',
+          specs: [
+            { label: 'Supported Formats', val: 'PDF, Notion, SRT, DOCX, TXT' },
+            { label: 'Subtitles Format', val: 'SRT & VTT Subtitle Files' },
+            { label: 'Integration', val: 'Direct Notion & Google Workspace Sync' },
+            { label: 'Batch Export', val: 'Bulk ZIP Archive Generation' },
+          ],
+          deepDive:
+            'Transcripts are exported with accurate millisecond timestamps, speaker tags, and highlighted key takeaways formatted for immediate use.',
+          codeSnippet: `await client.exportSession({\n  sessionId: 'cs-8924',\n  format: 'pdf',\n  includeTimestamps: true,\n  syncToNotion: true\n});`,
+        };
+    }
+  };
+
   return (
     <section id="features" className="py-24 relative overflow-hidden bg-[#080a0e]">
       {/* Toast Alert for Feature Card Micro-Interactions */}
@@ -120,6 +248,87 @@ export const Features: React.FC = () => {
             <Sparkles className="w-4 h-4 text-white animate-spin" style={{ animationDuration: '4s' }} />
             <span>{featureToast}</span>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* FEATURE DETAIL INTERACTIVE MODAL POPUP */}
+      <AnimatePresence>
+        {activeModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-2xl bg-[#0e111a] border border-orange-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl text-left overflow-hidden max-h-[90vh] overflow-y-auto"
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-orange-500/20 border border-orange-500/40 flex items-center justify-center text-orange-400">
+                    <activeModal.icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-extrabold text-white">{activeModal.title}</h3>
+                    <span className="text-xs text-orange-400 font-semibold">{activeModal.badge}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setActiveModal(null)}
+                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Modal Content Overview */}
+              <p className="text-sm text-slate-300 leading-relaxed mb-6">
+                {activeModal.overview}
+              </p>
+
+              {/* Specs Grid */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                {activeModal.specs.map((sp, idx) => (
+                  <div key={idx} className="p-3 rounded-xl bg-white/5 border border-white/10">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block">{sp.label}</span>
+                    <span className="text-xs font-extrabold text-orange-300 mt-0.5 block">{sp.val}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Deep Dive Text */}
+              <div className="p-4 rounded-2xl bg-black/50 border border-white/10 mb-6 text-xs text-slate-300 space-y-1">
+                <span className="font-bold text-orange-400 block">Technical Architecture:</span>
+                <p className="leading-relaxed">{activeModal.deepDive}</p>
+              </div>
+
+              {/* Code / SDK Usage */}
+              <div className="mb-6">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2 flex items-center gap-1.5">
+                  <Code className="w-3.5 h-3.5 text-orange-400" />
+                  SDK Integration Example
+                </span>
+                <pre className="p-4 rounded-xl bg-black text-orange-200 font-mono text-[11px] overflow-x-auto border border-white/10 leading-relaxed">
+                  {activeModal.codeSnippet}
+                </pre>
+              </div>
+
+              {/* Modal Action Footer */}
+              <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+                <span className="text-xs text-slate-400">Ready to test in live studio?</span>
+                <button
+                  onClick={() => {
+                    setActiveModal(null);
+                    showToast(`🚀 Initialized ${activeModal.title} in Studio Console!`);
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-lg shadow-orange-500/30 flex items-center gap-2 transition-all"
+                >
+                  <span>Launch in Studio Console</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
@@ -214,10 +423,14 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform">
+            {/* FULLY FUNCTIONAL LEARN MORE BUTTON */}
+            <button
+              onClick={() => setActiveModal(getModalDetails('Ultra-Low'))}
+              className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
+            >
               <span>Learn more about Ultra-Low</span>
               <ArrowRight className="w-4 h-4" />
-            </div>
+            </button>
           </motion.div>
 
           {/* CARD 2: LIVE MULTILINGUAL TRANSLATION */}
@@ -275,10 +488,14 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform">
+            {/* FULLY FUNCTIONAL LEARN MORE BUTTON */}
+            <button
+              onClick={() => setActiveModal(getModalDetails('Live'))}
+              className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
+            >
               <span>Learn more about Live</span>
               <ArrowRight className="w-4 h-4" />
-            </div>
+            </button>
           </motion.div>
 
           {/* CARD 3: AUTOMATED AI SUMMARIES */}
@@ -339,10 +556,14 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform">
+            {/* FULLY FUNCTIONAL LEARN MORE BUTTON */}
+            <button
+              onClick={() => setActiveModal(getModalDetails('Automated'))}
+              className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
+            >
               <span>Learn more about Automated</span>
               <ArrowRight className="w-4 h-4" />
-            </div>
+            </button>
           </motion.div>
 
           {/* CARD 4: UNIVERSAL ACCESSIBILITY */}
@@ -392,10 +613,14 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform">
+            {/* FULLY FUNCTIONAL LEARN MORE BUTTON */}
+            <button
+              onClick={() => setActiveModal(getModalDetails('Universal'))}
+              className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
+            >
               <span>Learn more about Universal</span>
               <ArrowRight className="w-4 h-4" />
-            </div>
+            </button>
           </motion.div>
 
           {/* CARD 5: ZERO DATA RETENTION OPTION */}
@@ -446,10 +671,14 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform">
+            {/* FULLY FUNCTIONAL LEARN MORE BUTTON */}
+            <button
+              onClick={() => setActiveModal(getModalDetails('Zero'))}
+              className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
+            >
               <span>Learn more about Zero</span>
               <ArrowRight className="w-4 h-4" />
-            </div>
+            </button>
           </motion.div>
 
           {/* CARD 6: MULTI-FORMAT INSTANT EXPORTS */}
@@ -507,10 +736,14 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform">
+            {/* FULLY FUNCTIONAL LEARN MORE BUTTON */}
+            <button
+              onClick={() => setActiveModal(getModalDetails('Multi-Format'))}
+              className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
+            >
               <span>Learn more about Multi-Format</span>
               <ArrowRight className="w-4 h-4" />
-            </div>
+            </button>
           </motion.div>
 
         </div>
