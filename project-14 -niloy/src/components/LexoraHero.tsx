@@ -181,7 +181,7 @@ export const LexoraHero: React.FC = () => {
           transition={{ duration: 0.8, delay: 0.5 }}
           className="mt-6 text-sm sm:text-base md:text-lg text-slate-200 max-w-2xl mx-auto font-normal leading-relaxed"
         >
-          Lexora is an all-in-one AI assistant that records, transcribes, translates and summarizes in real-time for everyone, everywhere.
+          ClarityStream AI is an all-in-one AI assistant that records, transcribes, translates and summarizes in real-time for everyone, everywhere.
         </motion.p>
 
         {/* Animated Action Buttons */}

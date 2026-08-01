@@ -15,8 +15,8 @@ export const LexoraNavbar: React.FC = () => {
             <div className="w-1 bg-orange-500 h-6 rounded-full" />
             <div className="w-1 bg-orange-500 h-4 rounded-full" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">
-            Lexora
+          <span className="text-xl font-bold tracking-tight text-white flex items-center gap-1">
+            ClarityStream <span className="text-orange-500">AI</span>
           </span>
         </a>
 
