@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import {
   Mic,
-  MicOff,
   Play,
-  Pause,
   Sparkles,
   ArrowRight,
   Globe,
@@ -13,15 +11,8 @@ import {
   Volume2,
   CheckCircle2,
   Zap,
-  Sliders,
-  ShieldCheck,
-  RotateCcw,
-  CheckCircle,
-  FileText,
-  Download,
-  Upload,
-  Layers,
 } from 'lucide-react';
+import { ClarityStreamConsole } from './ClarityStreamConsole';
 
 export const LexoraHero: React.FC = () => {
   const [isRecording, setIsRecording] = useState(true);
@@ -105,35 +96,16 @@ export const LexoraHero: React.FC = () => {
     return () => clearInterval(wordInterval);
   }, []);
 
-  // Character typing simulation for widgets
+  // Character typing simulation for floating widgets
   const [typedCaption, setTypedCaption] = useState('');
   const [typedTranslation, setTypedTranslation] = useState('');
-  const [gaugeProgress, setGaugeProgress] = useState(0);
-
-  // INTERACTIVE AUDIO STUDIO CONSOLE STATES
-  const [selectedAiModel, setSelectedAiModel] = useState('Whisper v3 Neural');
-  const [selectedAudioInput, setSelectedAudioInput] = useState('System Mic (Real-Time)');
-  const [modelDropdownOpen, setModelDropdownOpen] = useState(false);
-  const [inputDropdownOpen, setInputDropdownOpen] = useState(false);
-  const [transcribedMins, setTranscribedMins] = useState(6896);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const aiModels = ['Whisper v3 Neural (99.4%)', 'Deepgram Nova-2 (Streaming)', 'On-Device Local ONNX'];
-  const audioInputs = ['System Mic (Real-Time)', 'Zoom / Teams Loopback', 'Upload MP3 / WAV File'];
-
-  const triggerSaveNotification = () => {
-    setGaugeProgress(99);
-    setTranscribedMins((prev) => prev + 15);
-    setToastMessage(`✨ Audio Console Saved: ${selectedAiModel} with ${selectedAudioInput}`);
-    setTimeout(() => setToastMessage(null), 3500);
-  };
 
   // 3D Parallax Mouse Motion Values
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const rotateX = useSpring(useTransform(mouseY, [-400, 400], [8, -8]), { stiffness: 150, damping: 20 });
-  const rotateY = useSpring(useTransform(mouseX, [-600, 600], [-10, 10]), { stiffness: 150, damping: 20 });
+  const rotateX = useSpring(useTransform(mouseY, [-400, 400], [6, -6]), { stiffness: 150, damping: 20 });
+  const rotateY = useSpring(useTransform(mouseX, [-600, 600], [-8, 8]), { stiffness: 150, damping: 20 });
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -142,13 +114,6 @@ export const LexoraHero: React.FC = () => {
     mouseX.set(x);
     mouseY.set(y);
   };
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setGaugeProgress(99);
-    }, 400);
-    return () => clearTimeout(timeout);
-  }, []);
 
   // Character typing effect based on active selected language
   useEffect(() => {
@@ -215,21 +180,6 @@ export const LexoraHero: React.FC = () => {
       onMouseMove={handleMouseMove}
       className="relative pt-32 pb-20 md:pt-40 md:pb-28 min-h-screen flex flex-col justify-between overflow-hidden perspective-1000"
     >
-      {/* Toast Notification for User Click Actions */}
-      <AnimatePresence>
-        {toastMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.9 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white text-xs font-bold shadow-2xl border border-white/30 flex items-center gap-2"
-          >
-            <CheckCircle className="w-4 h-4 text-white animate-bounce" />
-            <span>{toastMessage}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Generated Cinematic Sunset Mountain Background Asset */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat -z-20 scale-105 transition-transform duration-1000"
@@ -368,7 +318,7 @@ export const LexoraHero: React.FC = () => {
         {/* ---------------------------------------------------- */}
         {/* FLOATING INTERACTIVE WIDGETS SECTION */}
         {/* ---------------------------------------------------- */}
-        <div className="relative mt-12 mb-16 max-w-6xl mx-auto min-h-[460px]">
+        <div className="relative mt-8 mb-12 max-w-6xl mx-auto">
           
           {/* FLOATING WIDGET 1: Top-Left "Live Recording" */}
           <motion.div
@@ -376,7 +326,7 @@ export const LexoraHero: React.FC = () => {
             animate={{ opacity: 1, x: 0, y: [0, -12, 0] }}
             transition={{ opacity: { duration: 0.8, delay: 0.7 }, y: { duration: 4, repeat: Infinity, ease: 'easeInOut' } }}
             whileHover={{ scale: 1.05, rotate: -1 }}
-            className="absolute top-0 left-0 md:left-4 z-20 w-64 rounded-2xl bg-[#141720]/85 border border-white/20 p-4 backdrop-blur-xl shadow-2xl text-left hidden sm:block hover:border-orange-500/50 transition-all cursor-pointer"
+            className="absolute -top-12 left-0 md:left-4 z-20 w-64 rounded-2xl bg-[#141720]/85 border border-white/20 p-4 backdrop-blur-xl shadow-2xl text-left hidden lg:block hover:border-orange-500/50 transition-all cursor-pointer"
           >
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
@@ -412,7 +362,7 @@ export const LexoraHero: React.FC = () => {
             animate={{ opacity: 1, x: 0, y: [0, -14, 0] }}
             transition={{ opacity: { duration: 0.8, delay: 0.8 }, y: { duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 } }}
             whileHover={{ scale: 1.02 }}
-            className="absolute top-4 right-0 md:right-4 z-40 w-72 rounded-2xl bg-[#141720]/90 border border-white/20 p-4 backdrop-blur-xl shadow-2xl text-left hidden sm:block hover:border-orange-500/50 transition-all"
+            className="absolute -top-10 right-0 md:right-4 z-40 w-72 rounded-2xl bg-[#141720]/90 border border-white/20 p-4 backdrop-blur-xl shadow-2xl text-left hidden lg:block hover:border-orange-500/50 transition-all"
           >
             <div className="flex items-center justify-between mb-2 relative">
               <div className="flex items-center gap-2">
@@ -446,8 +396,6 @@ export const LexoraHero: React.FC = () => {
                         onClick={() => {
                           setSelectedLangObj(lang);
                           setIsLangDropdownOpen(false);
-                          setToastMessage(`🌐 Caption Switched: ${lang.name} ${lang.flag}`);
-                          setTimeout(() => setToastMessage(null), 3000);
                         }}
                         className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
                           selectedLangObj.code === lang.code
@@ -472,285 +420,10 @@ export const LexoraHero: React.FC = () => {
             </div>
           </motion.div>
 
-          {/* FLOATING WIDGET 3: Center Pulsing Mic Orb */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30"
-          >
-            <div className="relative group cursor-pointer" onClick={toggleRecording}>
-              <div className={`absolute -inset-5 rounded-full bg-orange-500/30 ${isRecording ? 'animate-mic-pulse' : ''}`} />
-              <div className="absolute -inset-10 rounded-full bg-orange-500/15 animate-ping" style={{ animationDuration: '3.5s' }} />
-              
-              <button className="relative w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600 flex items-center justify-center text-white shadow-2xl shadow-orange-500/70 group-hover:scale-115 active:scale-95 transition-all">
-                <Mic className="w-7 h-7 text-white group-hover:rotate-12 transition-transform" />
-              </button>
-            </div>
-          </motion.div>
-
-          {/* FLOATING WIDGET 4: Bottom-Left "AI Summary" */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: [0, -10, 0] }}
-            transition={{ opacity: { duration: 0.8, delay: 0.9 }, y: { duration: 4.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 } }}
-            whileHover={{ scale: 1.05 }}
-            className="absolute bottom-4 left-0 md:left-6 z-20 w-64 rounded-2xl bg-[#141720]/85 border border-white/20 p-4 backdrop-blur-xl shadow-2xl text-left hidden sm:block hover:border-orange-500/50 transition-all cursor-pointer"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-4 h-4 text-orange-400" />
-              <span className="text-xs font-bold text-white">AI Summary</span>
-            </div>
-
-            <div className="space-y-1.5 text-xs text-slate-300 mb-3">
-              {[
-                'Quarterly report overview',
-                'Key insights discussed',
-                'Market opportunities',
-                'Growth strategies',
-              ].map((item, idx) => (
-                <div key={idx} className="flex items-center gap-2 hover:text-white transition-colors">
-                  <Check className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={() => {
-                setToastMessage('📝 AI Notes & Action Items Generated!');
-                setTimeout(() => setToastMessage(null), 3000);
-              }}
-              className="w-full py-1.5 rounded-lg bg-orange-500/20 border border-orange-500/40 text-orange-300 font-semibold text-xs hover:bg-orange-500 hover:text-white active:scale-95 transition-all shadow-md"
-            >
-              Generate Notes
-            </button>
-          </motion.div>
-
-          {/* FLOATING WIDGET 5: Bottom-Right "Translation" */}
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: [0, -12, 0] }}
-            transition={{ opacity: { duration: 0.8, delay: 1 }, y: { duration: 5.5, repeat: Infinity, ease: 'easeInOut', delay: 1.5 } }}
-            whileHover={{ scale: 1.05 }}
-            className="absolute bottom-4 right-0 md:right-6 z-20 w-72 rounded-2xl bg-[#141720]/85 border border-white/20 p-4 backdrop-blur-xl shadow-2xl text-left hidden sm:block hover:border-orange-500/50 transition-all cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-orange-400" />
-                <span className="text-xs font-bold text-white">Translation</span>
-              </div>
-              <div className="text-[11px] text-slate-300 bg-white/5 border border-white/10 px-2 py-0.5 rounded-md flex items-center gap-1">
-                <span>{selectedLangObj.transName}</span>
-                <ChevronDown className="w-3 h-3 text-slate-400" />
-              </div>
-            </div>
-
-            <p className="text-xs text-orange-200/90 leading-relaxed font-sans bg-black/50 p-2.5 rounded-xl border border-orange-500/20 min-h-[54px]">
-              "{typedTranslation}"
-            </p>
-          </motion.div>
-
           {/* ---------------------------------------------------- */}
-          {/* 100% RELATABLE LIVE AUDIO STUDIO RECORDING CONSOLE */}
+          {/* 100% REAL CLARITYSTREAM BACKEND STUDIO CONSOLE CARD */}
           {/* ---------------------------------------------------- */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="mx-auto pt-16 max-w-2xl"
-          >
-            <div className="rounded-3xl bg-white/95 text-slate-900 p-6 shadow-2xl border border-white/50 backdrop-blur-2xl transition-all hover:shadow-orange-500/25 hover:border-white">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-                
-                {/* Panel 1: Live Audio Session & Speech Precision Gauge */}
-                <motion.div
-                  whileHover={{ y: -3 }}
-                  onClick={() => {
-                    setTranscribedMins((prev) => prev + 15);
-                    setToastMessage('⚡ Live Audio Stream Logged: +15 Mins Captions');
-                    setTimeout(() => setToastMessage(null), 3000);
-                  }}
-                  className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all cursor-pointer group"
-                >
-                  <div>
-                    <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-                      <span className="font-extrabold text-slate-900 flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping" />
-                        Speech-to-Text
-                      </span>
-                      <span className="text-[10px] text-orange-600 font-bold">This Month</span>
-                    </div>
-                    <div className="flex items-baseline gap-2 mt-2">
-                      <span className="text-2xl font-black text-slate-900 group-hover:text-orange-600 transition-colors">
-                        {transcribedMins.toLocaleString()} <span className="text-xs font-normal text-slate-500">mins</span>
-                      </span>
-                      <span className="text-[11px] font-bold text-emerald-600">↑ +14.2%</span>
-                    </div>
-                    <p className="text-[10px] text-slate-400 mt-1">Live Audio Captions Streamed</p>
-                  </div>
-
-                  {/* Speech Precision Gauge Meter */}
-                  <div className="mt-4 pt-3 border-t border-slate-200 text-center">
-                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">
-                      Speech Precision Rate
-                    </span>
-                    <div className="relative w-24 h-12 mx-auto mt-2 overflow-hidden">
-                      <div
-                        className="w-24 h-24 rounded-full border-8 border-orange-500 border-b-transparent border-l-transparent transition-transform duration-1000 shadow-sm"
-                        style={{ transform: `rotate(${45 + (gaugeProgress / 100) * 180}deg)` }}
-                      />
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-sm font-extrabold text-slate-900">
-                        {gaugeProgress}%
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Panel 2: Real-Time Audio AI Settings & Model Selector */}
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between text-xs hover:bg-white hover:shadow-md transition-all">
-                  <div className="space-y-3 relative">
-                    
-                    {/* Model Selector */}
-                    <div className="relative">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase flex items-center justify-between">
-                        <span>Speech AI Engine</span>
-                        <Zap className="w-3.5 h-3.5 text-orange-500" />
-                      </label>
-                      <div
-                        onClick={() => setModelDropdownOpen(!modelDropdownOpen)}
-                        className="mt-1 px-3 py-1.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-800 flex justify-between items-center cursor-pointer hover:border-orange-500 transition-colors shadow-sm"
-                      >
-                        <span className="truncate text-[11px]">{selectedAiModel}</span>
-                        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                      </div>
-
-                      {modelDropdownOpen && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 p-1 space-y-1">
-                          {aiModels.map((m) => (
-                            <button
-                              key={m}
-                              onClick={() => {
-                                setSelectedAiModel(m);
-                                setModelDropdownOpen(false);
-                                setToastMessage(`🧠 AI Speech Engine Set: ${m}`);
-                                setTimeout(() => setToastMessage(null), 3000);
-                              }}
-                              className="w-full text-left px-2 py-1 rounded text-[10px] font-semibold text-slate-700 hover:bg-orange-50 hover:text-orange-600 transition-colors flex items-center justify-between"
-                            >
-                              <span>{m}</span>
-                              {selectedAiModel === m && <Check className="w-3 h-3 text-orange-600" />}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Audio Input Selector */}
-                    <div className="relative">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase flex items-center justify-between">
-                        <span>Audio Source Input</span>
-                        <Mic className="w-3.5 h-3.5 text-orange-500" />
-                      </label>
-                      <div
-                        onClick={() => setInputDropdownOpen(!inputDropdownOpen)}
-                        className="mt-1 px-3 py-1.5 rounded-lg bg-white border border-slate-300 font-semibold text-slate-800 flex justify-between items-center cursor-pointer hover:border-orange-500 transition-colors shadow-sm"
-                      >
-                        <span className="truncate text-[11px]">{selectedAudioInput}</span>
-                        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                      </div>
-
-                      {inputDropdownOpen && (
-                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-xl z-50 p-1 space-y-1">
-                          {audioInputs.map((src) => (
-                            <button
-                              key={src}
-                              onClick={() => {
-                                setSelectedAudioInput(src);
-                                setInputDropdownOpen(false);
-                                setToastMessage(`🎙️ Audio Input Source Changed: ${src}`);
-                                setTimeout(() => setToastMessage(null), 3000);
-                              }}
-                              className="w-full text-left px-2 py-1 rounded text-[10px] font-semibold text-slate-700 hover:bg-orange-50 hover:text-orange-600 transition-colors flex items-center justify-between"
-                            >
-                              <span>{src}</span>
-                              {selectedAudioInput === src && <Check className="w-3 h-3 text-orange-600" />}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Recording Studio Action Buttons */}
-                  <div className="flex items-center gap-2 mt-4">
-                    <button
-                      onClick={triggerSaveNotification}
-                      className="flex-1 py-1.5 rounded-lg bg-orange-500 text-white font-bold text-xs hover:bg-orange-600 active:scale-95 transition-all shadow-md shadow-orange-500/30 flex items-center justify-center gap-1"
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                      <span>Save Config</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedAiModel('Whisper v3 Neural (99.4%)');
-                        setSelectedAudioInput('System Mic (Real-Time)');
-                        setToastMessage('🔄 Audio Console Reset to Default Settings');
-                        setTimeout(() => setToastMessage(null), 3000);
-                      }}
-                      className="py-1.5 px-2 rounded-lg bg-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-300 active:scale-95 transition-all flex items-center justify-center"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Panel 3: AI Notes & Low Latency Streaming Score */}
-                <motion.div
-                  whileHover={{ y: -3 }}
-                  onClick={() => {
-                    setToastMessage('🚀 Real-Time Audio Latency: < 42ms');
-                    setTimeout(() => setToastMessage(null), 3000);
-                  }}
-                  className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col justify-between hover:bg-white hover:shadow-md transition-all cursor-pointer group"
-                >
-                  <div>
-                    <div className="flex items-center justify-between text-xs font-semibold text-slate-500">
-                      <span className="font-extrabold text-slate-900">AI Summaries</span>
-                      <span className="text-[10px] text-emerald-600 font-bold">Today</span>
-                    </div>
-                    <div className="flex items-baseline gap-2 mt-2">
-                      <span className="text-2xl font-black text-slate-900 group-hover:text-orange-600 transition-colors">148</span>
-                      <span className="text-[11px] font-bold text-emerald-600">↑ +24 Notes</span>
-                    </div>
-                    <p className="text-[10px] text-slate-400 mt-1">Saved in Supabase Vault</p>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-slate-200 text-center">
-                    <span className="text-[10px] font-bold text-slate-600 uppercase tracking-wider block">
-                      &lt; 50ms Streaming Latency
-                    </span>
-                    <div className="relative w-24 h-12 mx-auto mt-1 overflow-hidden">
-                      <div className="w-24 h-24 rounded-full border-8 border-emerald-500 border-b-transparent border-l-transparent rotate-[135deg] shadow-sm" />
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-xs font-extrabold text-slate-900">
-                        98.5%
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2 mt-4 text-[10px]">
-                      <button className="flex-1 py-1 rounded-md bg-white border border-slate-300 font-semibold text-slate-700 hover:border-orange-400 hover:text-orange-600 transition-colors">
-                        Speech Logs
-                      </button>
-                      <button className="flex-1 py-1 rounded-md bg-white border border-slate-300 font-semibold text-slate-700 hover:border-orange-400 hover:text-orange-600 transition-colors">
-                        Subtitles
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-
-              </div>
-            </div>
-          </motion.div>
+          <ClarityStreamConsole />
         </div>
 
         {/* STATS & TRUST BAR */}
