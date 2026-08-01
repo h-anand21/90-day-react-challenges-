@@ -16,70 +16,7 @@ import { ClarityStreamConsole } from './ClarityStreamConsole';
 
 export const LexoraHero: React.FC = () => {
   const [isRecording, setIsRecording] = useState(true);
-  const [timerCount, setTimerCount] = useState(165); // 02:45
   
-  // Interactive Language Selector State
-  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
-  const [selectedLangObj, setSelectedLangObj] = useState({
-    code: 'en',
-    name: 'English',
-    flag: '🇺🇸',
-    caption: 'Good morning everyone, today we will discuss the Q3 performance metrics and key accessibility goals...',
-    transName: 'Spanish',
-    translation: 'Buenos días a todos, hoy discutiremos el informe trimestral y las métricas clave de este período.',
-  });
-
-  const languageOptions = [
-    {
-      code: 'en',
-      name: 'English',
-      flag: '🇺🇸',
-      caption: 'Good morning everyone, today we will discuss the Q3 performance metrics and key accessibility goals...',
-      transName: 'Spanish',
-      translation: 'Buenos días a todos, hoy discutiremos el informe trimestral y las métricas clave de este período.',
-    },
-    {
-      code: 'es',
-      name: 'Spanish',
-      flag: '🇪🇸',
-      caption: 'Buenos días a todos, hoy discutiremos las métricas de rendimiento del tercer trimestre...',
-      transName: 'English',
-      translation: 'Good morning everyone, today we will discuss the Q3 performance metrics...',
-    },
-    {
-      code: 'fr',
-      name: 'French',
-      flag: '🇫🇷',
-      caption: "Bonjour à tous, aujourd'hui nous allons discuter des métriques de performance du troisième trimestre...",
-      transName: 'English',
-      translation: 'Good morning everyone, today we will discuss Q3 metrics...',
-    },
-    {
-      code: 'hi',
-      name: 'Hindi',
-      flag: '🇮🇳',
-      caption: 'नमस्कार आप सभी का स्वागत है, आज हम तीसरी तिमाही के प्रदर्शन मीट्रिक पर चर्चा करेंगे...',
-      transName: 'English',
-      translation: 'Welcome everyone, today we will discuss Q3 metrics...',
-    },
-    {
-      code: 'de',
-      name: 'German',
-      flag: '🇩🇪',
-      caption: 'Guten Morgen zusammen, heute werden wir die Leistungsmetriken für das dritte Quartal besprechen...',
-      transName: 'Spanish',
-      translation: 'Buenos días a todos, hoy discutiremos las métricas del tercer trimestre...',
-    },
-    {
-      code: 'ja',
-      name: 'Japanese',
-      flag: '🇯🇵',
-      caption: '皆さんおはようございます、本日は第3四半期の業績指標とアクセシビリティについて議論します...',
-      transName: 'English',
-      translation: 'Good morning everyone, today we will discuss Q3 metrics...',
-    },
-  ];
-
   // Dynamic Headline Rotating Text Words
   const [rotatingWordIdx, setRotatingWordIdx] = useState(0);
   const rotatingWords = [
@@ -96,16 +33,12 @@ export const LexoraHero: React.FC = () => {
     return () => clearInterval(wordInterval);
   }, []);
 
-  // Character typing simulation for floating widgets
-  const [typedCaption, setTypedCaption] = useState('');
-  const [typedTranslation, setTypedTranslation] = useState('');
-
   // 3D Parallax Mouse Motion Values
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  const rotateX = useSpring(useTransform(mouseY, [-400, 400], [6, -6]), { stiffness: 150, damping: 20 });
-  const rotateY = useSpring(useTransform(mouseX, [-600, 600], [-8, 8]), { stiffness: 150, damping: 20 });
+  const rotateX = useSpring(useTransform(mouseY, [-400, 400], [5, -5]), { stiffness: 150, damping: 20 });
+  const rotateY = useSpring(useTransform(mouseX, [-600, 600], [-6, 6]), { stiffness: 150, damping: 20 });
 
   const handleMouseMove = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -113,41 +46,6 @@ export const LexoraHero: React.FC = () => {
     const y = e.clientY - rect.top - rect.height / 2;
     mouseX.set(x);
     mouseY.set(y);
-  };
-
-  // Character typing effect based on active selected language
-  useEffect(() => {
-    if (!isRecording) return;
-    let charIdx = 0;
-    const fullCap = selectedLangObj.caption;
-    const fullTrans = selectedLangObj.translation;
-
-    setTypedCaption('');
-    setTypedTranslation('');
-
-    const interval = setInterval(() => {
-      charIdx = (charIdx + 1) % (fullCap.length + 1);
-      const transIdx = Math.floor((charIdx / fullCap.length) * fullTrans.length);
-      setTypedCaption(fullCap.slice(0, Math.max(8, charIdx)));
-      setTypedTranslation(fullTrans.slice(0, Math.max(10, transIdx)));
-    }, 70);
-
-    return () => clearInterval(interval);
-  }, [isRecording, selectedLangObj]);
-
-  // Live timer
-  useEffect(() => {
-    if (!isRecording) return;
-    const timer = setInterval(() => {
-      setTimerCount((prev) => prev + 1);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [isRecording]);
-
-  const formatTimer = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   const toggleRecording = () => {
@@ -178,7 +76,7 @@ export const LexoraHero: React.FC = () => {
   return (
     <section
       onMouseMove={handleMouseMove}
-      className="relative pt-32 pb-20 md:pt-40 md:pb-28 min-h-screen flex flex-col justify-between overflow-hidden perspective-1000"
+      className="relative pt-32 pb-20 md:pt-36 md:pb-24 min-h-screen flex flex-col justify-between overflow-hidden perspective-1000"
     >
       {/* Generated Cinematic Sunset Mountain Background Asset */}
       <div
@@ -291,7 +189,7 @@ export const LexoraHero: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.7 }}
-          className="mt-8 flex items-center justify-center gap-4"
+          className="mt-8 mb-10 flex items-center justify-center gap-4"
         >
           <motion.a
             href="#demo"
@@ -316,115 +214,9 @@ export const LexoraHero: React.FC = () => {
         </motion.div>
 
         {/* ---------------------------------------------------- */}
-        {/* FLOATING INTERACTIVE WIDGETS SECTION */}
+        {/* CLEAN UNCLUTTERED CLARITYSTREAM STUDIO CONSOLE CARD */}
         {/* ---------------------------------------------------- */}
-        <div className="relative mt-8 mb-12 max-w-6xl mx-auto">
-          
-          {/* FLOATING WIDGET 1: Top-Left "Live Recording" */}
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            animate={{ opacity: 1, x: 0, y: [0, -12, 0] }}
-            transition={{ opacity: { duration: 0.8, delay: 0.7 }, y: { duration: 4, repeat: Infinity, ease: 'easeInOut' } }}
-            whileHover={{ scale: 1.05, rotate: -1 }}
-            className="absolute -top-12 left-0 md:left-4 z-20 w-64 rounded-2xl bg-[#141720]/85 border border-white/20 p-4 backdrop-blur-xl shadow-2xl text-left hidden lg:block hover:border-orange-500/50 transition-all cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-                <span className="text-xs font-bold text-white">Live Recording</span>
-              </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 font-semibold animate-pulse">
-                ● Live
-              </span>
-            </div>
-
-            <div className="flex items-end gap-1 h-10 my-3 px-2 py-1 bg-black/50 rounded-xl border border-white/5">
-              {Array.from({ length: 18 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-1 rounded-full bg-gradient-to-t from-orange-600 to-amber-400 transition-all ${
-                    isRecording ? `animate-wave-${(i % 5) + 1}` : 'h-1 bg-slate-600'
-                  }`}
-                  style={{ height: isRecording ? `${Math.sin(i * 0.7 + Date.now() * 0.003) * 12 + 18}px` : '4px' }}
-                />
-              ))}
-            </div>
-
-            <div className="text-[11px] font-mono text-slate-300 font-semibold flex items-center justify-between">
-              <span className="text-orange-400 font-mono font-bold">{formatTimer(timerCount)}</span>
-              <span className="text-[10px] text-slate-400 font-sans">44.1 kHz • HD</span>
-            </div>
-          </motion.div>
-
-          {/* FLOATING WIDGET 2: Top-Right "Live Caption" */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0, y: [0, -14, 0] }}
-            transition={{ opacity: { duration: 0.8, delay: 0.8 }, y: { duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 } }}
-            whileHover={{ scale: 1.02 }}
-            className="absolute -top-10 right-0 md:right-4 z-40 w-72 rounded-2xl bg-[#141720]/90 border border-white/20 p-4 backdrop-blur-xl shadow-2xl text-left hidden lg:block hover:border-orange-500/50 transition-all"
-          >
-            <div className="flex items-center justify-between mb-2 relative">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-xs font-bold text-white">Live Caption</span>
-              </div>
-
-              <div className="relative">
-                <button
-                  onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                  className="flex items-center gap-1.5 text-[11px] font-bold text-slate-200 bg-white/10 hover:bg-orange-500/20 hover:text-orange-300 border border-white/15 hover:border-orange-500/40 px-2.5 py-1 rounded-lg transition-all"
-                >
-                  <span>{selectedLangObj.flag}</span>
-                  <span>{selectedLangObj.name}</span>
-                  <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {isLangDropdownOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 5, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 5, scale: 0.95 }}
-                    className="absolute right-0 mt-1.5 w-40 rounded-xl bg-[#181c28] border border-orange-500/40 p-1.5 shadow-2xl z-50 space-y-1"
-                  >
-                    <div className="text-[10px] uppercase font-bold text-orange-400 px-2 py-1 border-b border-white/10">
-                      Select Language:
-                    </div>
-                    {languageOptions.map((lang) => (
-                      <button
-                        key={lang.code}
-                        onClick={() => {
-                          setSelectedLangObj(lang);
-                          setIsLangDropdownOpen(false);
-                        }}
-                        className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                          selectedLangObj.code === lang.code
-                            ? 'bg-orange-500 text-white font-bold'
-                            : 'text-slate-200 hover:bg-white/10 hover:text-orange-300'
-                        }`}
-                      >
-                        <span className="flex items-center gap-1.5">
-                          <span>{lang.flag}</span>
-                          <span>{lang.name}</span>
-                        </span>
-                        {selectedLangObj.code === lang.code && <Check className="w-3 h-3 text-white" />}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </div>
-            </div>
-
-            <div className="text-xs text-slate-200 leading-relaxed font-sans mt-2 italic bg-black/50 p-2.5 rounded-xl border border-white/10 min-h-[54px]">
-              "{typedCaption}"<span className="inline-block w-1.5 h-3.5 bg-orange-500 ml-0.5 animate-pulse" />
-            </div>
-          </motion.div>
-
-          {/* ---------------------------------------------------- */}
-          {/* 100% REAL CLARITYSTREAM BACKEND STUDIO CONSOLE CARD */}
-          {/* ---------------------------------------------------- */}
-          <ClarityStreamConsole />
-        </div>
+        <ClarityStreamConsole />
 
         {/* STATS & TRUST BAR */}
         <motion.div
