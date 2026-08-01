@@ -33,6 +33,7 @@ interface VisualStep {
 }
 
 interface ModalData {
+  type: string;
   title: string;
   badge: string;
   icon: any;
@@ -40,6 +41,7 @@ interface ModalData {
   specs: { label: string; val: string }[];
   userSteps: VisualStep[];
   interactiveDemoText: string;
+  targetStudioSection: string;
 }
 
 export const Features: React.FC = () => {
@@ -135,6 +137,17 @@ export const Features: React.FC = () => {
     }, 180);
   };
 
+  // Smooth Scroll & Highlight Studio Console Feature
+  const scrollToStudioSection = (sectionId: string) => {
+    const el = document.getElementById('studio-console');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      window.dispatchEvent(
+        new CustomEvent('highlight-studio-section', { detail: { sectionId } })
+      );
+    }
+  };
+
   // Trigger Modal Interactive Demo
   const triggerModalDemo = (demoText: string) => {
     setIsDemoActive(true);
@@ -154,9 +167,11 @@ export const Features: React.FC = () => {
     switch (type) {
       case 'Ultra-Low':
         return {
+          type: 'Ultra-Low',
           title: 'How Ultra-Low Latency Streaming Works',
           badge: 'Live Step-by-Step User Guide',
           icon: Mic,
+          targetStudioSection: 'audio-vad',
           overview:
             'Experience instant speech-to-text with zero lag. See how live audio is captured, processed, and displayed on screen in under 50 milliseconds.',
           specs: [
@@ -191,9 +206,11 @@ export const Features: React.FC = () => {
 
       case 'Live':
         return {
+          type: 'Live',
           title: 'How Live Multilingual Translation Works',
           badge: '50+ Languages Translation Guide',
           icon: Globe,
+          targetStudioSection: 'speech-translation',
           overview:
             'Break language barriers in real time. Translate live spoken lectures and meetings into Spanish, French, Hindi, Japanese, and 50+ languages instantly.',
           specs: [
@@ -228,9 +245,11 @@ export const Features: React.FC = () => {
 
       case 'Automated':
         return {
+          type: 'Automated',
           title: 'How Automated AI Summaries Work',
           badge: 'GPT-4o AI Notes Guide',
           icon: Sparkles,
+          targetStudioSection: 'ai-notes',
           overview:
             'Stop spending hours writing meeting notes. GPT-4o AI extracts key takeaways, action points, and meeting minutes automatically.',
           specs: [
@@ -265,9 +284,11 @@ export const Features: React.FC = () => {
 
       case 'Universal':
         return {
+          type: 'Universal',
           title: 'How Universal Accessibility Works',
           badge: 'ADA & WCAG 2.1 AAA Accessibility Guide',
           icon: Headphones,
+          targetStudioSection: 'speech-translation',
           overview:
             'Empower every learner. Designed specifically for deaf and hard-of-hearing individuals, ESL students, and neurodivergent users.',
           specs: [
@@ -302,9 +323,11 @@ export const Features: React.FC = () => {
 
       case 'Zero':
         return {
+          type: 'Zero',
           title: 'How Zero Data Retention Security Works',
           badge: 'SOC2 & HIPAA Privacy Guide',
           icon: Shield,
+          targetStudioSection: 'audio-vad',
           overview:
             'Your voice data remains 100% private. Choose between military-grade cloud encryption or local on-device transcription.',
           specs: [
@@ -339,9 +362,11 @@ export const Features: React.FC = () => {
 
       default: // Multi-Format
         return {
+          type: 'Multi-Format',
           title: 'How One-Click Multi-Format Export Works',
           badge: 'PDF • Notion • SRT Subtitles Guide',
           icon: FileCheck,
+          targetStudioSection: 'instant-export',
           overview:
             'Take your notes anywhere. Export audio transcripts and meeting minutes directly into PDF, Notion, Word, or SRT subtitle files with one click.',
           specs: [
@@ -498,14 +523,16 @@ export const Features: React.FC = () => {
                 </div>
               </div>
 
-              {/* Modal Action Footer */}
+              {/* Modal Action Footer with Direct Studio Scroll & Highlight */}
               <div className="pt-4 border-t border-white/10 flex items-center justify-between">
-                <span className="text-xs text-slate-400">Want to test in main studio?</span>
+                <span className="text-xs text-slate-400">Want to test live in studio?</span>
                 <button
                   onClick={() => {
+                    const sec = activeModal.targetStudioSection;
                     setActiveModal(null);
                     setIsDemoActive(false);
-                    showToast(`🚀 Launching ${activeModal.title} in Studio Console!`);
+                    scrollToStudioSection(sec);
+                    showToast(`🚀 Navigated to ${activeModal.title} in Studio Console!`);
                   }}
                   className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold shadow-lg shadow-orange-500/30 flex items-center gap-2 transition-all"
                 >
@@ -609,9 +636,11 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK */}
+            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK WITH DIRECT SCROLL */}
             <button
-              onClick={() => setActiveModal(getModalDetails('Ultra-Low'))}
+              onClick={() => {
+                setActiveModal(getModalDetails('Ultra-Low'));
+              }}
               className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
             >
               <span>Learn how to use Ultra-Low</span>
@@ -674,9 +703,11 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK */}
+            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK WITH DIRECT SCROLL */}
             <button
-              onClick={() => setActiveModal(getModalDetails('Live'))}
+              onClick={() => {
+                setActiveModal(getModalDetails('Live'));
+              }}
               className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
             >
               <span>Learn how to use Translation</span>
@@ -742,9 +773,11 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK */}
+            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK WITH DIRECT SCROLL */}
             <button
-              onClick={() => setActiveModal(getModalDetails('Automated'))}
+              onClick={() => {
+                setActiveModal(getModalDetails('Automated'));
+              }}
               className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
             >
               <span>Learn how to use AI Notes</span>
@@ -799,9 +832,11 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK */}
+            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK WITH DIRECT SCROLL */}
             <button
-              onClick={() => setActiveModal(getModalDetails('Universal'))}
+              onClick={() => {
+                setActiveModal(getModalDetails('Universal'));
+              }}
               className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
             >
               <span>Learn how Accessibility Works</span>
@@ -857,9 +892,11 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK */}
+            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK WITH DIRECT SCROLL */}
             <button
-              onClick={() => setActiveModal(getModalDetails('Zero'))}
+              onClick={() => {
+                setActiveModal(getModalDetails('Zero'));
+              }}
               className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
             >
               <span>Learn how Security Works</span>
@@ -922,9 +959,11 @@ export const Features: React.FC = () => {
               </div>
             </div>
 
-            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK */}
+            {/* USER-FRIENDLY VISUAL WALKTHROUGH LINK WITH DIRECT SCROLL */}
             <button
-              onClick={() => setActiveModal(getModalDetails('Multi-Format'))}
+              onClick={() => {
+                setActiveModal(getModalDetails('Multi-Format'));
+              }}
               className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-orange-400 group-hover:translate-x-1 transition-transform w-full text-left"
             >
               <span>Learn how Export Works</span>

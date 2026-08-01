@@ -75,6 +75,23 @@ export const ClarityStreamConsole: React.FC = () => {
   const [exportingFormat, setExportingFormat] = useState<string | null>(null);
   const [exportProgress, setExportProgress] = useState(0);
 
+  // Highlight Section Animation State
+  const [highlightedSection, setHighlightedSection] = useState<string | null>(null);
+
+  // Listen to custom window scroll & highlight events
+  useEffect(() => {
+    const handleHighlightEvent = (e: any) => {
+      const targetId = e.detail?.sectionId;
+      if (targetId) {
+        setHighlightedSection(targetId);
+        setTimeout(() => setHighlightedSection(null), 3500);
+      }
+    };
+
+    window.addEventListener('highlight-studio-section', handleHighlightEvent);
+    return () => window.removeEventListener('highlight-studio-section', handleHighlightEvent);
+  }, []);
+
   // Live Timer
   useEffect(() => {
     if (!isRecording) return;
@@ -120,13 +137,12 @@ export const ClarityStreamConsole: React.FC = () => {
       setExportProgress(p);
       if (p >= 100) {
         clearInterval(interval);
-        setToastMsg(`📥 Saved Session #CS-8924 as ${format}`);
+        showNotification(`📥 Saved Session #CS-8924 as ${format}`);
         setTimeout(() => {
           setExportingFormat(null);
-          setToastMsg(null);
-        }, 3000);
+        }, 2500);
       }
-    }, 200);
+    }, 180);
   };
 
   const showNotification = (msg: string) => {
@@ -135,7 +151,7 @@ export const ClarityStreamConsole: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto my-6 relative z-30 text-left">
+    <div id="studio-console" className="w-full max-w-6xl mx-auto my-6 relative z-30 text-left scroll-mt-28">
       {/* Toast Notification Alert */}
       <AnimatePresence>
         {toastMsg && (
@@ -182,11 +198,18 @@ export const ClarityStreamConsole: React.FC = () => {
           </div>
         </div>
 
-        {/* PERFECT 3-COLUMN EQUAL-HEIGHT GRID */}
+        {/* PERFECT 3-COLUMN EQUAL-HEIGHT GRID WITH DYNAMIC HIGHLIGHT ANCHORS */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 items-stretch">
           
           {/* COLUMN 1: AUDIO CAPTURE & VAD CONTROL */}
-          <div className="p-5 rounded-2xl bg-[#141824] border border-white/10 flex flex-col justify-between space-y-4">
+          <div
+            id="audio-vad"
+            className={`p-5 rounded-2xl bg-[#141824] border transition-all duration-500 flex flex-col justify-between space-y-4 ${
+              highlightedSection === 'audio-vad'
+                ? 'border-orange-500 ring-4 ring-orange-500/30 scale-[1.02] shadow-2xl shadow-orange-500/30'
+                : 'border-white/10'
+            }`}
+          >
             <div>
               <div className="flex items-center justify-between text-xs font-bold text-slate-400 mb-3">
                 <span className="uppercase tracking-wider text-orange-400">01. Audio Capture & VAD</span>
@@ -262,7 +285,14 @@ export const ClarityStreamConsole: React.FC = () => {
           </div>
 
           {/* COLUMN 2: LIVE SPEECH-TO-TEXT & TRANSLATION ENGINE */}
-          <div className="p-5 rounded-2xl bg-[#141824] border border-white/10 flex flex-col justify-between space-y-4">
+          <div
+            id="speech-translation"
+            className={`p-5 rounded-2xl bg-[#141824] border transition-all duration-500 flex flex-col justify-between space-y-4 ${
+              highlightedSection === 'speech-translation'
+                ? 'border-blue-500 ring-4 ring-blue-500/30 scale-[1.02] shadow-2xl shadow-blue-500/30'
+                : 'border-white/10'
+            }`}
+          >
             <div>
               {/* Header with Language Pair Selector */}
               <div className="flex items-center justify-between pb-3 border-b border-white/10">
@@ -338,7 +368,14 @@ export const ClarityStreamConsole: React.FC = () => {
           </div>
 
           {/* COLUMN 3: AI NOTES & MULTI-FORMAT EXPORT */}
-          <div className="p-5 rounded-2xl bg-[#141824] border border-white/10 flex flex-col justify-between space-y-4">
+          <div
+            id="ai-notes"
+            className={`p-5 rounded-2xl bg-[#141824] border transition-all duration-500 flex flex-col justify-between space-y-4 ${
+              highlightedSection === 'ai-notes' || highlightedSection === 'instant-export'
+                ? 'border-purple-500 ring-4 ring-purple-500/30 scale-[1.02] shadow-2xl shadow-purple-500/30'
+                : 'border-white/10'
+            }`}
+          >
             <div>
               <div className="flex items-center justify-between text-xs font-bold text-slate-400 mb-3">
                 <span className="uppercase tracking-wider flex items-center gap-1.5 text-orange-400">
@@ -366,7 +403,7 @@ export const ClarityStreamConsole: React.FC = () => {
             </div>
 
             {/* Instant Export Bar */}
-            <div className="pt-3 border-t border-white/10 space-y-2">
+            <div id="instant-export" className="pt-3 border-t border-white/10 space-y-2">
               <div className="flex items-center justify-between text-[11px] font-extrabold text-slate-400">
                 <span>INSTANT EXPORT SESSION</span>
                 {exportingFormat && <span className="text-orange-400 font-mono">{exportProgress}%</span>}
