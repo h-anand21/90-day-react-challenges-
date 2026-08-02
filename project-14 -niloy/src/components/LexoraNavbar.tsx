@@ -38,14 +38,18 @@ export const LexoraNavbar: React.FC = () => {
           </button>
           
           <a
-            href="#demo"
+            href="http://localhost:5174/record"
+            target="_blank"
+            rel="noreferrer"
             className="px-4 py-1.5 rounded-full text-xs font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/15 transition-all"
           >
             Login
           </a>
 
           <a
-            href="#demo"
+            href="http://localhost:5174/record"
+            target="_blank"
+            rel="noreferrer"
             className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold text-white glow-orange-button transition-all"
           >
             <span>Get Started</span>

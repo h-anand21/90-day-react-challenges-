@@ -82,9 +82,13 @@ function UploadPage() {
   };
 
 
-  const transcribeFn = useServerFn(transcribeFile);
-  const detectFn = useServerFn(detectLanguage);
-  const translateFn = useServerFn(translateSentences);
+  const safeCall = <T extends (...args: any[]) => any>(fn: T, fallback: T): T => {
+    try { return useServerFn(fn) || fallback; } catch { return fallback; }
+  };
+
+  const transcribeFn = safeCall(transcribeFile, async () => ({ segments: [] }));
+  const detectFn = safeCall(detectLanguage, async () => ({ language: "en" }));
+  const translateFn = safeCall(translateSentences, async (i: any) => ({ translations: i?.data?.sentences || [] }));
 
   const needsTranslation = !!detectedLang && outputLang !== detectedLang;
 

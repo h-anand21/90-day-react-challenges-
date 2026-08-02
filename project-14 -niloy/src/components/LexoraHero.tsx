@@ -192,10 +192,11 @@ export const LexoraHero: React.FC = () => {
           className="mt-8 mb-10 flex items-center justify-center gap-4"
         >
           <motion.a
-            href="#demo"
+            href="http://localhost:5174/record"
+            target="_blank"
+            rel="noreferrer"
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
-            onClick={toggleRecording}
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold text-white glow-orange-button transition-all shadow-2xl shadow-orange-500/50"
           >
             <span>Get Started Free</span>
@@ -203,7 +204,7 @@ export const LexoraHero: React.FC = () => {
           </motion.a>
 
           <motion.a
-            href="#demo"
+            href="#how-it-works"
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
             className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 backdrop-blur-md transition-all shadow-xl"

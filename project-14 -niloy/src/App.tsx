@@ -8,6 +8,18 @@ import { FAQ } from './components/FAQ';
 import { Footer } from './components/Footer';
 
 function App() {
+  React.useEffect(() => {
+    // If user navigates to /record, /demo, /live, auto-scroll to studio console
+    if (window.location.pathname.includes('record') || window.location.hash.includes('record')) {
+      setTimeout(() => {
+        const el = document.getElementById('studio-console');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-[#090b10] text-slate-100 font-sans selection:bg-orange-500 selection:text-white">
       <LexoraNavbar />

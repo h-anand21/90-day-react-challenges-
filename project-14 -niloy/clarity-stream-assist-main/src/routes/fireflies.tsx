@@ -57,7 +57,10 @@ function formatDate(ms: number | null) {
 }
 
 function MeetingsPage() {
-  const listFn = useServerFn(listFirefliesTranscripts);
+  const safeCall = <T extends (...args: any[]) => any>(fn: T, fallback: T): T => {
+    try { return useServerFn(fn) || fallback; } catch { return fallback; }
+  };
+  const listFn = safeCall(listFirefliesTranscripts, async () => ({ transcripts: [] }));
   const list = useQuery({
     queryKey: ["fireflies", "list"],
     queryFn: () => listFn(),

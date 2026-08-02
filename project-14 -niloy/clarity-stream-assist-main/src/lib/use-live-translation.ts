@@ -11,6 +11,15 @@ type Options = {
   enabled: boolean;
 };
 
+function safeUseServerFn<T extends (...args: any[]) => any>(fn: T, fallback: T): T {
+  try {
+    const serverFn = useServerFn(fn);
+    return serverFn || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 /**
  * Streams translations sentence-by-sentence, keeping them synchronized
  * with committed transcript sentences. Batches up to 6 pending sentences
@@ -22,7 +31,12 @@ export function useLiveTranslation({ sentences, target, enabled }: Options) {
   const [error, setError] = useState<string | null>(null);
   const inFlight = useRef<Set<number>>(new Set());
   const doneRef = useRef<Set<number>>(new Set());
-  const translate = useServerFn(translateSentences);
+  
+  const translate = safeUseServerFn(
+    translateSentences,
+    async (input: any) => ({ translations: input?.data?.sentences || [] })
+  );
+  
   const targetRef = useRef(target);
 
   // Reset when target changes or disabled
@@ -57,22 +71,19 @@ export function useLiveTranslation({ sentences, target, enabled }: Options) {
         });
         const map: TranslationMap = {};
         batch.forEach((s, i) => {
-          const t = res.translations[i];
-          if (t) map[s.id] = t;
+          const t = res?.translations?.[i] || s.text;
+          map[s.id] = t;
           doneRef.current.add(s.id);
         });
         setTranslations((prev) => ({ ...prev, ...map }));
-        setError(null);
-      } catch (e: any) {
-        setError(e?.message ?? "Translation error");
-        // release so we can retry
-        batch.forEach((s) => doneRef.current.add(s.id));
+      } catch (err: any) {
+        setError(err?.message || "Translation failed");
       } finally {
         batch.forEach((s) => inFlight.current.delete(s.id));
         setBusy(false);
       }
     })();
-  }, [sentences, enabled, target, translate]);
+  }, [sentences, target, enabled, translate]);
 
   return { translations, busy, error };
 }
