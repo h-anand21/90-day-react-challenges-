@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
+import path from "path";
 
 // Plugin to mock cloudflare:workers so browser import-analysis resolves smoothly
 const cloudflareWorkersPlugin = () => ({
@@ -19,40 +20,11 @@ const cloudflareWorkersPlugin = () => ({
   },
 });
 
-// Plugin to polyfill node:async_hooks for browser environment
-const nodeAsyncHooksMockPlugin = () => ({
-  name: "mock-node-async-hooks",
-  resolveId(id: string) {
-    if (id === "node:async_hooks" || id === "async_hooks") {
-      return "\0node:async_hooks";
-    }
-  },
-  load(id: string) {
-    if (id === "\0node:async_hooks") {
-      return `
-        export class AsyncLocalStorage {
-          disable() {}
-          getStore() { return undefined; }
-          run(store, callback, ...args) { return callback ? callback(...args) : undefined; }
-          exit(callback, ...args) { return callback ? callback(...args) : undefined; }
-          enterWith() {}
-        }
-        export class AsyncResource {
-          runInAsyncScope(fn, ...args) { return fn(...args); }
-          emitDestroy() {}
-          asyncId() { return 0; }
-          triggerAsyncId() { return 0; }
-        }
-        export default { AsyncLocalStorage, AsyncResource };
-      `;
-    }
-  },
-});
+const polyfillPath = path.resolve(__dirname, "./src/lib/async-hooks-polyfill.ts");
 
 export default defineConfig({
   plugins: [
     cloudflareWorkersPlugin(),
-    nodeAsyncHooksMockPlugin(),
     TanStackRouterVite({ target: "react", autoCodeSplitting: true }),
     react(),
     tailwindcss(),
@@ -60,8 +32,13 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": "/src",
+      "@": path.resolve(__dirname, "./src"),
+      "node:async_hooks": polyfillPath,
+      "async_hooks": polyfillPath,
     },
+  },
+  optimizeDeps: {
+    include: ["@tanstack/react-start"],
   },
   server: {
     port: 5174,
