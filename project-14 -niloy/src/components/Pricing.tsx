@@ -65,9 +65,11 @@ export const Pricing: React.FC = () => {
     }
   ];
 
+  const getRecordUrl = () => typeof window !== 'undefined' && window.location.hostname !== 'localhost' ? 'https://claritystream.vercel.app/record' : 'http://localhost:5174/record';
+
   const handleCheckout = (plan: { name: string; price: string; period: string }) => {
     if (plan.price === '₹0') {
-      window.location.href = 'http://localhost:5174/record';
+      window.location.href = getRecordUrl();
       return;
     }
     // Open Payment Verification Modal for ₹499 & ₹999
@@ -123,7 +125,7 @@ export const Pricing: React.FC = () => {
 
     setTimeout(() => {
       setSelectedPlan(null);
-      window.location.href = 'http://localhost:5174/record';
+      window.location.href = getRecordUrl();
     }, 3000);
   };
 

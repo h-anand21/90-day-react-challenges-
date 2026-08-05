@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Mic, Heart, Globe, Share2, MessageSquare, ArrowRight, CheckCircle2, X, Shield, Lock, FileText } from 'lucide-react';
+import { getRecordUrl, getLibraryUrl, getAppShareUrl } from '@/config/urls';
 
 export const Footer: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [activeModal, setActiveModal] = useState<'privacy' | 'terms' | 'soc2' | 'accessibility' | null>(null);
 
   const handleShare = () => {
-    navigator.clipboard.writeText('http://localhost:5174/');
+    navigator.clipboard.writeText(getAppShareUrl());
     setCopied(true);
     setTimeout(() => setCopied(false), 3000);
   };
@@ -17,6 +18,9 @@ export const Footer: React.FC = () => {
       contactEl.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  const recordUrl = getRecordUrl();
+  const libraryUrl = getLibraryUrl();
 
   return (
     <footer className="bg-[#050608] border-t border-white/10 pt-16 pb-12 text-slate-400 text-sm relative">
@@ -39,7 +43,7 @@ export const Footer: React.FC = () => {
               Join thousands of students, researchers, and professionals transcribing with 99.4% AI accuracy.
             </p>
             <a
-              href="http://localhost:5174/record"
+              href={recordUrl}
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-slate-950 text-white font-bold text-sm hover:bg-slate-900 shadow-xl hover:scale-105 active:scale-95 transition-all"
             >
               <span>Start Live Session Now</span>
@@ -101,9 +105,9 @@ export const Footer: React.FC = () => {
           <div className="text-left">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4">Product</h4>
             <ul className="space-y-2.5 text-xs">
-              <li><a href="http://localhost:5174/record" className="hover:text-orange-400 transition-colors">Live Session Demo</a></li>
-              <li><a href="http://localhost:5174/record" className="hover:text-orange-400 transition-colors">Speech-to-Text</a></li>
-              <li><a href="http://localhost:5174/record" className="hover:text-orange-400 transition-colors">Live Translation</a></li>
+              <li><a href={recordUrl} className="hover:text-orange-400 transition-colors">Live Session Demo</a></li>
+              <li><a href={recordUrl} className="hover:text-orange-400 transition-colors">Speech-to-Text</a></li>
+              <li><a href={recordUrl} className="hover:text-orange-400 transition-colors">Live Translation</a></li>
               <li><a href="#pricing" className="hover:text-orange-400 transition-colors">Pricing Plans</a></li>
             </ul>
           </div>
@@ -113,8 +117,8 @@ export const Footer: React.FC = () => {
             <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-4">Accessibility</h4>
             <ul className="space-y-2.5 text-xs">
               <li><button onClick={() => setActiveModal('accessibility')} className="hover:text-orange-400 transition-colors text-left">Deaf & Hard-of-Hearing</button></li>
-              <li><a href="http://localhost:5174/record" className="hover:text-orange-400 transition-colors">Lecture Captions</a></li>
-              <li><a href="http://localhost:5174/library" className="hover:text-orange-400 transition-colors">Meeting Notes</a></li>
+              <li><a href={recordUrl} className="hover:text-orange-400 transition-colors">Lecture Captions</a></li>
+              <li><a href={libraryUrl} className="hover:text-orange-400 transition-colors">Meeting Notes</a></li>
               <li><button onClick={() => setActiveModal('accessibility')} className="hover:text-orange-400 transition-colors text-left">WCAG 2.1 AAA Standard</button></li>
             </ul>
           </div>

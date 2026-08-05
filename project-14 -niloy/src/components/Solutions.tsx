@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GraduationCap, School, Building2, HeartHandshake, CheckCircle2, ArrowRight, Sparkles, Shield, Zap } from 'lucide-react';
+import { getRecordUrl } from '@/config/urls';
 
 const SOLUTIONS = [
   {
@@ -141,7 +142,7 @@ export const Solutions: React.FC = () => {
 
               <div className="pt-4 flex flex-wrap items-center gap-4">
                 <a
-                  href="http://localhost:5174/record"
+                  href={getRecordUrl()}
                   className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-orange-500/30 hover:scale-105 transition-transform"
                 >
                   <span>Try Solution in Studio</span>

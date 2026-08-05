@@ -13,6 +13,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { ClarityStreamConsole } from './ClarityStreamConsole';
+import { getRecordUrl } from '@/config/urls';
 
 export const LexoraHero: React.FC = () => {
   const [isRecording, setIsRecording] = useState(true);
@@ -192,9 +193,7 @@ export const LexoraHero: React.FC = () => {
           className="mt-8 mb-10 flex items-center justify-center gap-4"
         >
           <motion.a
-            href="http://localhost:5174/record"
-            target="_blank"
-            rel="noreferrer"
+            href={getRecordUrl()}
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-bold text-white glow-orange-button transition-all shadow-2xl shadow-orange-500/50"
