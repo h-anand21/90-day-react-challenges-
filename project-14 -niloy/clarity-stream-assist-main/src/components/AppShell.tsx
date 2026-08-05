@@ -3,6 +3,7 @@ import { TopNav } from "./TopNav";
 import { FloatingDock } from "./FloatingDock";
 import { CommandPalette } from "./CommandPalette";
 import { AccessibilityPanel } from "./AccessibilityPanel";
+import { AIChat, AIChatFab } from "./AIChat";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -20,6 +21,8 @@ export function AppShell({ children }: { children: ReactNode }) {
       
       <CommandPalette />
       <AccessibilityPanel />
+      <AIChatFab />
+      <AIChat />
     </div>
   );
 }

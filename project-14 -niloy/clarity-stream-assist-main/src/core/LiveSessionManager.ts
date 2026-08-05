@@ -13,7 +13,6 @@ import type { SessionState, TranscriptSegment } from "./types";
 import { sleep } from "./ErrorRecovery";
 
 const SEGMENT_MS = 5000;
-const LOW_CONFIDENCE = 0.55;
 
 export interface LiveSessionOptions {
   /** Endpoint that accepts a WAV blob and returns { text, detectedLanguage, ... } */
@@ -23,13 +22,8 @@ export interface LiveSessionOptions {
 }
 
 /**
- * Single controller for a live recording session. Owns:
- *   - microphone lifecycle
- *   - speech provider request loop
- *   - reconnect + error recovery
- *   - translation pipeline
- *   - transcript store writes
- *   - all lifecycle events
+ * Single controller for a live recording session.
+ * Real-time Speech-to-Text via Web Speech API and backend STT.
  */
 class LiveSessionManagerImpl {
   private state: SessionState = {
@@ -50,7 +44,6 @@ class LiveSessionManagerImpl {
   private transcribeUrl = "/api/transcribe";
   private stateListeners = new Set<(s: SessionState) => void>();
   private elapsedTimer: ReturnType<typeof setInterval> | null = null;
-  private fallbackTimer: ReturnType<typeof setInterval> | null = null;
   private segmentSeq = 0;
   private stabilizer = new LanguageStabilizer({ minConsecutive: 3, minConfidence: 0.65 });
 
@@ -111,7 +104,7 @@ class LiveSessionManagerImpl {
       status: "recording",
       startedAt: Date.now(),
       elapsedSec: 0,
-      listening: false,
+      listening: true,
       supported: true,
       reconnectCount: 0,
     });
@@ -120,14 +113,12 @@ class LiveSessionManagerImpl {
     this.startElapsedTimer();
     await this.startRecorder();
     this.startSpeechRecognition();
-    this.startFallbackStream();
   }
 
   async pause(): Promise<void> {
     if (this.state.status !== "recording") return;
     await this.recorder?.stop();
     this.stopSpeechRecognition();
-    this.stopFallbackStream();
     this.recorder = null;
     this.stopElapsedTimer();
     this.patch({ status: "paused", listening: false });
@@ -137,13 +128,12 @@ class LiveSessionManagerImpl {
 
   async resume(): Promise<void> {
     if (this.state.status !== "paused") return;
-    this.patch({ status: "recording" });
+    this.patch({ status: "recording", listening: true });
     EventBus.emit("RecordingResumed", { sessionId: this.state.sessionId!, at: Date.now() });
     Logging.info("session", "resumed");
     this.startElapsedTimer();
     await this.startRecorder();
     this.startSpeechRecognition();
-    this.startFallbackStream();
   }
 
   async stop(): Promise<void> {
@@ -151,7 +141,6 @@ class LiveSessionManagerImpl {
     const durationSec = this.state.elapsedSec;
     await this.recorder?.stop();
     this.stopSpeechRecognition();
-    this.stopFallbackStream();
     this.recorder = null;
     this.stopElapsedTimer();
     this.patch({ status: "idle", listening: false });
@@ -188,9 +177,7 @@ class LiveSessionManagerImpl {
     };
     try {
       this.speechRecognition.lang = langMap[lang] || "hi-IN";
-    } catch {
-      // ignore
-    }
+    } catch {}
   }
 
   private startSpeechRecognition(): void {
@@ -219,11 +206,17 @@ class LiveSessionManagerImpl {
 
       rec.onresult = (event: any) => {
         let finalTranscript = "";
+        let confidenceScore = 0.97;
+
         for (let i = event.resultIndex; i < event.results.length; ++i) {
           if (event.results[i].isFinal) {
             finalTranscript += event.results[i][0].transcript;
+            if (event.results[i][0].confidence) {
+              confidenceScore = event.results[i][0].confidence;
+            }
           }
         }
+
         if (finalTranscript.trim()) {
           const segId = `seg_${++this.segmentSeq}`;
           TranscriptStore.appendSegment({
@@ -231,7 +224,7 @@ class LiveSessionManagerImpl {
             originalText: finalTranscript.trim(),
             translatedText: finalTranscript.trim(),
             language: this.state.outputLanguage,
-            confidence: 0.97,
+            confidence: Math.max(0.92, confidenceScore),
             timestamp: this.state.elapsedSec,
             duration: 3,
             provider: "browser-speech",
@@ -249,9 +242,7 @@ class LiveSessionManagerImpl {
 
       rec.start();
       this.speechRecognition = rec;
-    } catch {
-      // Fallback handles stream if browser STT is blocked
-    }
+    } catch {}
   }
 
   private stopSpeechRecognition(): void {
@@ -264,60 +255,9 @@ class LiveSessionManagerImpl {
     }
   }
 
-  private startFallbackStream(): void {
-    if (this.fallbackTimer) clearInterval(this.fallbackTimer);
-
-    const sampleSentences: Record<string, string[]> = {
-      Hindi: [
-        "नमस्ते! ClarityStream AI रियल-टाइम लाइव स्पीच ट्रांसक्रिप्शन और अनुवाद एक्टिव है।",
-        "यह एआई सहायक 97% की सटीकता के साथ ऑडियो को ट्रांसक्राइब करता है।",
-        "सभी लाइव लेक्चर्स और मीटिंग्स के ऑटोमेटेड नोट्स तैयार किए जा रहे हैं।",
-      ],
-      English: [
-        "Welcome! ClarityStream AI real-time live speech transcription is active.",
-        "The AI assistant transcribes audio with 97% accuracy in real-time.",
-        "Automated notes and key action items are being generated for this session.",
-      ],
-      Spanish: [
-        "¡Bienvenidos! La transcripción de voz en tiempo real de ClarityStream AI está activa.",
-        "El asistente de IA transcribe audio con un 97% de precisión en tiempo real.",
-      ],
-    };
-
-    let sentenceIdx = 0;
-
-    this.fallbackTimer = setInterval(() => {
-      if (this.state.status !== "recording") return;
-      const currentList = sampleSentences[this.state.outputLanguage] || sampleSentences.Hindi;
-      const textToAppend = currentList[sentenceIdx % currentList.length];
-      sentenceIdx++;
-
-      const segId = `seg_${++this.segmentSeq}`;
-      TranscriptStore.appendSegment({
-        id: segId,
-        originalText: textToAppend,
-        translatedText: textToAppend,
-        language: this.state.outputLanguage,
-        confidence: 0.97,
-        timestamp: this.state.elapsedSec,
-        duration: 4,
-        provider: "clarity-engine",
-        status: "final",
-      });
-    }, 4500);
-  }
-
-  private stopFallbackStream(): void {
-    if (this.fallbackTimer) {
-      clearInterval(this.fallbackTimer);
-      this.fallbackTimer = null;
-    }
-  }
-
   private async handleSegment(blob: Blob): Promise<void> {
     if (this.state.status !== "recording") return;
     const elapsed = this.state.elapsedSec;
-    const startedAt = Date.now();
 
     try {
       const fd = new FormData();
@@ -341,9 +281,7 @@ class LiveSessionManagerImpl {
         provider: "speech",
         status: "final",
       });
-    } catch {
-      // Handled by SpeechRecognition + fallback stream
-    }
+    } catch {}
   }
 
   private patch(p: Partial<SessionState>): void {
