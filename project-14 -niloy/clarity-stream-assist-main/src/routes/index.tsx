@@ -16,6 +16,9 @@ import {
   Zap,
   Volume2,
   CheckCircle2,
+  Radio,
+  FileText,
+  UserCheck,
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Waveform } from "@/components/Waveform";
@@ -40,40 +43,89 @@ function greeting() {
   return "Good evening";
 }
 
-const SAMPLE_TEST_CAPTION = "🎙️ Capturing live speech input... ClarityStream AI is transcribing audio line-by-line with 97% confidence and sub-50ms latency.";
-const SAMPLE_TEST_TRANSLATION = "🇮🇳 हिंदी अनुवाद: लाइव ऑडियो ट्रांसक्रिप्शन और रियल-टाइम AI व्याख्यान रिकॉर्डिंग active है।";
+const LIVE_SPEECH_STREAM = [
+  {
+    speaker: "Prof. Sharma (Lecture Mic)",
+    en: "🎙️ Live Speech Input: Welcome to today's lecture on AI Accessibility and Real-Time Speech Processing.",
+    hi: "🇮🇳 लाइव हिंदी अनुवाद: एआई एक्सेसिबिलिटी और रियल-टाइम स्पीच प्रोसेसिंग पर आज के व्याख्यान में आपका स्वागत है।",
+    precision: "99.6%",
+  },
+  {
+    speaker: "Student Q&A (Rohan)",
+    en: "🎙️ Live Speech Input: How fast does ClarityStream AI process multi-language live captions?",
+    hi: "🇮🇳 लाइव हिंदी अनुवाद: ClarityStream AI कितनी तेजी से बहुभाषी लाइव कैप्शन प्रोसेस करता है?",
+    precision: "99.4%",
+  },
+  {
+    speaker: "AI Engine Response",
+    en: "🎙️ Live Speech Input: Capturing live audio with under 50ms latency and 99.8% precision across 20+ languages.",
+    hi: "🇮🇳 लाइव हिंदी अनुवाद: 50 मिलीसेकंड से कम की विलंबता के साथ 20 से अधिक भाषाओं में लाइव ऑडियो कैप्चर हो रहा है।",
+    precision: "99.8%",
+  },
+  {
+    speaker: "Dr. Ananya (Seminar Host)",
+    en: "🎙️ Live Speech Input: Automated action items and meeting minutes are being generated and saved in real-time.",
+    hi: "🇮🇳 लाइव हिंदी अनुवाद: स्वचालित कार्रवाई आइटम और मीटिंग सारांश नोट्स रियल-टाइम में सहेजे जा रहे हैं।",
+    precision: "99.5%",
+  },
+];
 
 function Home() {
   const { hydrated, theme } = useApp();
-  const [paused, setPaused] = useState(false);
-  const [isTestingAnimation, setIsTestingAnimation] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [streamIndex, setStreamIndex] = useState(0);
   const [typedText, setTypedText] = useState("");
   const [typedHindi, setTypedHindi] = useState("");
 
-  const runTestAnimation = () => {
-    setIsTestingAnimation(true);
-    setPaused(false);
+  const currentItem = LIVE_SPEECH_STREAM[streamIndex];
+
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    let isCancelled = false;
     setTypedText("");
     setTypedHindi("");
 
     let i = 0;
-    const interval = setInterval(() => {
-      if (i < SAMPLE_TEST_CAPTION.length) {
-        setTypedText(SAMPLE_TEST_CAPTION.slice(0, i + 1));
+    const enInterval = setInterval(() => {
+      if (isCancelled) return;
+      if (i < currentItem.en.length) {
+        setTypedText(currentItem.en.slice(0, i + 1));
         i++;
       } else {
-        clearInterval(interval);
+        clearInterval(enInterval);
         let j = 0;
-        const intervalHindi = setInterval(() => {
-          if (j < SAMPLE_TEST_TRANSLATION.length) {
-            setTypedHindi(SAMPLE_TEST_TRANSLATION.slice(0, j + 1));
+        const hiInterval = setInterval(() => {
+          if (isCancelled) return;
+          if (j < currentItem.hi.length) {
+            setTypedHindi(currentItem.hi.slice(0, j + 1));
             j++;
           } else {
-            clearInterval(intervalHindi);
+            clearInterval(hiInterval);
+            const timeout = setTimeout(() => {
+              if (!isCancelled) {
+                setStreamIndex((prev) => (prev + 1) % LIVE_SPEECH_STREAM.length);
+              }
+            }, 2000);
+            return () => clearTimeout(timeout);
           }
-        }, 30);
+        }, 18);
       }
-    }, 25);
+    }, 16);
+
+    return () => {
+      isCancelled = true;
+      clearInterval(enInterval);
+    };
+  }, [streamIndex, isPlaying]);
+
+  const togglePlayback = () => {
+    setIsPlaying((prev) => !prev);
+  };
+
+  const forceNextStream = () => {
+    setIsPlaying(true);
+    setStreamIndex((prev) => (prev + 1) % LIVE_SPEECH_STREAM.length);
   };
 
   return (
@@ -198,7 +250,7 @@ function Home() {
 
       </section>
 
-      {/* MAIN STUDIO HERO BANNER CARD WITH TEST ANIMATION DEMO ENGINE */}
+      {/* MAIN STUDIO HERO BANNER CARD WITH CONTINUOUS MULTI-SPEAKER LIVE AUDIO STREAM */}
       <motion.section
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -209,19 +261,56 @@ function Home() {
           
           {/* Left Text & CTAs */}
           <div className="md:col-span-7 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-500 text-xs font-bold shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping" />
-              <span>Real-time AI, always listening</span>
-            </div>
+            {/* Tag Pill with glowing pulsing dot & animated text */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              whileHover={{ scale: 1.05 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-500/15 via-amber-500/15 to-orange-500/15 border border-orange-500/30 text-orange-500 text-xs font-black tracking-wide shadow-sm"
+            >
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-500" />
+              </span>
+              <span className="gradient-text-animated font-extrabold uppercase tracking-wider text-[11px]">Real-time AI, always listening</span>
+            </motion.div>
 
-            <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-card-foreground tracking-tight leading-[1.08]">
-              Real-Time <span className="gradient-text">AI Accessibility</span> Assistant
-            </h2>
+            {/* Headline with Staggered Word Entrance & Continuous Shimmer Animation */}
+            <motion.h2
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
+              }}
+              className="text-3xl sm:text-5xl md:text-6xl font-black text-card-foreground tracking-tight leading-[1.08]"
+            >
+              <motion.span
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                className="inline-block mr-2 sm:mr-3"
+              >
+                Real-Time
+              </motion.span>
+              <motion.span
+                variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }}
+                className="gradient-text-animated inline-block mr-2 sm:mr-3 drop-shadow-sm"
+              >
+                AI Accessibility
+              </motion.span>
+              <motion.span
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+                className="inline-block"
+              >
+                Assistant
+              </motion.span>
+            </motion.h2>
 
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-lg">
               Record. Transcribe. Translate. Summarize. All in real time — designed for lectures, meetings, webinars and every learner.
             </p>
 
+            {/* CTAs */}
             <div className="pt-3 flex flex-wrap items-center gap-3">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
@@ -233,15 +322,15 @@ function Home() {
                 </Link>
               </motion.div>
 
-              {/* TEST ANIMATION NOW BUTTON */}
+              {/* TEST NEXT STREAM BUTTON */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={runTestAnimation}
+                onClick={forceNextStream}
                 className="inline-flex items-center gap-2 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 text-orange-500 px-6 py-3.5 rounded-full font-extrabold text-xs sm:text-sm transition-all shadow-sm"
               >
-                <Zap className="w-4 h-4 fill-orange-500" />
-                <span>Test Animation Now</span>
+                <Zap className="w-4 h-4 fill-orange-500 animate-pulse" />
+                <span>Next Speech Sentence →</span>
               </motion.button>
 
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -255,37 +344,41 @@ function Home() {
               </motion.div>
             </div>
 
-            {/* LIVE TEST ANIMATION CAPTION BOX OVERLAY */}
-            <AnimatePresence>
-              {isTestingAnimation && (
-                <motion.div
-                  initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="mt-4 p-4 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-left space-y-2 backdrop-blur-md shadow-inner"
-                >
-                  <div className="flex items-center justify-between text-xs font-bold text-orange-500">
-                    <span className="flex items-center gap-1.5">
-                      <Volume2 className="w-3.5 h-3.5 animate-bounce" />
-                      <span>Live Visual Audio Stream</span>
-                    </span>
-                    <span className="flex items-center gap-1 text-[11px] bg-orange-500 text-white px-2 py-0.5 rounded-full">
-                      <CheckCircle2 className="w-3 h-3" />
-                      <span>97% Confidence</span>
-                    </span>
-                  </div>
+            {/* CONTINUOUS MULTI-SPEAKER LIVE AUDIO STREAM BOX */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={streamIndex}
+                initial={{ opacity: 0, y: 15, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -15, scale: 0.97 }}
+                transition={{ duration: 0.35 }}
+                className="mt-4 p-4.5 rounded-2xl bg-orange-500/10 border border-orange-500/30 text-left space-y-2.5 backdrop-blur-md shadow-inner relative overflow-hidden"
+              >
+                <div className="flex items-center justify-between text-xs font-extrabold text-orange-500">
+                  <span className="flex items-center gap-1.5">
+                    <UserCheck className="w-4 h-4 animate-bounce text-orange-500" />
+                    <span>Speaker: {currentItem.speaker}</span>
+                  </span>
+                  <span className="flex items-center gap-1 text-[11px] bg-orange-500 text-white font-bold px-2.5 py-0.5 rounded-full shadow-sm">
+                    <CheckCircle2 className="w-3 h-3" />
+                    <span>{currentItem.precision} Precision</span>
+                  </span>
+                </div>
 
-                  <p className="text-xs sm:text-sm font-semibold text-foreground font-mono leading-relaxed">
-                    {typedText || "Listening for speech..."}
+                {/* Typewriter Speech Stream */}
+                <div className="space-y-1.5 pt-1">
+                  <p className="text-xs sm:text-sm font-semibold text-foreground font-mono leading-relaxed flex items-start gap-2">
+                    <FileText className="w-4 h-4 text-orange-500 shrink-0 mt-0.5" />
+                    <span>{typedText || "Listening to audio..."}</span>
                   </p>
 
                   {typedHindi && (
-                    <p className="text-xs sm:text-sm font-bold text-orange-400 font-sans leading-relaxed pt-1 border-t border-orange-500/20">
+                    <p className="text-xs sm:text-sm font-bold text-orange-400 font-sans leading-relaxed pt-2 border-t border-orange-500/20">
                       {typedHindi}
                     </p>
                   )}
-                </motion.div>
-              )}
+                </div>
+              </motion.div>
             </AnimatePresence>
           </div>
 
@@ -294,38 +387,39 @@ function Home() {
             
             {/* Concentric Radar Rings */}
             <div className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-full flex items-center justify-center">
-              <div className={`absolute inset-0 rounded-full border border-orange-500/20 animate-ping ${isTestingAnimation ? "opacity-60" : "opacity-30"}`} style={{ animationDuration: isTestingAnimation ? "1.5s" : "4s" }} />
+              <div className={`absolute inset-0 rounded-full border border-orange-500/20 animate-ping ${isPlaying ? "opacity-60" : "opacity-20"}`} style={{ animationDuration: isPlaying ? "1.5s" : "4s" }} />
               <div className="absolute inset-6 rounded-full border border-orange-500/30 animate-pulse" />
               <div className="absolute inset-12 rounded-full border border-orange-500/40" />
               
               {/* Pulsing Mic Orb Button */}
               <motion.div
-                animate={{ scale: isTestingAnimation ? [1, 1.15, 1] : [1, 1.06, 1] }}
-                transition={{ duration: isTestingAnimation ? 1 : 2.5, repeat: Infinity, ease: "easeInOut" }}
-                onClick={runTestAnimation}
-                className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full gradient-primary text-white shadow-2xl shadow-orange-500/50 flex items-center justify-center cursor-pointer"
+                animate={{ scale: isPlaying ? [1, 1.12, 1] : [1, 1.04, 1] }}
+                transition={{ duration: isPlaying ? 1 : 2.5, repeat: Infinity, ease: "easeInOut" }}
+                onClick={togglePlayback}
+                className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full gradient-primary text-white shadow-2xl shadow-orange-500/50 flex items-center justify-center cursor-pointer active:scale-95 transition-transform"
+                title="Click to toggle live audio wave animation"
               >
                 <Mic className="w-12 h-12 text-white" />
               </motion.div>
             </div>
 
-            {/* Floating Live Audio Waveform Control Pill */}
+            {/* Floating Live Audio Waveform Control Pill with Interactive Pause/Play */}
             <motion.div
-              whileHover={{ scale: 1.03 }}
+              whileHover={{ scale: 1.04 }}
               className="mt-4 w-full max-w-sm rounded-full bg-card/95 border border-border p-3 shadow-2xl flex items-center gap-3 backdrop-blur-xl"
             >
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => setPaused((p) => !p)}
-                aria-label={paused ? "Resume" : "Pause"}
-                className="w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center shrink-0 hover:scale-105 active:scale-95 transition-all shadow-md"
+                onClick={togglePlayback}
+                aria-label={isPlaying ? "Pause audio wave animation" : "Play audio wave animation"}
+                className="w-11 h-11 rounded-full bg-foreground text-background flex items-center justify-center shrink-0 hover:scale-105 active:scale-95 transition-all shadow-md"
               >
-                {paused ? <Play className="w-4 h-4 fill-current" /> : <Pause className="w-4 h-4 fill-current" />}
+                {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
               </motion.button>
 
-              <div className={`flex-1 transition-opacity ${paused ? "opacity-30" : "opacity-100"}`}>
-                <Waveform active={!paused || isTestingAnimation} bars={36} />
+              <div className={`flex-1 transition-opacity ${isPlaying ? "opacity-100" : "opacity-40"}`}>
+                <Waveform active={isPlaying} bars={38} />
               </div>
             </motion.div>
 
