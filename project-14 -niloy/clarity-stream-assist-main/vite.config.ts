@@ -4,6 +4,12 @@ import tailwindcss from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const polyfillPath = path.resolve(__dirname, "./src/lib/async-hooks-polyfill.ts");
 
 // Plugin to mock cloudflare:workers so browser import-analysis resolves smoothly
 const cloudflareWorkersPlugin = () => ({
@@ -20,8 +26,6 @@ const cloudflareWorkersPlugin = () => ({
   },
 });
 
-const polyfillPath = path.resolve(__dirname, "./src/lib/async-hooks-polyfill.ts");
-
 export default defineConfig({
   plugins: [
     cloudflareWorkersPlugin(),
@@ -33,8 +37,6 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "react": path.resolve(__dirname, "./node_modules/react"),
-      "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
       "node:async_hooks": polyfillPath,
       "async_hooks": polyfillPath,
     },
