@@ -43,6 +43,20 @@ function greeting() {
   return "Good evening";
 }
 
+const HERO_ROTATING_SUBTITLES = [
+  "AI Accessibility Assistant",
+  "Live Lecture Translator",
+  "Meeting Notes Summarizer",
+  "Universal Speech Engine",
+];
+
+const TAG_ROTATING_MESSAGES = [
+  "Real-time AI, always listening",
+  "Sub-50ms Ultra-Low Latency",
+  "99.4% Precision Accuracy",
+  "20+ Live Languages Active",
+];
+
 const LIVE_SPEECH_STREAM = [
   {
     speaker: "Prof. Sharma (Lecture Mic)",
@@ -73,12 +87,80 @@ const LIVE_SPEECH_STREAM = [
 function Home() {
   const { hydrated, theme } = useApp();
   const [isPlaying, setIsPlaying] = useState(true);
+  
+  // Dynamic Headline Typewriter State
+  const [heroTitleIndex, setHeroTitleIndex] = useState(0);
+  const [heroTypedTitle, setHeroTypedTitle] = useState("");
+
+  // Dynamic Tag Pill Typewriter State
+  const [tagIndex, setTagIndex] = useState(0);
+  const [typedTagText, setTypedTagText] = useState("");
+
+  // Continuous Multi-Speaker Stream State
   const [streamIndex, setStreamIndex] = useState(0);
   const [typedText, setTypedText] = useState("");
   const [typedHindi, setTypedHindi] = useState("");
 
-  const currentItem = LIVE_SPEECH_STREAM[streamIndex];
+  // Headline Rotating Typewriter Effect
+  useEffect(() => {
+    let isSubscribed = true;
+    const fullText = HERO_ROTATING_SUBTITLES[heroTitleIndex];
+    setHeroTypedTitle("");
 
+    let charIndex = 0;
+    const typeTimer = setInterval(() => {
+      if (!isSubscribed) return;
+      if (charIndex < fullText.length) {
+        setHeroTypedTitle(fullText.slice(0, charIndex + 1));
+        charIndex++;
+      } else {
+        clearInterval(typeTimer);
+        const holdTimer = setTimeout(() => {
+          if (isSubscribed) {
+            setHeroTitleIndex((prev) => (prev + 1) % HERO_ROTATING_SUBTITLES.length);
+          }
+        }, 2200);
+        return () => clearTimeout(holdTimer);
+      }
+    }, 40);
+
+    return () => {
+      isSubscribed = false;
+      clearInterval(typeTimer);
+    };
+  }, [heroTitleIndex]);
+
+  // Tag Pill Rotating Typewriter Effect
+  useEffect(() => {
+    let isSubscribed = true;
+    const fullTag = TAG_ROTATING_MESSAGES[tagIndex];
+    setTypedTagText("");
+
+    let charIndex = 0;
+    const tagTimer = setInterval(() => {
+      if (!isSubscribed) return;
+      if (charIndex < fullTag.length) {
+        setTypedTagText(fullTag.slice(0, charIndex + 1));
+        charIndex++;
+      } else {
+        clearInterval(tagTimer);
+        const holdTimer = setTimeout(() => {
+          if (isSubscribed) {
+            setTagIndex((prev) => (prev + 1) % TAG_ROTATING_MESSAGES.length);
+          }
+        }, 2500);
+        return () => clearTimeout(holdTimer);
+      }
+    }, 35);
+
+    return () => {
+      isSubscribed = false;
+      clearInterval(tagTimer);
+    };
+  }, [tagIndex]);
+
+  // Continuous Speech Stream Typewriter Effect
+  const currentItem = LIVE_SPEECH_STREAM[streamIndex];
   useEffect(() => {
     if (!isPlaying) return;
 
@@ -250,7 +332,7 @@ function Home() {
 
       </section>
 
-      {/* MAIN STUDIO HERO BANNER CARD WITH CONTINUOUS MULTI-SPEAKER LIVE AUDIO STREAM */}
+      {/* MAIN STUDIO HERO BANNER CARD WITH TYPEWRITER TITLE & TAG ANIMATIONS */}
       <motion.section
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -261,50 +343,41 @@ function Home() {
           
           {/* Left Text & CTAs */}
           <div className="md:col-span-7 space-y-4">
-            {/* Tag Pill with glowing pulsing dot & animated text */}
+            
+            {/* Tag Pill with LIVE Typewriter Message Animation */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
-              whileHover={{ scale: 1.05 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-500/15 via-amber-500/15 to-orange-500/15 border border-orange-500/30 text-orange-500 text-xs font-black tracking-wide shadow-sm"
+              whileHover={{ scale: 1.04 }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-500/15 via-amber-500/15 to-orange-500/15 border border-orange-500/30 text-orange-500 text-xs font-black tracking-wide shadow-sm min-h-[32px]"
             >
-              <span className="relative flex h-2.5 w-2.5">
+              <span className="relative flex h-2.5 w-2.5 shrink-0">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-500" />
               </span>
-              <span className="gradient-text-animated font-extrabold uppercase tracking-wider text-[11px]">Real-time AI, always listening</span>
+              <span className="gradient-text-animated font-extrabold uppercase tracking-wider text-[11px]">
+                {typedTagText}
+                <motion.span animate={{ opacity: [1, 0, 1] }} transition={{ duration: 0.6, repeat: Infinity }} className="inline-block ml-0.5 text-orange-500">|</motion.span>
+              </span>
             </motion.div>
 
-            {/* Headline with Staggered Word Entrance & Continuous Shimmer Animation */}
-            <motion.h2
-              initial="hidden"
-              animate="visible"
-              variants={{
-                hidden: { opacity: 0 },
-                visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
-              }}
-              className="text-3xl sm:text-5xl md:text-6xl font-black text-card-foreground tracking-tight leading-[1.08]"
-            >
-              <motion.span
-                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-                className="inline-block mr-2 sm:mr-3"
-              >
-                Real-Time
-              </motion.span>
-              <motion.span
-                variants={{ hidden: { opacity: 0, scale: 0.8 }, visible: { opacity: 1, scale: 1 } }}
-                className="gradient-text-animated inline-block mr-2 sm:mr-3 drop-shadow-sm"
-              >
-                AI Accessibility
-              </motion.span>
-              <motion.span
-                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-                className="inline-block"
-              >
-                Assistant
-              </motion.span>
-            </motion.h2>
+            {/* Main Headline with DYNAMIC TYPEWRITER TITLE MORPHING ANIMATION */}
+            <div className="min-h-[110px] sm:min-h-[140px] flex items-center">
+              <h2 className="text-3xl sm:text-5xl md:text-6xl font-black text-card-foreground tracking-tight leading-[1.08]">
+                <span>Real-Time </span>
+                <span className="gradient-text-animated font-black inline-block">
+                  {heroTypedTitle}
+                  <motion.span
+                    animate={{ opacity: [1, 0, 1] }}
+                    transition={{ duration: 0.8, repeat: Infinity }}
+                    className="inline-block ml-1 text-orange-500"
+                  >
+                    |
+                  </motion.span>
+                </span>
+              </h2>
+            </div>
 
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-lg">
               Record. Transcribe. Translate. Summarize. All in real time — designed for lectures, meetings, webinars and every learner.

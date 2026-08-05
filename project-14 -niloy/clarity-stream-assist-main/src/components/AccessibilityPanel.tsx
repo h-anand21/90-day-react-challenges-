@@ -7,7 +7,7 @@ export function AccessibilityFab() {
     <button
       onClick={() => setA11yOpen(true)}
       aria-label="Accessibility options"
-      className="fixed left-5 bottom-24 md:bottom-5 z-30 w-12 h-12 rounded-full glass-strong grid place-items-center hover:scale-105 transition"
+      className="fixed left-5 bottom-24 md:bottom-5 z-30 w-12 h-12 rounded-full glass-strong grid place-items-center hover:scale-105 transition shadow-lg"
     >
       <Accessibility className="w-5 h-5 text-primary" />
     </button>
@@ -34,22 +34,36 @@ export function AccessibilityPanel() {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex" onClick={() => setA11yOpen(false)}>
-      <div className="flex-1 bg-foreground/10 backdrop-blur-sm" />
-      <aside className="w-full max-w-sm glass-strong h-full p-6 overflow-y-auto float-in" onClick={(e) => e.stopPropagation()} style={{ animationDuration: "0.3s" }}>
-        <div className="flex items-center justify-between mb-6">
+    <div className="fixed inset-0 z-[100] flex" onClick={() => setA11yOpen(false)}>
+      {/* Dark backdrop blur covering the whole screen */}
+      <div className="flex-1 bg-black/70 backdrop-blur-md transition-opacity" />
+      
+      {/* Opaque side drawer eliminating any text bleed-through */}
+      <aside
+        className="w-full max-w-sm bg-card border-l border-border h-full p-6 overflow-y-auto shadow-2xl relative z-10 text-card-foreground"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-6 pb-4 border-b border-border">
           <div>
-            <h2 className="text-lg font-bold">Accessibility</h2>
-            <p className="text-xs text-muted-foreground">Tailor AccessAI to your needs</p>
+            <h2 className="text-lg font-extrabold text-foreground">Accessibility</h2>
+            <p className="text-xs text-muted-foreground">Tailor ClarityStream AI to your needs</p>
           </div>
-          <button onClick={() => setA11yOpen(false)} className="p-2 rounded-xl hover:bg-muted"><X className="w-4 h-4" /></button>
+          <button
+            onClick={() => setA11yOpen(false)}
+            className="p-2 rounded-xl bg-muted/60 hover:bg-muted text-foreground transition"
+            aria-label="Close panel"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
-        <div className="mb-4 p-4 rounded-2xl bg-card/60 border border-border/60">
+        <div className="mb-4 p-4 rounded-2xl bg-muted/40 border border-border">
           <div className="flex items-center gap-3 mb-3">
-            <span className="w-9 h-9 rounded-xl bg-muted grid place-items-center text-primary"><Type className="w-4 h-4" /></span>
+            <span className="w-9 h-9 rounded-xl bg-primary/10 grid place-items-center text-primary">
+              <Type className="w-4 h-4" />
+            </span>
             <div className="flex-1">
-              <div className="text-sm font-medium">Text Size</div>
+              <div className="text-sm font-bold text-foreground">Text Size</div>
               <div className="text-[11px] text-muted-foreground">Applies across the app</div>
             </div>
           </div>
@@ -61,10 +75,16 @@ export function AccessibilityPanel() {
                   key={s.key}
                   onClick={() => setTextSize(s.key)}
                   aria-pressed={active}
-                  className={`rounded-xl border transition py-2.5 flex flex-col items-center gap-0.5 ${active ? "gradient-primary text-white border-transparent shadow" : "bg-card/60 border-border/60 hover:bg-card"}`}
+                  className={`rounded-xl border transition py-2.5 flex flex-col items-center gap-0.5 ${
+                    active
+                      ? "gradient-primary text-white border-transparent shadow-lg"
+                      : "bg-card border-border hover:bg-muted text-foreground"
+                  }`}
                 >
-                  <span className={`${s.key === "small" ? "text-xs" : s.key === "medium" ? "text-sm" : "text-base"} font-semibold`}>{s.sample}</span>
-                  <span className="text-[11px] opacity-80">{s.label}</span>
+                  <span className={`${s.key === "small" ? "text-xs" : s.key === "medium" ? "text-sm" : "text-base"} font-extrabold`}>
+                    {s.sample}
+                  </span>
+                  <span className="text-[11px] opacity-90 font-medium">{s.label}</span>
                 </button>
               );
             })}
@@ -72,26 +92,41 @@ export function AccessibilityPanel() {
         </div>
 
         <div className="space-y-2">
-
-          {items.map((i) => (
-            <button
-              key={i.label}
-              onClick={i.toggle}
-              className="w-full flex items-center gap-3 p-3.5 rounded-2xl bg-card/60 hover:bg-card transition border border-border/60"
+          {items.map((item) => (
+            <div
+              key={item.label}
+              className="p-3.5 rounded-2xl bg-muted/40 border border-border flex items-center justify-between gap-3"
             >
-              <span className="w-9 h-9 rounded-xl bg-muted grid place-items-center text-primary">{i.icon}</span>
-              <span className="flex-1 text-left">
-                <span className="block text-sm font-medium">{i.label}</span>
-                {i.hint && <span className="block text-[11px] text-muted-foreground">{i.hint}</span>}
-              </span>
-              <span className={`w-10 h-6 rounded-full transition ${i.on ? "gradient-primary" : "bg-muted"} relative`}>
-                <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition ${i.on ? "left-[18px]" : "left-0.5"}`} />
-              </span>
-            </button>
+              <div className="flex items-center gap-3">
+                <span className="w-8 h-8 rounded-xl bg-card border border-border grid place-items-center text-primary">
+                  {item.icon}
+                </span>
+                <span className="text-xs font-bold text-foreground">{item.label}</span>
+              </div>
+
+              {item.hint ? (
+                <span className="text-[11px] text-muted-foreground font-medium">{item.hint}</span>
+              ) : (
+                <button
+                  onClick={item.toggle}
+                  aria-pressed={item.on}
+                  className={`w-11 h-6 rounded-full transition-colors relative ${
+                    item.on ? "bg-primary" : "bg-muted-foreground/30"
+                  }`}
+                >
+                  <span
+                    className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white transition-transform ${
+                      item.on ? "translate-x-5" : ""
+                    }`}
+                  />
+                </button>
+              )}
+            </div>
           ))}
         </div>
-        <div className="mt-6 p-4 rounded-2xl bg-primary/5 border border-primary/20">
-          <p className="text-xs text-muted-foreground">Voice commands coming soon — speak "start recording" to control AccessAI hands-free.</p>
+
+        <div className="mt-6 p-4 rounded-2xl bg-primary/5 border border-primary/20 text-xs text-muted-foreground leading-relaxed">
+          Voice commands coming soon — speak &ldquo;start recording&rdquo; to control ClarityStream AI hands-free.
         </div>
       </aside>
     </div>
