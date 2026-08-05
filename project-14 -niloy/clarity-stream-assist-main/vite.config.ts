@@ -33,12 +33,15 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "react": path.resolve(__dirname, "./node_modules/react"),
+      "react-dom": path.resolve(__dirname, "./node_modules/react-dom"),
       "node:async_hooks": polyfillPath,
       "async_hooks": polyfillPath,
     },
+    dedupe: ["react", "react-dom"],
   },
   optimizeDeps: {
-    include: ["@tanstack/react-start"],
+    include: ["react", "react-dom", "framer-motion", "@tanstack/react-router"],
   },
   server: {
     port: 5174,

@@ -24,15 +24,15 @@ export function TopNav() {
 
   return (
     <header className="sticky top-0 z-40 px-4 pt-4">
-      <div className="mx-auto max-w-7xl glass rounded-2xl px-4 py-3 flex items-center justify-between gap-3 shadow-xl backdrop-blur-xl border border-border">
+      <div className="mx-auto max-w-7xl glass rounded-2xl px-4 py-2.5 flex items-center justify-between gap-3 shadow-xl backdrop-blur-xl border border-border">
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-2.5 group shrink-0">
           <div className="w-9 h-9 rounded-xl gradient-primary grid place-items-center shadow-lg shadow-orange-500/30">
             <Sparkles className="w-5 h-5 text-white" />
           </div>
           <div className="hidden sm:block leading-tight text-left">
-            <div className="font-extrabold text-[15px] text-foreground tracking-tight">AccessAI</div>
-            <div className="text-[10px] text-muted-foreground -mt-0.5">ClarityStream AI Studio</div>
+            <div className="font-black text-[16px] text-foreground tracking-tight">ClarityStream AI</div>
+            <div className="text-[10px] text-muted-foreground -mt-0.5 font-medium">Real-Time Speech Studio</div>
           </div>
         </Link>
 
@@ -107,7 +107,7 @@ export function TopNav() {
             )}
           </div>
 
-          {/* PROMINENT SUN/MOON THEME TOGGLE BUTTON MATCHING USER DIRECTIVE */}
+          {/* PROMINENT SUN/MOON THEME TOGGLE BUTTON */}
           <button
             aria-label="Toggle Light and Dark mode theme"
             onClick={toggleTheme}
@@ -126,6 +126,18 @@ export function TopNav() {
               </>
             )}
           </button>
+
+          {/* Integrated User Profile Avatar Chip */}
+          <div className="hidden sm:flex items-center gap-2.5 pl-2 border-l border-border/60">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 text-white font-extrabold text-xs flex items-center justify-center border border-white/20 shadow-inner">
+              R
+            </div>
+            <div className="text-left leading-tight hidden lg:block">
+              <span className="text-xs font-extrabold text-foreground block">Rohan</span>
+              <span className="text-[10px] text-muted-foreground font-medium block">Free Plan</span>
+            </div>
+            <ChevronDown className="w-3.5 h-3.5 text-muted-foreground hidden lg:block" />
+          </div>
         </div>
       </div>
     </header>

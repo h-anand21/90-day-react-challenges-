@@ -49,7 +49,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           This page didn't load
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-sm text-red-400 font-mono bg-red-950/50 p-3 rounded-lg border border-red-500/30 text-left overflow-auto max-h-40">
+          {error?.message || String(error)}
+        </p>
+        <p className="mt-2 text-xs text-muted-foreground">
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
