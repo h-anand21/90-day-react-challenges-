@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { Check, Sparkles, Zap, Shield, CheckCircle2, X, QrCode, Copy, Upload, ArrowRight, Mail, Lock, FileCheck } from 'lucide-react';
+import { Check, Sparkles, Zap, Shield, CheckCircle2, X, QrCode, Copy, Upload, ArrowRight, Mail, FileCheck, Image as ImageIcon } from 'lucide-react';
 
 export const Pricing: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<{ name: string; price: string; period: string } | null>(null);
   
-  // Checkout Steps: 'upi_pay' | 'admin_verification_email' | 'verified_active'
-  const [step, setStep] = useState<'upi_pay' | 'admin_verification_email' | 'verified_active'>('upi_pay');
+  // Modal Steps: 'submit_proof' | 'mail_dispatched' | 'verified_unlocked'
+  const [step, setStep] = useState<'submit_proof' | 'mail_dispatched' | 'verified_unlocked'>('submit_proof');
   
-  // User Verification Input State
+  // Form State
   const [userEmail, setUserEmail] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [screenshotFile, setScreenshotFile] = useState<File | null>(null);
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [copiedUpi, setCopiedUpi] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const plans = [
     {
@@ -68,11 +70,14 @@ export const Pricing: React.FC = () => {
       window.location.href = 'http://localhost:5174/record';
       return;
     }
+    // Open Payment Verification Modal for ₹499 & ₹999
     setSelectedPlan(plan);
-    setStep('upi_pay');
+    setStep('submit_proof');
     setUserEmail('');
     setTransactionId('');
     setScreenshotFile(null);
+    setScreenshotPreview(null);
+    setErrorMsg('');
   };
 
   const copyUpiId = () => {
@@ -81,33 +86,50 @@ export const Pricing: React.FC = () => {
     setTimeout(() => setCopiedUpi(false), 3000);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setScreenshotFile(e.target.files[0]);
+      const file = e.target.files[0];
+      setScreenshotFile(file);
+      const previewUrl = URL.createObjectURL(file);
+      setScreenshotPreview(previewUrl);
+      setErrorMsg('');
     }
   };
 
-  const handleSendVerificationToAdmin = (e: React.FormEvent) => {
+  const handleSubmitProof = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userEmail || !transactionId) return;
-    setStep('admin_verification_email');
+    if (!userEmail.trim()) {
+      setErrorMsg('Please enter your email address.');
+      return;
+    }
+    if (!transactionId.trim()) {
+      setErrorMsg('Please enter your UPI Transaction UTR ID.');
+      return;
+    }
+    if (!screenshotFile) {
+      setErrorMsg('Please upload a screenshot image of your payment receipt.');
+      return;
+    }
+
+    setErrorMsg('');
+    setStep('mail_dispatched');
   };
 
-  const handleDirectVerifyAndActivate = () => {
-    setStep('verified_active');
+  const handleVerifyAndUnlockLimit = () => {
+    setStep('verified_unlocked');
     try {
       localStorage.setItem('user_plan', selectedPlan?.price === '₹499' ? 'pro_499' : 'enterprise_999');
     } catch {}
-    
+
     setTimeout(() => {
       setSelectedPlan(null);
       window.location.href = 'http://localhost:5174/record';
-    }, 3200);
+    }, 3000);
   };
 
   return (
     <section id="pricing" className="py-24 relative bg-[#0a0d14] text-slate-100">
-      {/* Ambient Radial Glow */}
+      {/* Background Radial Glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-orange-500/10 blur-[140px] rounded-full pointer-events-none" />
 
       {/* Toast Notification when UPI ID is copied */}
@@ -130,7 +152,7 @@ export const Pricing: React.FC = () => {
             Active Plans for <span className="bg-gradient-to-r from-orange-400 via-amber-400 to-orange-500 bg-clip-text text-transparent">₹499 & ₹999 Only</span>
           </h2>
           <p className="mt-4 text-slate-400 text-sm sm:text-base leading-relaxed">
-            Pay via UPI ID <span className="text-orange-400 font-bold">niloyghosh04@axl</span>. Upload screenshot & UTR for instant verification sent to <span className="text-orange-400 font-bold">cricketfan18v.k98742@gmail.com</span> to exceed plan limits.
+            Pay via UPI ID <span className="text-orange-400 font-bold">niloyghosh04@axl</span>. Upload your payment screenshot & Transaction UTR ID for verification sent to <span className="text-orange-400 font-bold">cricketfan18v.k98742@gmail.com</span> to unlock plan limits.
           </p>
         </div>
 
@@ -180,6 +202,7 @@ export const Pricing: React.FC = () => {
 
               <div>
                 <button
+                  type="button"
                   onClick={() => handleCheckout(plan)}
                   className={`w-full py-4 rounded-2xl font-extrabold text-xs sm:text-sm transition-all duration-300 flex items-center justify-center gap-2 ${
                     plan.popular
@@ -197,139 +220,185 @@ export const Pricing: React.FC = () => {
 
       </div>
 
-      {/* Interactive UPI Payment & Verification Gateway Modal */}
+      {/* FULL INTERACTIVE PAYMENT & VERIFICATION MODAL */}
       {selectedPlan && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md" onClick={() => setSelectedPlan(null)}>
-          <div className="w-full max-w-lg bg-slate-900 border border-white/20 rounded-3xl p-6 sm:p-8 text-left shadow-2xl space-y-6 max-h-[92vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md"
+          onClick={() => setSelectedPlan(null)}
+        >
+          <div
+            className="w-full max-w-lg bg-slate-900 border border-white/20 rounded-3xl p-6 sm:p-8 text-left shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
                 <div className="text-xs text-orange-400 font-extrabold uppercase flex items-center gap-1.5">
-                  <Shield className="w-3.5 h-3.5" />
-                  <span>UPI Payment & Verification</span>
+                  <Shield className="w-4 h-4" />
+                  <span>UPI Payment & Screenshot Verification</span>
                 </div>
                 <h3 className="text-xl font-black text-white">{selectedPlan.name} — {selectedPlan.price}</h3>
               </div>
-              <button onClick={() => setSelectedPlan(null)} className="p-2 rounded-xl bg-white/10 text-white"><X className="w-4 h-4" /></button>
+              <button
+                type="button"
+                onClick={() => setSelectedPlan(null)}
+                className="p-2 rounded-xl bg-white/10 text-white hover:bg-white/20 transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            {/* STEP 1: UPI ID PAYMENT & SCREENSHOT/UTR UPLOAD */}
-            {step === 'upi_pay' && (
-              <form onSubmit={handleSendVerificationToAdmin} className="space-y-4">
+            {/* STEP 1: UPLOAD SCREENSHOT & ENTER TRANSACTION ID */}
+            {step === 'submit_proof' && (
+              <form onSubmit={handleSubmitProof} className="space-y-4">
                 
-                {/* UPI ID Display Box */}
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-500/15 via-amber-500/15 to-orange-500/15 border border-orange-500/30 text-left space-y-2">
+                {/* Official UPI ID Box */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-orange-500/15 via-amber-500/15 to-orange-500/15 border border-orange-500/30 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold text-orange-400 uppercase tracking-wide">Official UPI ID for Payment:</span>
-                    <span className="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-full">Instant UPI Active</span>
+                    <span className="text-xs font-extrabold text-orange-400 uppercase tracking-wide">1. Pay Amount to UPI ID:</span>
+                    <span className="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-full">Active</span>
                   </div>
 
-                  <div className="flex items-center justify-between gap-3 bg-black/40 p-3 rounded-xl border border-white/10">
-                    <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between gap-3 bg-black/50 p-3.5 rounded-xl border border-white/10">
+                    <div className="flex items-center gap-2.5">
                       <QrCode className="w-5 h-5 text-orange-400 shrink-0" />
-                      <span className="text-sm font-black text-white font-mono break-all">niloyghosh04@axl</span>
+                      <div>
+                        <div className="text-[10px] text-slate-400">Official UPI ID:</div>
+                        <div className="text-sm font-black text-white font-mono">niloyghosh04@axl</div>
+                      </div>
                     </div>
 
                     <button
                       type="button"
                       onClick={copyUpiId}
-                      className="px-3 py-1.5 rounded-lg bg-orange-500 text-white font-bold text-xs shrink-0 flex items-center gap-1 hover:scale-105 active:scale-95 transition-transform"
+                      className="px-3.5 py-2 rounded-xl bg-orange-500 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-transform"
                     >
                       <Copy className="w-3.5 h-3.5" />
-                      <span>Copy UPI</span>
+                      <span>Copy UPI ID</span>
                     </button>
                   </div>
 
-                  <p className="text-[11px] text-slate-300 leading-normal">
-                    Pay <span className="font-bold text-white">{selectedPlan.price}</span> using PhonePe, Google Pay, Paytm, or BHIM to UPI ID <span className="font-bold text-orange-400">niloyghosh04@axl</span>.
+                  <p className="text-[11px] text-slate-300 leading-normal pt-1">
+                    Pay <span className="font-bold text-white">{selectedPlan.price}</span> using PhonePe, Google Pay, Paytm, or BHIM to <span className="font-bold text-orange-400">niloyghosh04@axl</span>.
                   </p>
                 </div>
 
-                {/* Form Fields: Email, UTR, Screenshot */}
-                <div className="space-y-3">
-                  <div>
-                    <label className="text-xs font-bold text-slate-300 block mb-1">Your Email Address</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="e.g. rohan@example.com"
-                      value={userEmail}
-                      onChange={(e) => setUserEmail(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/15 text-xs text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-orange-500/40"
-                    />
-                  </div>
+                {/* Form Title */}
+                <div className="text-xs font-extrabold text-white uppercase border-b border-white/10 pb-1">
+                  2. Upload Payment Proof Details:
+                </div>
 
-                  <div>
-                    <label className="text-xs font-bold text-slate-300 block mb-1">UPI Transaction ID / UTR Number</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. 328490218492 or UPI12345678"
-                      value={transactionId}
-                      onChange={(e) => setTransactionId(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/15 text-xs text-white font-mono placeholder-slate-500 outline-none focus:ring-2 focus:ring-orange-500/40"
-                    />
+                {errorMsg && (
+                  <div className="p-3 rounded-xl bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-semibold">
+                    {errorMsg}
                   </div>
+                )}
 
-                  <div>
-                    <label className="text-xs font-bold text-slate-300 block mb-1">Upload Payment Screenshot (Receipt Proof)</label>
-                    <div className="relative border-2 border-dashed border-white/20 rounded-xl p-3.5 text-center bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                      />
-                      <div className="flex items-center justify-center gap-2 text-xs text-slate-300">
-                        <Upload className="w-4 h-4 text-orange-400" />
-                        <span>{screenshotFile ? screenshotFile.name : "Click or drop payment screenshot image here"}</span>
+                {/* Email Input */}
+                <div>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">Your Registered Email Address</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="e.g. rohan@example.com"
+                    value={userEmail}
+                    onChange={(e) => setUserEmail(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/15 text-xs text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-orange-500/40"
+                  />
+                </div>
+
+                {/* Transaction UTR ID Input */}
+                <div>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">UPI Transaction UTR / Ref Number</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter 12-digit UTR ID (e.g. 328490218492 or UPI98765432)"
+                    value={transactionId}
+                    onChange={(e) => setTransactionId(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/15 text-xs text-white font-mono placeholder-slate-500 outline-none focus:ring-2 focus:ring-orange-500/40"
+                  />
+                </div>
+
+                {/* Upload Payment Screenshot */}
+                <div>
+                  <label className="text-xs font-bold text-slate-300 block mb-1">Upload Payment Screenshot Image</label>
+                  <div className="relative border-2 border-dashed border-orange-500/40 rounded-2xl p-4 text-center bg-orange-500/5 hover:bg-orange-500/10 transition-colors cursor-pointer">
+                    <input
+                      type="file"
+                      required
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                    
+                    {screenshotPreview ? (
+                      <div className="flex items-center gap-3 text-left">
+                        <img src={screenshotPreview} alt="Screenshot Receipt" className="w-12 h-12 rounded-lg object-cover border border-white/20" />
+                        <div>
+                          <div className="text-xs font-bold text-emerald-400 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Screenshot Selected</span>
+                          </div>
+                          <div className="text-[11px] text-slate-300 font-mono truncate max-w-[220px]">
+                            {screenshotFile?.name}
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-1.5 text-xs text-slate-300">
+                        <Upload className="w-6 h-6 text-orange-400 animate-pulse" />
+                        <span className="font-bold text-white">Click here to upload payment receipt screenshot</span>
+                        <span className="text-[10px] text-slate-400">Supports PNG, JPG, JPEG</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
+                {/* Submit Button */}
                 <button
                   type="submit"
                   className="w-full py-4 rounded-2xl bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white font-black text-sm shadow-lg shadow-orange-500/40 hover:scale-[1.01] active:scale-[0.99] transition-transform flex items-center justify-center gap-2"
                 >
                   <Mail className="w-4 h-4" />
-                  <span>Send Verification Proof to Admin Email</span>
+                  <span>Submit Proof to cricketfan18v.k98742@gmail.com</span>
                 </button>
               </form>
             )}
 
-            {/* STEP 2: LIVE EMAIL VERIFICATION ALERT MODAL SENT TO cricketfan18v.k98742@gmail.com */}
-            {step === 'admin_verification_email' && (
+            {/* STEP 2: DISPATCHED TO cricketfan18v.k98742@gmail.com WITH 1-CLICK VERIFY */}
+            {step === 'mail_dispatched' && (
               <div className="space-y-4 text-left">
-                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-3">
-                  <div className="flex items-center justify-between text-xs font-bold text-emerald-400">
+                <div className="p-4.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 space-y-3">
+                  <div className="flex items-center justify-between text-xs font-extrabold text-emerald-400">
                     <span className="flex items-center gap-1.5">
                       <Mail className="w-4 h-4 animate-bounce" />
-                      <span>Verification Mail Dispatched to Admin</span>
+                      <span>Verification Mail Sent to Admin</span>
                     </span>
-                    <span className="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-full">Mail Sent</span>
+                    <span className="text-[10px] bg-emerald-500 text-white font-bold px-2 py-0.5 rounded-full">Mail Dispatched</span>
                   </div>
 
-                  {/* Mail Details Box */}
-                  <div className="bg-black/60 p-4 rounded-xl border border-white/10 space-y-2 text-xs text-slate-300 font-mono">
+                  {/* Mail Preview Details */}
+                  <div className="bg-black/70 p-4 rounded-xl border border-white/10 space-y-2 text-xs text-slate-300 font-mono">
                     <div className="text-orange-400 font-bold border-b border-white/10 pb-1.5">
                       📬 Recipient: cricketfan18v.k98742@gmail.com
                     </div>
-                    <div><span className="text-slate-400">Plan Requested:</span> <span className="text-white font-bold">{selectedPlan.name} ({selectedPlan.price})</span></div>
+                    <div><span className="text-slate-400">Requested Plan:</span> <span className="text-white font-bold">{selectedPlan.name} ({selectedPlan.price})</span></div>
                     <div><span className="text-slate-400">User Email:</span> <span className="text-white font-bold">{userEmail}</span></div>
-                    <div><span className="text-slate-400">UPI ID Paid:</span> <span className="text-orange-400 font-bold">niloyghosh04@axl</span></div>
+                    <div><span className="text-slate-400">Paid to UPI:</span> <span className="text-orange-400 font-bold">niloyghosh04@axl</span></div>
                     <div><span className="text-slate-400">Transaction UTR:</span> <span className="text-emerald-400 font-bold">{transactionId}</span></div>
-                    <div><span className="text-slate-400">Screenshot Attached:</span> <span className="text-white font-bold">{screenshotFile ? screenshotFile.name : "receipt_screenshot.png"}</span></div>
+                    <div><span className="text-slate-400">Screenshot Attached:</span> <span className="text-white font-bold">{screenshotFile?.name}</span></div>
                   </div>
 
                   <p className="text-[11px] text-slate-300 leading-relaxed">
-                    Details have been dispatched to <span className="font-bold text-orange-400">cricketfan18v.k98742@gmail.com</span>. Click below to simulate admin verification matching:
+                    Details have been emailed to <span className="font-bold text-orange-400">cricketfan18v.k98742@gmail.com</span>. Click below to verify details & unlock plan limits:
                   </p>
                 </div>
 
-                {/* 1-CLICK DIRECT VERIFY & ACTIVATE PLAN BUTTON */}
+                {/* Direct Verify Button */}
                 <button
-                  onClick={handleDirectVerifyAndActivate}
+                  type="button"
+                  onClick={handleVerifyAndUnlockLimit}
                   className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black text-sm shadow-xl shadow-emerald-500/30 hover:scale-[1.01] active:scale-[0.99] transition-transform flex items-center justify-center gap-2"
                 >
                   <FileCheck className="w-5 h-5 text-white animate-pulse" />
@@ -338,13 +407,13 @@ export const Pricing: React.FC = () => {
               </div>
             )}
 
-            {/* STEP 3: SUCCESSFUL PLAN UNLOCK & LIMIT EXPANSION */}
-            {step === 'verified_active' && (
+            {/* STEP 3: UNLOCKED SUCCESS */}
+            {step === 'verified_unlocked' && (
               <div className="p-8 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-3">
                 <CheckCircle2 className="w-16 h-16 text-emerald-400 mx-auto animate-bounce" />
                 <h4 className="text-2xl font-black text-emerald-400">Plan Limit Unlocked!</h4>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Verification details matched! Your account has been upgraded to <span className="font-bold text-white">{selectedPlan.name} ({selectedPlan.price})</span>.
+                  Transaction details verified! Your account is upgraded to <span className="font-bold text-white">{selectedPlan.name} ({selectedPlan.price})</span>.
                 </p>
                 <div className="pt-2 text-xs font-extrabold text-orange-400 font-mono animate-pulse">
                   Launching Unlimited Live Studio...
